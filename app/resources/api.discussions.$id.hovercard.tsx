@@ -3,7 +3,7 @@ import { useFetcher } from "react-router";
 import { handleError, handleSuccess } from "~/.server/response";
 import { getDiscussionWithReply } from "~/.server/data/discussion";
 
-import type { Route } from "./+types/discussions.$id.hovercard";
+import type { Route } from "./+types/api.discussions.$id.hovercard";
 
 export const loader = async ({ params }: Route.LoaderArgs) => {
   try {

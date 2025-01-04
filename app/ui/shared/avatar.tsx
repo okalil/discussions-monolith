@@ -44,6 +44,6 @@ function parseSource(src: string) {
   try {
     return new URL(src).toString();
   } catch {
-    return `/api/uploads/${src}`;
+    return `/uploads/${src}`;
   }
 }

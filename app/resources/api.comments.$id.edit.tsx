@@ -6,7 +6,7 @@ import { updateComment } from "~/.server/data/comment";
 import { handleError, handleSuccess } from "~/.server/response";
 import { updateCommentValidator } from "~/.server/validators/comment";
 
-import type { Route } from "./+types/discussions.$id.vote";
+import type { Route } from "./+types/api.discussions.$id.vote";
 
 export const action = async ({ request, params }: Route.ActionArgs) => {
   try {

@@ -8,7 +8,7 @@ import { VoteButton } from "~/ui/shared/vote-button";
 import { getDiscussion } from "~/.server/data/discussion";
 import { CommentForm } from "~/ui/discussion/comment-form";
 import { CommentsList } from "~/ui/discussion/comments-list";
-import { useVoteDiscussionFetcher } from "~/api/discussions.$id.vote";
+import { useVoteDiscussionFetcher } from "~/resources/api.discussions.$id.vote";
 
 import type { Route } from "./+types/discussion.route";
 

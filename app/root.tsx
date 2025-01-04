@@ -12,11 +12,11 @@ import {
   useLoaderData,
 } from "react-router";
 
-import type { Route } from "./+types/root";
+import stylesheet from "~/root.css?url";
+import { toasts } from "~/.server/toasts";
+import { NavigationProgress } from "~/ui/shared/navigation-progress";
 
-import stylesheet from "./root.css?url";
-import { toasts } from "./.server/toasts";
-import { NavigationProgress } from "./ui/shared/navigation-progress";
+import type { Route } from "./+types/root";
 
 export const meta: Route.MetaFunction = () => [{ title: "Discussions" }];
 
@@ -50,7 +50,6 @@ export default function App() {
       </head>
       <body className="h-full">
         <Outlet />
-        <Toaster />
         <GlobalToasts />
         <NavigationProgress />
         <ScrollRestoration />
@@ -76,7 +75,7 @@ function GlobalToasts() {
       messages.forEach((message) => toast.error(message, { richColors: true })),
     [messages]
   );
-  return null;
+  return <Toaster />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

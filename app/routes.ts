@@ -2,13 +2,13 @@ import { flatRoutes } from "@react-router/fs-routes";
 import {
   index,
   layout,
-  prefix,
   route,
   type RouteConfig,
 } from "@react-router/dev/routes";
 
+const resourcesRoutes = await flatRoutes({ rootDirectory: "resources" });
 const routes = [
-  ...prefix("api", await flatRoutes({ rootDirectory: "api" })),
+  ...resourcesRoutes,
 
   route("login", "ui/auth/login.route.tsx"),
   route("register", "ui/auth/register.route.tsx"),

@@ -6,7 +6,7 @@ import { createComment } from "~/.server/data/comment";
 import { handleError, handleSuccess } from "~/.server/response";
 import { createCommentValidator } from "~/.server/validators/comment";
 
-import type { Route } from "./+types/comments.new";
+import type { Route } from "./+types/api.comments.new";
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const form = await bodyParser.parse(request);

@@ -3,9 +3,9 @@ import { use, useState, useEffect } from "react";
 
 import type { CommentsDto } from "~/.server/data/comment";
 
-import { useVoteCommentFetcher } from "~/api/comments.$id.vote";
-import { useEditCommentFetcher } from "~/api/comments.$id.edit";
-import { useDeleteCommentFetcher } from "~/api/comments.$id.delete";
+import { useVoteCommentFetcher } from "~/resources/api.comments.$id.vote";
+import { useEditCommentFetcher } from "~/resources/api.comments.$id.edit";
+import { useDeleteCommentFetcher } from "~/resources/api.comments.$id.delete";
 
 import { cn } from "../shared/utils/cn";
 import { Avatar } from "../shared/avatar";

@@ -1,4 +1,4 @@
-import { useCreateCommentFetcher } from "~/api/comments.new";
+import { useCreateCommentFetcher } from "~/resources/api.comments.new";
 
 import { Button } from "../shared/button";
 import { Textarea } from "../shared/textarea";

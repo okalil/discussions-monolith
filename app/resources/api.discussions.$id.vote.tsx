@@ -6,7 +6,7 @@ import { handleError, handleSuccess } from "~/.server/response";
 import { voteDiscussionValidator } from "~/.server/validators/discussion";
 import { unvoteDiscussion, voteDiscussion } from "~/.server/data/discussion";
 
-import type { Route } from "./+types/discussions.$id.vote";
+import type { Route } from "./+types/api.discussions.$id.vote";
 
 export const action = async ({ request, params }: Route.ActionArgs) => {
   try {

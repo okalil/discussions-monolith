@@ -1,16 +1,29 @@
-# Welcome to React Router!
+# Discussions Monolith
 
-A modern, production-ready template for building full-stack React applications using React Router.
+This project is a discussion web application (based on Github Discussions), designed with a clear architecture and understandable code organization.
+The purpose is to provide a reference implementation for monolithic applications with React and React Router.
 
-## Features
+## Code Organization
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+The application code is organized in three main folders:
+
+1. `.server`: This contains "back-end" specific code that doesn't run on the client, like database queries, validators and other services.
+2. `resources`: This contains [resources routes](https://reactrouter.com/how-to/resource-routes), following the [flat routes convention](https://reactrouter.com/how-to/file-route-conventions) to automatically map file name to url
+3. `ui`: This contains all application UI components organized by feature.
+
+### Why not implement services code directly in router loaders/actions?
+
+Some essential services like auth, database, file storage, mailing and validation are abstracted away from the main application code. This has two main benefits:
+
+1. A service can be reused across various routes;
+2. We can easily change the service implementation without changing code in various routes
+
+### Why not use flat routes convention for UI routes too?
+
+The UI routes are implemented with manual configuration for two reasons:
+
+1. Sub components colocation: file system based routing doesn't provide much flexibility for colocating sub components next to the route where it is used;
+2. Confusing file name patterns: UI routes may use a lot of special patterns, like optional segments, pathless layouts, layoutless paths etc, translating this to the file system makes the filename complex.
 
 ## Getting Started
 
@@ -88,10 +101,6 @@ Make sure to deploy the output of `npm run build`
 │   ├── client/    # Static assets
 │   └── server/    # Server-side code
 ```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
 
 ---
 

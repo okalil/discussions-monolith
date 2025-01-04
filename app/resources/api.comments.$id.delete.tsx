@@ -4,7 +4,7 @@ import { auth } from "~/.server/auth";
 import { deleteComment } from "~/.server/data/comment";
 import { handleError, handleSuccess } from "~/.server/response";
 
-import type { Route } from "./+types/comments.$id.delete";
+import type { Route } from "./+types/api.comments.$id.delete";
 
 export const action = async ({ request, params }: Route.ActionArgs) => {
   try {

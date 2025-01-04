@@ -4,8 +4,8 @@ import * as HoverCard from "@radix-ui/react-hover-card";
 
 import type { DiscussionsDto } from "~/.server/data/discussion";
 
-import { useVoteDiscussionFetcher } from "~/api/discussions.$id.vote";
-import { useHoverDiscussionFetcher } from "~/api/discussions.$id.hovercard";
+import { useVoteDiscussionFetcher } from "~/resources/api.discussions.$id.vote";
+import { useHoverDiscussionFetcher } from "~/resources/api.discussions.$id.hovercard";
 
 import { cn } from "../shared/utils/cn";
 import { Avatar } from "../shared/avatar";
