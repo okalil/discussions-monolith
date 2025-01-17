@@ -13,8 +13,8 @@ import { Input } from "../shared/input";
 
 export const meta: Route.MetaFunction = () => [{ title: "Top Discussions" }];
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const user = await auth.getUser(request);
+export const loader = async ({ request, context }: Route.LoaderArgs) => {
+  const user = await auth.getUser(context.session);
   const {
     q,
     page = 1,

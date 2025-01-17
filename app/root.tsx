@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Toaster, toast } from "sonner";
 import {
-  data,
+  createCookieSessionStorage,
   isRouteErrorResponse,
   Links,
   Meta,
@@ -13,10 +13,36 @@ import {
 } from "react-router";
 
 import stylesheet from "~/root.css?url";
-import { toasts } from "~/.server/toasts";
 import { NavigationProgress } from "~/ui/shared/navigation-progress";
 
 import type { Route } from "./+types/root";
+
+import { env } from "./.server/env";
+
+const sessionStorage = createCookieSessionStorage({
+  cookie: {
+    name: "__session",
+    httpOnly: true,
+    secure: env.NODE_ENV === "production",
+    secrets: [env.SESSION_SECRET],
+    sameSite: "lax",
+    path: "/",
+  },
+});
+
+export const middleware = [
+  async function session({ request, context, next }: Route.MiddlewareArgs) {
+    context.session = await sessionStorage.getSession(
+      request.headers.get("Cookie")
+    );
+    const response = await next();
+    response.headers.append(
+      "Set-Cookie",
+      await sessionStorage.commitSession(context.session)
+    );
+    return response;
+  },
+];
 
 export const meta: Route.MetaFunction = () => [{ title: "Discussions" }];
 
@@ -34,9 +60,9 @@ export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const { message, cookie } = await toasts.pop(request);
-  return data({ message }, { headers: [["set-cookie", cookie]] });
+export const loader = async ({ context }: Route.LoaderArgs) => {
+  const message = await context.session.get("toast");
+  return { message };
 };
 
 export default function App() {

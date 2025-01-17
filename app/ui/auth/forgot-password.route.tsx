@@ -3,7 +3,6 @@ import { Form, Link, redirect, useNavigation } from "react-router";
 import { env } from "~/.server/env";
 import { auth } from "~/.server/auth";
 import { mailer } from "~/.server/mailer";
-import { toasts } from "~/.server/toasts";
 import { Button } from "~/ui/shared/button";
 import { handleError } from "~/.server/response";
 import { bodyParser } from "~/.server/body-parser";
@@ -50,7 +49,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
   );
 }
 
-export const action = async ({ request }: Route.ActionArgs) => {
+export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   try {
     const { email } = await forgetPasswordValidator.validate(body);
@@ -66,7 +65,8 @@ export const action = async ({ request }: Route.ActionArgs) => {
         />
       ),
     });
-    const cookie = await toasts.put(
+    const cookie = await context.session.flash(
+      "toast",
       "An email was sent to reset your password, check your inbox!"
     );
     throw redirect("/login", { headers: [["set-cookie", cookie]] });

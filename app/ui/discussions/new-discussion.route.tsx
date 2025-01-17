@@ -12,10 +12,10 @@ import type { Route } from "./+types/new-discussion.route";
 import { Input } from "../shared/input";
 import { Textarea } from "../shared/textarea";
 
-export const action = async ({ request }: Route.ActionArgs) => {
+export const action = async ({ request, context }: Route.ActionArgs) => {
   const form = await bodyParser.parse(request);
   try {
-    const user = await auth.getUserOrFail(request);
+    const user = await auth.getUserOrFail(context.session);
     const { title, body } = await createDiscussionValidator.validate(form);
     const discussion = await createDiscussion(title, body, user.id);
     throw redirect(`/discussions/${discussion.id}`);

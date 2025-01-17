@@ -8,9 +8,13 @@ import { voteCommentValidator } from "~/.server/validators/comment";
 
 import type { Route } from "./+types/api.discussions.$id.vote";
 
-export const action = async ({ request, params }: Route.ActionArgs) => {
+export const action = async ({
+  request,
+  context,
+  params,
+}: Route.ActionArgs) => {
   try {
-    const user = await auth.getUserOrFail(request);
+    const user = await auth.getUserOrFail(context.session);
     const body = await bodyParser.parse(request);
     const { voted } = await voteCommentValidator.validate(body);
 

@@ -1,8 +1,9 @@
+import type { Session } from "react-router";
+
 import bcrypt from "bcrypt";
 import crypto from "node:crypto";
-import { createCookieSessionStorage, redirect } from "react-router";
+import { redirect } from "react-router";
 
-import { env } from "./env";
 import {
   createUser,
   createVerificationToken,
@@ -14,52 +15,26 @@ import {
   updatePassword,
 } from "./data/user";
 
-const authSessionStorage = createCookieSessionStorage({
-  cookie: {
-    name: "__session",
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    secrets: [env.SESSION_SECRET],
-    sameSite: "lax",
-    path: "/",
-  },
-});
-
 class Auth {
-  async #getSession(request?: Request) {
-    const session = await authSessionStorage.getSession(
-      request?.headers.get("Cookie")
-    );
-    return session;
-  }
-
-  async getUserId(request: Request) {
-    const session = await this.#getSession(request);
+  async getUserId(session: Session) {
     return session.get("userId");
   }
 
-  async getUser(request: Request) {
-    const userId = await this.getUserId(request);
+  async getUser(session: Session) {
+    const userId = await this.getUserId(session);
     if (!userId) return null;
     const user = await getUser(userId);
     return user;
   }
 
-  async getUserOrFail(request: Request) {
-    const user = await this.getUser(request);
-    const url = new URL(request.url);
+  async getUserOrFail(session: Session) {
+    const user = await this.getUser(session);
+    // const url = new URL(request.url);
     const searchParams =
-      url.pathname &&
-      new URLSearchParams([["redirect", url.pathname + url.search]]);
+      // url.pathname &&
+      new URLSearchParams(); //[["redirect", url.pathname + url.search]]);
     if (!user) throw redirect(`/login?${searchParams}`);
     return user;
-  }
-
-  async login(userId: number) {
-    const session = await this.#getSession();
-    session.set("userId", userId);
-    const cookie = await authSessionStorage.commitSession(session);
-    return cookie;
   }
 
   async signIn(email: string, password: string) {
@@ -72,22 +47,13 @@ class Auth {
     if (!isValid) {
       throw new Error("Invalid email or password");
     }
-
-    const cookie = await this.login(account.userId);
-    return cookie;
+    return account.userId;
   }
 
   async signUp(name: string, email: string, password: string) {
     password = await bcrypt.hash(password, 10);
     const user = await createUser(name, email, password);
-    const cookie = await this.login(user.id);
-    return cookie;
-  }
-
-  async logout() {
-    const session = await this.#getSession();
-    const cookie = await authSessionStorage.destroySession(session);
-    return cookie;
+    return user.id;
   }
 
   async forgetPassword(email: string) {
@@ -121,6 +87,10 @@ class Auth {
 
     await updatePassword(verificationToken.identifier, password);
     await deleteVerificationToken(verificationToken.token);
+  }
+
+  logout(session: Session) {
+    session.unset("userId");
   }
 }
 

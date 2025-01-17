@@ -6,9 +6,9 @@ import { handleError, handleSuccess } from "~/.server/response";
 
 import type { Route } from "./+types/api.comments.$id.delete";
 
-export const action = async ({ request, params }: Route.ActionArgs) => {
+export const action = async ({ context, params }: Route.ActionArgs) => {
   try {
-    const user = await auth.getUserOrFail(request);
+    const user = await auth.getUserOrFail(context.session);
     await deleteComment(Number(params.id), user.id);
     return handleSuccess();
   } catch (error) {

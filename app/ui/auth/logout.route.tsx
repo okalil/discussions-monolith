@@ -2,7 +2,9 @@ import { redirect } from "react-router";
 
 import { auth } from "~/.server/auth";
 
-export const action = async () => {
-  const cookie = await auth.logout();
-  throw redirect("/login", { headers: [["set-cookie", cookie]] });
+import type { Route } from "./+types/logout.route";
+
+export const action = async ({ context }: Route.ActionArgs) => {
+  auth.logout(context.session);
+  throw redirect("/login");
 };

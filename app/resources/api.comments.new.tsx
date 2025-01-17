@@ -8,10 +8,10 @@ import { createCommentValidator } from "~/.server/validators/comment";
 
 import type { Route } from "./+types/api.comments.new";
 
-export const action = async ({ request }: Route.ActionArgs) => {
+export const action = async ({ request, context }: Route.ActionArgs) => {
   const form = await bodyParser.parse(request);
   try {
-    const user = await auth.getUserOrFail(request);
+    const user = await auth.getUserOrFail(context.session);
     const { body, discussionId } = await createCommentValidator.validate(form);
     const { id } = await createComment(discussionId, body, user.id);
     return handleSuccess({ id });

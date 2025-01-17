@@ -9,8 +9,8 @@ import { Avatar } from "~/ui/shared/avatar";
 
 import type { Route } from "./+types/main.route";
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const user = await auth.getUser(request);
+export const loader = async ({ context }: Route.LoaderArgs) => {
+  const user = await auth.getUser(context.session);
   return { user };
 };
 

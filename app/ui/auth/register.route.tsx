@@ -85,12 +85,13 @@ export default function Component({ actionData }: Route.ComponentProps) {
   );
 }
 
-export const action = async ({ request }: Route.ActionArgs) => {
+export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   try {
     const { name, email, password } = await signUpValidator.validate(body);
-    const cookie = await auth.signUp(name, email, password);
-    throw redirect("/", { headers: [["set-cookie", cookie]] });
+    const userId = await auth.signUp(name, email, password);
+    context.session.set("userId", userId);
+    throw redirect("/");
   } catch (error) {
     delete body.password;
     delete body.password_confirmation;

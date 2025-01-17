@@ -12,8 +12,8 @@ import { useVoteDiscussionFetcher } from "~/resources/api.discussions.$id.vote";
 
 import type { Route } from "./+types/discussion.route";
 
-export const loader = async ({ request, params }: Route.LoaderArgs) => {
-  const userId = await auth.getUserId(request);
+export const loader = async ({ context, params }: Route.LoaderArgs) => {
+  const userId = await auth.getUserId(context.session);
 
   const comments = getComments(Number(params.id), userId);
   const discussion = await getDiscussion(Number(params.id), userId);
@@ -114,8 +114,4 @@ export default function Component({
       )}
     </main>
   );
-}
-
-export function ErrorBoundary() {
-  return <div>shit</div>;
 }

@@ -1,7 +1,6 @@
 import { Form, Link, redirect, useNavigation } from "react-router";
 
 import { auth } from "~/.server/auth";
-import { toasts } from "~/.server/toasts";
 import { Button } from "~/ui/shared/button";
 import { handleError } from "~/.server/response";
 import { bodyParser } from "~/.server/body-parser";
@@ -79,7 +78,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
   );
 }
 
-export const action = async ({ request }: Route.ActionArgs) => {
+export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   try {
     const {
@@ -87,14 +86,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
       password,
       redirect: redirectUrl = "/",
     } = await signInValidator.validate(body);
-    const authCookie = await auth.signIn(email, password);
-    const toastCookie = await toasts.put("Signed in successfully!");
-    throw redirect(redirectUrl, {
-      headers: [
-        ["set-cookie", authCookie],
-        ["set-cookie", toastCookie],
-      ],
-    });
+    const userId = await auth.signIn(email, password);
+    context.session.set("userId", userId);
+    context.session.flash("toast", "Signed in successfully!");
+    throw redirect(redirectUrl);
   } catch (error) {
     delete body.password;
     return handleError(error, { values: body });
