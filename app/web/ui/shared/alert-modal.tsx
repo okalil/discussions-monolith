@@ -1,6 +1,6 @@
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 
-import { cn } from "~/ui/shared/utils/cn";
+import { cn } from "~/web/ui/shared/utils/cn";
 
 import { Button } from "./button";
 

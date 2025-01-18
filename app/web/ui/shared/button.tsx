@@ -1,7 +1,7 @@
 import React from "react";
 import { CgSpinner } from "react-icons/cg";
 
-import { cn } from "~/ui/shared/utils/cn";
+import { cn } from "~/web/ui/shared/utils/cn";
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "default" | "danger";
   loading?: boolean;

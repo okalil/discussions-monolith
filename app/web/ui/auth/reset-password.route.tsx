@@ -7,10 +7,9 @@ import {
   useSearchParams,
 } from "react-router";
 
-import { auth } from "~/.server/auth";
-import { Button } from "~/ui/shared/button";
+import { bodyParser } from "~/web/body-parser";
+import { Button } from "~/web/ui/shared/button";
 import { handleError } from "~/.server/response";
-import { bodyParser } from "~/.server/body-parser";
 
 import type { Route } from "./+types/reset-password.route";
 
@@ -78,13 +77,13 @@ export default function Component({ actionData }: Route.ComponentProps) {
   );
 }
 
-export const action = async ({ request }: Route.ActionArgs) => {
+export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   try {
     const { email, password, token } = await resetPasswordValidator.validate(
       body
     );
-    await auth.resetPassword(email, password, token);
+    await context.auth.resetPassword(email, password, token);
 
     throw redirect("/login");
   } catch (error) {

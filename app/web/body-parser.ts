@@ -6,6 +6,7 @@ class BodyParser {
   }
 
   parseForm(form: FormData | URLSearchParams) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const object: Record<string, any> = {};
     form.forEach((value, key) => {
       const parts = key.split(/[.[\]]+/).filter(Boolean);

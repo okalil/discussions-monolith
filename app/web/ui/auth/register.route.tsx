@@ -1,10 +1,9 @@
 import vine from "@vinejs/vine";
 import { Form, Link, redirect, useNavigation } from "react-router";
 
-import { auth } from "~/.server/auth";
-import { Button } from "~/ui/shared/button";
+import { bodyParser } from "~/web/body-parser";
+import { Button } from "~/web/ui/shared/button";
 import { handleError } from "~/.server/response";
-import { bodyParser } from "~/.server/body-parser";
 
 import type { Route } from "./+types/register.route";
 
@@ -89,8 +88,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   try {
     const { name, email, password } = await registerValidator.validate(body);
-    const userId = await auth.signUp(name, email, password);
-    context.session.set("userId", userId);
+    await context.auth.signUp(name, email, password);
     throw redirect("/");
   } catch (error) {
     delete body.password;

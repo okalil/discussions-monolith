@@ -1,7 +1,8 @@
+import type { Session } from "react-router";
+
 import { useEffect } from "react";
 import { Toaster, toast } from "sonner";
 import {
-  createCookieSessionStorage,
   isRouteErrorResponse,
   Links,
   Meta,
@@ -13,36 +14,15 @@ import {
 } from "react-router";
 
 import stylesheet from "~/root.css?url";
-import { NavigationProgress } from "~/ui/shared/navigation-progress";
+import { NavigationProgress } from "~/web/ui/shared/navigation-progress";
 
+import type { Auth } from "./web/auth";
 import type { Route } from "./+types/root";
 
-import { env } from "./.server/env";
+import { auth } from "./web/auth";
+import { session } from "./web/session";
 
-const sessionStorage = createCookieSessionStorage({
-  cookie: {
-    name: "__session",
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    secrets: [env.SESSION_SECRET],
-    sameSite: "lax",
-    path: "/",
-  },
-});
-
-export const middleware = [
-  async function session({ request, context, next }: Route.MiddlewareArgs) {
-    context.session = await sessionStorage.getSession(
-      request.headers.get("Cookie")
-    );
-    const response = await next();
-    response.headers.append(
-      "Set-Cookie",
-      await sessionStorage.commitSession(context.session)
-    );
-    return response;
-  },
-];
+export const middleware = [session, auth];
 
 export const meta: Route.MetaFunction = () => [{ title: "Discussions" }];
 
@@ -131,4 +111,11 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       )}
     </main>
   );
+}
+
+declare module "react-router" {
+  export interface AppLoadContext {
+    session: Session;
+    auth: Auth;
+  }
 }

@@ -4,50 +4,57 @@ import bcrypt from "bcrypt";
 import crypto from "node:crypto";
 import { redirect } from "react-router";
 
+import type { Route } from "../+types/root";
+import type { UserDto } from "../.server/data/user";
+
 import {
   createUser,
   createVerificationToken,
   deleteVerificationToken,
-  getCredentialAccount,
   getUser,
+  getUserIdByCredentials,
   getUserByEmail,
   getVerificationToken,
   updatePassword,
-} from "./data/user";
+} from "../.server/data/user";
 
-class Auth {
-  async getUserId(session: Session) {
-    return session.get("userId");
+export class Auth {
+  private request: Request;
+  private session: Session;
+  private user?: UserDto;
+
+  constructor(request: Request, session: Session) {
+    this.request = request;
+    this.session = session;
   }
 
-  async getUser(session: Session) {
-    const userId = await this.getUserId(session);
+  getUserId() {
+    return this.session.get("userId");
+  }
+
+  async getUser() {
+    if (this.user) return this.user;
+    const userId = this.getUserId();
     if (!userId) return null;
     const user = await getUser(userId);
     return user;
   }
 
-  async getUserOrFail(session: Session) {
-    const user = await this.getUser(session);
-    // const url = new URL(request.url);
-    const searchParams =
-      // url.pathname &&
-      new URLSearchParams(); //[["redirect", url.pathname + url.search]]);
-    if (!user) throw redirect(`/login?${searchParams}`);
+  async getUserOrFail() {
+    const user = await this.getUser();
+    if (!user) {
+      const url = new URL(this.request.url);
+      const searchParams =
+        url.pathname &&
+        new URLSearchParams([["redirect", url.pathname + url.search]]);
+      throw redirect(`/login?${searchParams}`);
+    }
     return user;
   }
 
   async signIn(email: string, password: string) {
-    const account = await getCredentialAccount(email);
-    if (!account || !account.password) {
-      throw new Error("Invalid email or password");
-    }
-
-    const isValid = await bcrypt.compare(password, account.password);
-    if (!isValid) {
-      throw new Error("Invalid email or password");
-    }
-    return account.userId;
+    const userId = await getUserIdByCredentials(email, password);
+    this.session.set("userId", userId);
   }
 
   async signUp(name: string, email: string, password: string) {
@@ -89,9 +96,11 @@ class Auth {
     await deleteVerificationToken(verificationToken.token);
   }
 
-  logout(session: Session) {
-    session.unset("userId");
+  logout() {
+    this.session.unset("userId");
   }
 }
 
-export const auth = new Auth();
+export const auth = async ({ request, context }: Route.MiddlewareArgs) => {
+  context.auth = new Auth(request, context.session);
+};

@@ -2,15 +2,14 @@ import type { ShouldRevalidateFunction } from "react-router";
 
 import { Link, Outlet, Form } from "react-router";
 
-import { auth } from "~/.server/auth";
-import { cn } from "~/ui/shared/utils/cn";
-import { Button } from "~/ui/shared/button";
-import { Avatar } from "~/ui/shared/avatar";
+import { cn } from "~/web/ui/shared/utils/cn";
+import { Button } from "~/web/ui/shared/button";
+import { Avatar } from "~/web/ui/shared/avatar";
 
 import type { Route } from "./+types/main.route";
 
 export const loader = async ({ context }: Route.LoaderArgs) => {
-  const user = await auth.getUser(context.session);
+  const user = await context.auth.getUser();
   return { user };
 };
 

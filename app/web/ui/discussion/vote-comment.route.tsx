@@ -1,23 +1,19 @@
 import vine from "@vinejs/vine";
 import { useFetcher } from "react-router";
 
-import { auth } from "~/.server/auth";
-import { bodyParser } from "~/.server/body-parser";
+import { bodyParser } from "~/web/body-parser";
 import { handleError, handleSuccess } from "~/.server/response";
-import { unvoteDiscussion, voteDiscussion } from "~/.server/data/discussion";
+import { unvoteComment, voteComment } from "~/.server/data/comment";
 
-import type { Route } from "./+types/vote-discussion.route";
+import type { Route } from "./+types/vote-comment.route";
 
 import { VoteButton } from "../shared/vote-button";
 
-interface VoteDiscussionProps extends React.ComponentProps<typeof VoteButton> {
-  discussionId: number;
+interface VoteCommentProps extends React.ComponentProps<typeof VoteButton> {
+  commentId: number;
 }
 
-export function VoteDiscussion({
-  discussionId,
-  ...props
-}: VoteDiscussionProps) {
+export function VoteComment({ commentId, ...props }: VoteCommentProps) {
   const fetcher = useFetcher();
 
   const optimisticVoted =
@@ -38,7 +34,7 @@ export function VoteDiscussion({
       onClick={() =>
         fetcher.submit(
           { voted: !voted },
-          { action: `/discussions/${discussionId}/vote`, method: "POST" }
+          { action: `comments/${commentId}/vote`, method: "POST" }
         )
       }
       active={voted}
@@ -53,14 +49,14 @@ export const action = async ({
   params,
 }: Route.ActionArgs) => {
   try {
-    const user = await auth.getUserOrFail(context.session);
+    const user = await context.auth.getUserOrFail();
     const body = await bodyParser.parse(request);
-    const { voted } = await voteDiscussionValidator.validate(body);
+    const { voted } = await voteCommentValidator.validate(body);
 
     if (voted) {
-      await voteDiscussion(Number(params.id), user.id);
+      await voteComment(Number(params.id), user.id);
     } else {
-      await unvoteDiscussion(Number(params.id), user.id);
+      await unvoteComment(Number(params.id), user.id);
     }
     return handleSuccess();
   } catch (error) {
@@ -68,7 +64,7 @@ export const action = async ({
   }
 };
 
-const voteDiscussionValidator = vine.compile(
+const voteCommentValidator = vine.compile(
   vine.object({
     voted: vine.boolean(),
   })

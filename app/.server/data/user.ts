@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import { and, eq, sql } from "drizzle-orm";
 
 import { db, schema } from "../db";
@@ -30,6 +31,7 @@ export const getUser = async (userId: number) => {
   if (!user) return null;
   return user;
 };
+export type UserDto = Awaited<ReturnType<typeof getUser>>;
 
 export const getUserByEmail = async (email: string) => {
   const users = await db
@@ -95,6 +97,22 @@ export const getCredentialAccount = async (email: string) => {
       )
     );
   return accounts.at(0) ?? null;
+};
+
+export const getUserIdByCredentials = async (
+  email: string,
+  password: string
+) => {
+  const account = await getCredentialAccount(email);
+  if (!account || !account.password) {
+    throw new Error("Invalid email or password");
+  }
+
+  const isValid = await bcrypt.compare(password, account.password);
+  if (!isValid) {
+    throw new Error("Invalid email or password");
+  }
+  return account.userId;
 };
 
 export const updatePassword = async (email: string, password: string) => {

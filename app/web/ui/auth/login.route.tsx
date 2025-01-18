@@ -2,10 +2,9 @@ import vine from "@vinejs/vine";
 import { Form, Link, redirect, useNavigation } from "react-router";
 
 import { env } from "~/.server/env";
-import { auth } from "~/.server/auth";
-import { Button } from "~/ui/shared/button";
+import { bodyParser } from "~/web/body-parser";
+import { Button } from "~/web/ui/shared/button";
 import { handleError } from "~/.server/response";
-import { bodyParser } from "~/.server/body-parser";
 
 import type { Route } from "./+types/login.route";
 
@@ -87,8 +86,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       password,
       redirect: redirectUrl = "/",
     } = await loginValidator.validate(body);
-    const userId = await auth.signIn(email, password);
-    context.session.set("userId", userId);
+    await context.auth.signIn(email, password);
     context.session.flash("toast", "Signed in successfully!");
     throw redirect(redirectUrl);
   } catch (error) {
