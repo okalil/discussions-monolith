@@ -1,5 +1,3 @@
-import type { Session } from "react-router";
-
 import { useEffect } from "react";
 import { Toaster, toast } from "sonner";
 import {
@@ -16,7 +14,6 @@ import {
 import stylesheet from "~/root.css?url";
 import { NavigationProgress } from "~/web/ui/shared/navigation-progress";
 
-import type { Auth } from "./web/auth";
 import type { Route } from "./+types/root";
 
 import { auth } from "./web/auth";
@@ -111,11 +108,4 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       )}
     </main>
   );
-}
-
-declare module "react-router" {
-  export interface AppLoadContext {
-    session: Session;
-    auth: Auth;
-  }
 }
