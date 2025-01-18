@@ -1,4 +1,4 @@
-import { storage } from "~/.server/storage";
+import { storage } from "~/core/storage";
 
 import type { Route } from "./+types/uploads";
 

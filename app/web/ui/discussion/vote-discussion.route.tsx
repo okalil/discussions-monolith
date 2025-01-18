@@ -2,8 +2,8 @@ import vine from "@vinejs/vine";
 import { useFetcher } from "react-router";
 
 import { bodyParser } from "~/web/body-parser";
-import { handleError, handleSuccess } from "~/.server/response";
-import { unvoteDiscussion, voteDiscussion } from "~/.server/data/discussion";
+import { handleError, handleSuccess } from "~/core/response";
+import { unvoteDiscussion, voteDiscussion } from "~/core/data/discussion";
 
 import type { Route } from "./+types/vote-discussion.route";
 

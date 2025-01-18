@@ -4,8 +4,7 @@ import bcrypt from "bcrypt";
 import crypto from "node:crypto";
 import { redirect } from "react-router";
 
-import type { Route } from "../+types/root";
-import type { UserDto } from "../.server/data/user";
+import type { UserDto } from "~/core/data/user";
 
 import {
   createUser,
@@ -16,7 +15,9 @@ import {
   getUserByEmail,
   getVerificationToken,
   updatePassword,
-} from "../.server/data/user";
+} from "~/core/data/user";
+
+import type { Route } from "../+types/root";
 
 export class Auth {
   private request: Request;
@@ -60,7 +61,7 @@ export class Auth {
   async signUp(name: string, email: string, password: string) {
     password = await bcrypt.hash(password, 10);
     const user = await createUser(name, email, password);
-    return user.id;
+    this.session.set("userId", user.id);
   }
 
   async forgetPassword(email: string) {

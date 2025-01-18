@@ -1,11 +1,11 @@
 import vine from "@vinejs/vine";
 import { useFetcher } from "react-router";
 
-import type { CommentsDto } from "~/.server/data/comment";
+import type { CommentsDto } from "~/core/data/comment";
 
 import { bodyParser } from "~/web/body-parser";
-import { updateComment } from "~/.server/data/comment";
-import { handleError, handleSuccess } from "~/.server/response";
+import { updateComment } from "~/core/data/comment";
+import { handleError, handleSuccess } from "~/core/response";
 
 import type { Route } from "./+types/edit-comment.route";
 

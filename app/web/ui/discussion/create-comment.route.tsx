@@ -4,8 +4,8 @@ import { useFetcher } from "react-router";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { Textarea } from "~/web/ui/shared/textarea";
-import { createComment } from "~/.server/data/comment";
-import { handleError, handleSuccess } from "~/.server/response";
+import { createComment } from "~/core/data/comment";
+import { handleError, handleSuccess } from "~/core/response";
 
 import type { Route } from "./+types/create-comment.route";
 

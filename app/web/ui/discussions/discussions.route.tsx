@@ -3,7 +3,7 @@ import { Form, useSearchParams } from "react-router";
 
 import { Button } from "~/web/ui/shared/button";
 import { Pagination } from "~/web/ui/shared/pagination";
-import { getDiscussions } from "~/.server/data/discussion";
+import { getDiscussions } from "~/core/data/discussion";
 import { DiscussionRow } from "~/web/ui/discussions/discussion-row";
 
 import type { Route } from "./+types/discussions.route";

@@ -3,8 +3,8 @@ import { Form, redirect, useNavigation } from "react-router";
 
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
-import { handleError } from "~/.server/response";
-import { createDiscussion } from "~/.server/data/discussion";
+import { handleError } from "~/core/response";
+import { createDiscussion } from "~/core/data/discussion";
 
 import type { Route } from "./+types/new-discussion.route";
 

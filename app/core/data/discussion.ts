@@ -9,7 +9,7 @@ import {
   sql,
 } from "drizzle-orm";
 
-import { db, schema } from "~/.server/db";
+import { db, schema } from "~/core/db";
 
 export const createDiscussion = async (
   title: string,

@@ -1,7 +1,7 @@
 import { MdMoreHoriz } from "react-icons/md";
 import { use, useState, useEffect } from "react";
 
-import type { CommentsDto } from "~/.server/data/comment";
+import type { CommentsDto } from "~/core/data/comment";
 
 import { cn } from "../shared/utils/cn";
 import { Avatar } from "../shared/avatar";

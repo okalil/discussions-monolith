@@ -2,12 +2,12 @@ import vine from "@vinejs/vine";
 import { useMemo, useState } from "react";
 import { Form, redirect, useNavigation } from "react-router";
 
-import { storage } from "~/.server/storage";
+import { storage } from "~/core/storage";
 import { bodyParser } from "~/web/body-parser";
 import { Avatar } from "~/web/ui/shared/avatar";
 import { Button } from "~/web/ui/shared/button";
-import { handleError } from "~/.server/response";
-import { updateUser } from "~/.server/data/user";
+import { handleError } from "~/core/response";
+import { updateUser } from "~/core/data/user";
 
 import type { Route } from "./+types/profile.route";
 

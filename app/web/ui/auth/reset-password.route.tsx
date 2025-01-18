@@ -9,7 +9,7 @@ import {
 
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
-import { handleError } from "~/.server/response";
+import { handleError } from "~/core/response";
 
 import type { Route } from "./+types/reset-password.route";
 

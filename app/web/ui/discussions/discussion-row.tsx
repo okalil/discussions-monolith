@@ -1,7 +1,7 @@
 import { Form, Link } from "react-router";
 import { MdChatBubbleOutline } from "react-icons/md";
 
-import type { DiscussionsDto } from "~/.server/data/discussion";
+import type { DiscussionsDto } from "~/core/data/discussion";
 
 import { cn } from "../shared/utils/cn";
 import { Avatar } from "../shared/avatar";

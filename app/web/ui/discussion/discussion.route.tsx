@@ -2,8 +2,8 @@ import { Suspense } from "react";
 import { Link } from "react-router";
 
 import { Avatar } from "~/web/ui/shared/avatar";
-import { getComments } from "~/.server/data/comment";
-import { getDiscussion } from "~/.server/data/discussion";
+import { getComments } from "~/core/data/comment";
+import { getDiscussion } from "~/core/data/discussion";
 import { CommentsList } from "~/web/ui/discussion/comments-list";
 
 import type { Route } from "./+types/discussion.route";

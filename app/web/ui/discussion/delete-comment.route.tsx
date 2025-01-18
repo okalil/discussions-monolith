@@ -1,7 +1,7 @@
 import { useFetcher } from "react-router";
 
-import { deleteComment } from "~/.server/data/comment";
-import { handleError, handleSuccess } from "~/.server/response";
+import { deleteComment } from "~/core/data/comment";
+import { handleError, handleSuccess } from "~/core/response";
 
 import type { Route } from "./+types/delete-comment.route";
 

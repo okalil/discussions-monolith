@@ -1,8 +1,8 @@
 import { Link, useFetcher } from "react-router";
 import * as HoverCard from "@radix-ui/react-hover-card";
 
-import { handleError, handleSuccess } from "~/.server/response";
-import { getDiscussionWithReply } from "~/.server/data/discussion";
+import { handleError, handleSuccess } from "~/core/response";
+import { getDiscussionWithReply } from "~/core/data/discussion";
 
 import type { Route } from "./+types/discussion-hovercard.route";
 
