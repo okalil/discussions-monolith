@@ -67,7 +67,6 @@ function createAuth(request: Request, session: Session): Auth {
       password = await bcrypt.hash(password, 10);
       const newUser = await createUser(name, email, password);
       session.set("userId", newUser.id);
-      user = newUser; // Set the user after signup
     },
 
     async forgetPassword(email: string) {
