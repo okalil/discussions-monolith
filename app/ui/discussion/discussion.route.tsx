@@ -4,13 +4,13 @@ import { Link } from "react-router";
 import { auth } from "~/.server/auth";
 import { Avatar } from "~/ui/shared/avatar";
 import { getComments } from "~/.server/data/comment";
-import { VoteButton } from "~/ui/shared/vote-button";
 import { getDiscussion } from "~/.server/data/discussion";
-import { CommentForm } from "~/ui/discussion/comment-form";
 import { CommentsList } from "~/ui/discussion/comments-list";
-import { useVoteDiscussionFetcher } from "~/resources/api.discussions.$id.vote";
 
 import type { Route } from "./+types/discussion.route";
+
+import { CreateComment } from "./create-comment.route";
+import { VoteDiscussion } from "./vote-discussion.route";
 
 export const loader = async ({ context, params }: Route.LoaderArgs) => {
   const userId = await auth.getUserId(context.session);
@@ -30,19 +30,6 @@ export default function Component({
 }: Route.ComponentProps) {
   const { discussion, comments } = loaderData;
   const { user } = matches[1].data;
-
-  const voteFetcher = useVoteDiscussionFetcher(discussion.id);
-
-  const optimisticVoted = voteFetcher.voted;
-  const voted = optimisticVoted ?? discussion.voted;
-
-  let votes = discussion.votesCount;
-  if (
-    typeof optimisticVoted === "boolean" &&
-    optimisticVoted !== discussion.voted
-  ) {
-    votes += voted ? 1 : -1;
-  }
 
   const authenticated = !!user;
 
@@ -74,11 +61,11 @@ export default function Component({
           </p>
         </div>
         <div className="whitespace-pre-wrap mb-2">{discussion.body}</div>
-        <VoteButton
+        <VoteDiscussion
+          discussionId={discussion.id}
+          active={discussion.voted}
+          total={discussion.votesCount}
           disabled={!authenticated}
-          onClick={() => voteFetcher.submit(!voted)}
-          active={voted}
-          total={votes}
         />
       </section>
 
@@ -99,7 +86,7 @@ export default function Component({
       {authenticated ? (
         <section>
           <h3 className="text-lg font-medium mb-4">Add a comment</h3>
-          <CommentForm discussionId={discussion.id} />
+          <CreateComment discussionId={discussion.id} />
         </section>
       ) : (
         <div className="rounded-md border border-gray-300 px-3 py-3">

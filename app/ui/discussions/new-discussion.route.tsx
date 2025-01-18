@@ -1,3 +1,4 @@
+import vine from "@vinejs/vine";
 import { Form, redirect, useNavigation } from "react-router";
 
 import { auth } from "~/.server/auth";
@@ -5,24 +6,11 @@ import { Button } from "~/ui/shared/button";
 import { handleError } from "~/.server/response";
 import { bodyParser } from "~/.server/body-parser";
 import { createDiscussion } from "~/.server/data/discussion";
-import { createDiscussionValidator } from "~/.server/validators/discussion";
 
 import type { Route } from "./+types/new-discussion.route";
 
 import { Input } from "../shared/input";
 import { Textarea } from "../shared/textarea";
-
-export const action = async ({ request, context }: Route.ActionArgs) => {
-  const form = await bodyParser.parse(request);
-  try {
-    const user = await auth.getUserOrFail(context.session);
-    const { title, body } = await createDiscussionValidator.validate(form);
-    const discussion = await createDiscussion(title, body, user.id);
-    throw redirect(`/discussions/${discussion.id}`);
-  } catch (error) {
-    return handleError(error, { values: form });
-  }
-};
 
 export default function Component({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
@@ -61,3 +49,22 @@ export default function Component({ actionData }: Route.ComponentProps) {
     </main>
   );
 }
+
+export const action = async ({ request, context }: Route.ActionArgs) => {
+  const form = await bodyParser.parse(request);
+  try {
+    const user = await auth.getUserOrFail(context.session);
+    const { title, body } = await createDiscussionValidator.validate(form);
+    const discussion = await createDiscussion(title, body, user.id);
+    throw redirect(`/discussions/${discussion.id}`);
+  } catch (error) {
+    return handleError(error, { values: form });
+  }
+};
+
+const createDiscussionValidator = vine.compile(
+  vine.object({
+    title: vine.string().trim().minLength(1),
+    body: vine.string().trim().minLength(1),
+  })
+);

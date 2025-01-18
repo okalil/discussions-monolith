@@ -1,10 +1,10 @@
+import vine from "@vinejs/vine";
 import { Form, Link, redirect, useNavigation } from "react-router";
 
 import { auth } from "~/.server/auth";
 import { Button } from "~/ui/shared/button";
 import { handleError } from "~/.server/response";
 import { bodyParser } from "~/.server/body-parser";
-import { signUpValidator } from "~/.server/validators/user";
 
 import type { Route } from "./+types/register.route";
 
@@ -88,7 +88,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   try {
-    const { name, email, password } = await signUpValidator.validate(body);
+    const { name, email, password } = await registerValidator.validate(body);
     const userId = await auth.signUp(name, email, password);
     context.session.set("userId", userId);
     throw redirect("/");
@@ -98,3 +98,11 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     return handleError(error, { values: body });
   }
 };
+
+const registerValidator = vine.compile(
+  vine.object({
+    name: vine.string().trim(),
+    email: vine.string().email(),
+    password: vine.string().minLength(6).confirmed(),
+  })
+);

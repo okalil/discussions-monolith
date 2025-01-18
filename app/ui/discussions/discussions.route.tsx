@@ -1,3 +1,4 @@
+import vine from "@vinejs/vine";
 import { Form, useSearchParams } from "react-router";
 
 import { auth } from "~/.server/auth";
@@ -5,7 +6,6 @@ import { Button } from "~/ui/shared/button";
 import { Pagination } from "~/ui/shared/pagination";
 import { getDiscussions } from "~/.server/data/discussion";
 import { DiscussionRow } from "~/ui/discussions/discussion-row";
-import { getDiscussionsValidator } from "~/.server/validators/discussion";
 
 import type { Route } from "./+types/discussions.route";
 
@@ -76,3 +76,11 @@ export default function Component({
     </div>
   );
 }
+
+const getDiscussionsValidator = vine.compile(
+  vine.object({
+    page: vine.number().optional(),
+    limit: vine.number().optional(),
+    q: vine.string().optional(),
+  })
+);

@@ -1,3 +1,4 @@
+import vine from "@vinejs/vine";
 import {
   Form,
   Link,
@@ -10,7 +11,6 @@ import { auth } from "~/.server/auth";
 import { Button } from "~/ui/shared/button";
 import { handleError } from "~/.server/response";
 import { bodyParser } from "~/.server/body-parser";
-import { resetPasswordValidator } from "~/.server/validators/user";
 
 import type { Route } from "./+types/reset-password.route";
 
@@ -86,8 +86,16 @@ export const action = async ({ request }: Route.ActionArgs) => {
     );
     await auth.resetPassword(email, password, token);
 
-    return redirect("/login");
+    throw redirect("/login");
   } catch (error) {
     return handleError(error);
   }
 };
+
+const resetPasswordValidator = vine.compile(
+  vine.object({
+    email: vine.string().email(),
+    password: vine.string().minLength(8).confirmed(),
+    token: vine.string(),
+  })
+);

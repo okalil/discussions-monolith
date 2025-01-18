@@ -1,10 +1,11 @@
+import vine from "@vinejs/vine";
 import { Form, Link, redirect, useNavigation } from "react-router";
 
+import { env } from "~/.server/env";
 import { auth } from "~/.server/auth";
 import { Button } from "~/ui/shared/button";
 import { handleError } from "~/.server/response";
 import { bodyParser } from "~/.server/body-parser";
-import { signInValidator } from "~/.server/validators/user";
 
 import type { Route } from "./+types/login.route";
 
@@ -85,7 +86,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       email,
       password,
       redirect: redirectUrl = "/",
-    } = await signInValidator.validate(body);
+    } = await loginValidator.validate(body);
     const userId = await auth.signIn(email, password);
     context.session.set("userId", userId);
     context.session.flash("toast", "Signed in successfully!");
@@ -95,3 +96,21 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     return handleError(error, { values: body });
   }
 };
+
+const loginValidator = vine.compile(
+  vine.object({
+    email: vine.string().email(),
+    password: vine.string().minLength(8),
+    redirect: vine
+      .string()
+      .optional()
+      .transform((value) => {
+        try {
+          const url = new URL(value, env.SITE_URL);
+          return url.pathname + url.search;
+        } catch {
+          return;
+        }
+      }),
+  })
+);

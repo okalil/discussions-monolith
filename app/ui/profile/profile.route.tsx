@@ -1,3 +1,4 @@
+import vine from "@vinejs/vine";
 import { useMemo, useState } from "react";
 import { Form, redirect, useNavigation } from "react-router";
 
@@ -8,7 +9,6 @@ import { Button } from "~/ui/shared/button";
 import { handleError } from "~/.server/response";
 import { updateUser } from "~/.server/data/user";
 import { bodyParser } from "~/.server/body-parser";
-import { updateUserValidator } from "~/.server/validators/user";
 
 import type { Route } from "./+types/profile.route";
 
@@ -95,6 +95,35 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     return handleError(error, { values: body });
   }
 };
+
+const updateUserValidator = vine.compile(
+  vine.object({
+    name: vine.string(),
+    image: vine.any().use(
+      vine.createRule((value, _, field) => {
+        if (!(value instanceof File)) {
+          field.report("The {{ field }} must be a file", "file", field);
+          return;
+        }
+
+        // handle empty file
+        if (!value.name) {
+          field.mutate(void 0, field);
+          return;
+        }
+
+        // limits to 5 MB
+        if (value.size > 5 * 1024 * 1024) {
+          field.report(
+            "The {{ field }} is greater than max size",
+            "file",
+            field
+          );
+        }
+      })()
+    ),
+  })
+);
 
 async function uploadAvatar(userId: number, file?: unknown) {
   if (!file || !(file instanceof File)) return;

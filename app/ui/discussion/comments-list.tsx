@@ -3,25 +3,20 @@ import { use, useState, useEffect } from "react";
 
 import type { CommentsDto } from "~/.server/data/comment";
 
-import { useVoteCommentFetcher } from "~/resources/api.comments.$id.vote";
-import { useEditCommentFetcher } from "~/resources/api.comments.$id.edit";
-import { useDeleteCommentFetcher } from "~/resources/api.comments.$id.delete";
-
 import { cn } from "../shared/utils/cn";
 import { Avatar } from "../shared/avatar";
-import { Button } from "../shared/button";
-import { Textarea } from "../shared/textarea";
-import { VoteButton } from "../shared/vote-button";
 import { AlertModal } from "../shared/alert-modal";
+import { EditComment } from "./edit-comment.route";
+import { VoteComment } from "./vote-comment.route";
 import { DropdownMenu } from "../shared/dropdown-menu";
+import { DeleteComment } from "./delete-comment.route";
 
-export function CommentsList({
-  authenticated,
-  ...props
-}: {
+interface CommentsListProps {
   comments: Promise<CommentsDto>;
   authenticated: boolean;
-}) {
+}
+
+export function CommentsList({ authenticated, ...props }: CommentsListProps) {
   const comments = use(props.comments);
 
   if (!comments.length) return null;
@@ -39,72 +34,21 @@ export function CommentsList({
   );
 }
 
-function CommentRow({
-  comment,
-  authenticated,
-}: {
+interface CommentRowProps {
   comment: CommentsDto[number];
   authenticated: boolean;
-}) {
+}
+
+function CommentRow({ comment, authenticated }: CommentRowProps) {
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const editFetcher = useEditCommentFetcher(comment.id);
-  const deleteFetcher = useDeleteCommentFetcher(comment.id);
-  const voteFetcher = useVoteCommentFetcher(comment.id);
 
-  useEffect(() => setEditing(false), [comment.updatedAt]);
-
-  const optimisticVoted = voteFetcher.voted;
-  const voted = optimisticVoted ?? comment.voted;
-
-  let votes = comment.votesCount;
-  if (
-    typeof optimisticVoted === "boolean" &&
-    optimisticVoted !== comment.voted
-  ) {
-    votes += voted ? 1 : -1;
-  }
+  useEffect(() => setEditing(false), [comment]);
 
   if (editing) {
     return (
       <li className="mb-4">
-        <editFetcher.Form
-          {...editFetcher.formProps}
-          className={cn("px-3 py-3", "border border-gray-300 rounded-md")}
-        >
-          <input type="hidden" name="id" value={comment.id} />
-          <div>
-            <label htmlFor="edit_content" className="text-sm font-medium mb-2">
-              Write
-            </label>
-            <Textarea
-              id="edit_content"
-              className="border border-gray-200 rounded-lg p-2 w-full mb-3"
-              rows={4}
-              name="body"
-              required
-              defaultValue={comment.body}
-            />
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              variant="danger"
-              className="h-10 w-24 ml-auto"
-              type="button"
-              onClick={() => setEditing(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              className="h-10 w-48"
-              loading={editFetcher.state !== "idle"}
-            >
-              Update comment
-            </Button>
-          </div>
-        </editFetcher.Form>
+        <EditComment comment={comment} onCancel={() => setEditing(false)} />
       </li>
     );
   }
@@ -191,27 +135,18 @@ function CommentRow({
               description="Are you sure you want to delete this comment?"
               open={deleting}
               onOpenChange={setDeleting}
-              action={
-                <deleteFetcher.Form {...deleteFetcher.formProps}>
-                  <Button
-                    variant="danger"
-                    loading={deleteFetcher.state !== "idle"}
-                  >
-                    Delete comment
-                  </Button>
-                </deleteFetcher.Form>
-              }
+              action={<DeleteComment commentId={comment.id} />}
             />
           </div>
         )}
       </div>
 
       <p className="text-gray-700 mb-3 whitespace-pre-wrap">{comment.body}</p>
-      <VoteButton
+      <VoteComment
+        commentId={comment.id}
+        active={comment.voted}
+        total={comment.votesCount}
         disabled={!authenticated}
-        active={voted}
-        total={votes}
-        onClick={() => voteFetcher.submit(!voted)}
       />
     </li>
   );

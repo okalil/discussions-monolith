@@ -1,3 +1,4 @@
+import vine from "@vinejs/vine";
 import { Form, Link, redirect, useNavigation } from "react-router";
 
 import { env } from "~/.server/env";
@@ -6,7 +7,6 @@ import { mailer } from "~/.server/mailer";
 import { Button } from "~/ui/shared/button";
 import { handleError } from "~/.server/response";
 import { bodyParser } from "~/.server/body-parser";
-import { forgetPasswordValidator } from "~/.server/validators/user";
 
 import type { Route } from "./+types/forgot-password.route";
 
@@ -74,3 +74,9 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     return handleError(error, { values: body });
   }
 };
+
+const forgetPasswordValidator = vine.compile(
+  vine.object({
+    email: vine.string().email(),
+  })
+);
