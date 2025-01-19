@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import crypto from "node:crypto";
 import { redirect } from "react-router";
 
+import type { Route } from "../+types/root";
+
 import {
   createUser,
   createVerificationToken,
@@ -95,3 +97,29 @@ class Auth {
 }
 
 export const auth = new Auth();
+
+export async function authMiddleware({
+  request,
+  context,
+}: Route.MiddlewareArgs) {
+  const userId = context.session.get("userId");
+  const user = userId && (await getUser(userId));
+  context.auth = {
+    getUser() {
+      return user;
+    },
+    getUserOrFail() {
+      const url = new URL(request.url);
+      const searchParams =
+        url.pathname &&
+        new URLSearchParams([["redirect", url.pathname + url.search]]);
+      if (!user) throw redirect("/login?" + searchParams);
+    },
+    login(userId: number) {
+      context.session.set("userId", userId);
+    },
+    logout(userId: number) {
+      context.session.unset("userId", userId);
+    },
+  };
+}

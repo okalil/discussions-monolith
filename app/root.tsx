@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Toaster, toast } from "sonner";
 import {
-  createCookieSessionStorage,
   isRouteErrorResponse,
   Links,
   Meta,
@@ -17,31 +16,14 @@ import { NavigationProgress } from "~/ui/shared/navigation-progress";
 
 import type { Route } from "./+types/root";
 
-import { env } from "./.server/env";
-
-const sessionStorage = createCookieSessionStorage({
-  cookie: {
-    name: "__session",
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    secrets: [env.SESSION_SECRET],
-    sameSite: "lax",
-    path: "/",
-  },
-});
+import { session } from "./.server/session";
+import { limiter } from "./.server/limiter";
+import { authMiddleware as auth } from "./.server/auth";
 
 export const middleware = [
-  async function session({ request, context, next }: Route.MiddlewareArgs) {
-    context.session = await sessionStorage.getSession(
-      request.headers.get("Cookie")
-    );
-    const response = await next();
-    response.headers.append(
-      "Set-Cookie",
-      await sessionStorage.commitSession(context.session)
-    );
-    return response;
-  },
+  limiter({ max: 100, window: 60 * 1000 }),
+  session,
+  auth,
 ];
 
 export const meta: Route.MetaFunction = () => [{ title: "Discussions" }];
