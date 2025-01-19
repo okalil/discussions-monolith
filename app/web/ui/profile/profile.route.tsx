@@ -3,11 +3,11 @@ import { useMemo, useState } from "react";
 import { Form, redirect, useNavigation } from "react-router";
 
 import { storage } from "~/core/storage";
-import { Avatar } from "~/web/ui/shared/avatar";
-import { Button } from "~/web/ui/shared/button";
-import { bodyParser } from "~/web/body-parser";
 import { handleError } from "~/web/response";
 import { updateUser } from "~/core/data/user";
+import { bodyParser } from "~/web/body-parser";
+import { Avatar } from "~/web/ui/shared/avatar";
+import { Button } from "~/web/ui/shared/button";
 
 import type { Route } from "./+types/profile.route";
 

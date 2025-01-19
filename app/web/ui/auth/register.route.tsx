@@ -1,10 +1,10 @@
 import vine from "@vinejs/vine";
 import { Form, Link, redirect, useNavigation } from "react-router";
 
-import { Button } from "~/web/ui/shared/button";
-import { bodyParser } from "~/web/body-parser";
 import { handleError } from "~/web/response";
 import { createUser } from "~/core/data/user";
+import { bodyParser } from "~/web/body-parser";
+import { Button } from "~/web/ui/shared/button";
 
 import type { Route } from "./+types/register.route";
 

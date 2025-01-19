@@ -3,9 +3,9 @@ import { Form, Link, redirect, useNavigation } from "react-router";
 
 import { env } from "~/core/env";
 import { mailer } from "~/core/mailer";
-import { Button } from "~/web/ui/shared/button";
-import { bodyParser } from "~/web/body-parser";
 import { handleError } from "~/web/response";
+import { bodyParser } from "~/web/body-parser";
+import { Button } from "~/web/ui/shared/button";
 import { createVerificationToken, getUserByEmail } from "~/core/data/user";
 
 import type { Route } from "./+types/forgot-password.route";

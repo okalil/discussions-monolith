@@ -7,9 +7,9 @@ import {
   useSearchParams,
 } from "react-router";
 
-import { Button } from "~/web/ui/shared/button";
-import { bodyParser } from "~/web/body-parser";
 import { handleError } from "~/web/response";
+import { bodyParser } from "~/web/body-parser";
+import { Button } from "~/web/ui/shared/button";
 import { resetPassword } from "~/core/data/user";
 
 import type { Route } from "./+types/reset-password.route";
