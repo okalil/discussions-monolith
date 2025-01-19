@@ -12,13 +12,13 @@ import {
 } from "react-router";
 
 import stylesheet from "~/root.css?url";
-import { NavigationProgress } from "~/ui/shared/navigation-progress";
+import { NavigationProgress } from "~/web/ui/shared/navigation-progress";
 
 import type { Route } from "./+types/root";
 
-import { auth } from "./.server/auth";
-import { session } from "./.server/session";
-import { limiter } from "./.server/limiter";
+import { auth } from "./web/auth";
+import { limiter } from "./web/limiter";
+import { session } from "./web/session";
 
 export const middleware = [
   limiter({ max: 100, window: 60 * 1000 }),

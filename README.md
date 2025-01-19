@@ -5,20 +5,19 @@ The purpose is to provide a reference implementation for monolithic applications
 
 ## Code Organization
 
-The application code is organized in three main folders:
+The application code is organized in two main folders:
 
-1. `.server`: This contains "back-end" specific code that doesn't run on the client, like database queries, validators and other services.
-2. `resources`: This contains [resources routes](https://reactrouter.com/how-to/resource-routes), following the [flat routes convention](https://reactrouter.com/how-to/file-route-conventions) to automatically map file name to url
-3. `ui`: This contains all application UI components organized by feature.
+1. `core`: This contain the core application logic and data access, and integration with other services like mailing, queues etc.
+2. `web`: This contains all web specific code, like session management and UI code
 
 ### Why not implement services code directly in router loaders/actions?
 
-Some essential services like auth, database, file storage, mailing and validation are abstracted away from the main application code. This has two main benefits:
+Some essential services like database, file storage and mailing are abstracted away from the main application code. This has two main benefits:
 
 1. A service can be reused across various routes;
 2. We can easily change the service implementation without changing code in various routes
 
-### Why not use flat routes convention for UI routes too?
+### Why not use flat routes convention?
 
 The UI routes are implemented with manual configuration for two reasons:
 
