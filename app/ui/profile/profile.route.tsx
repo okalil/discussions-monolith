@@ -2,7 +2,6 @@ import vine from "@vinejs/vine";
 import { useMemo, useState } from "react";
 import { Form, redirect, useNavigation } from "react-router";
 
-import { auth } from "~/.server/auth";
 import { storage } from "~/.server/storage";
 import { Avatar } from "~/ui/shared/avatar";
 import { Button } from "~/ui/shared/button";
@@ -17,7 +16,7 @@ import { Input } from "../shared/input";
 export const meta = () => [{ title: "Discussions | Profile" }];
 
 export const loader = async ({ context }: Route.LoaderArgs) => {
-  const user = await auth.getUserOrFail(context.session);
+  const user = await context.auth.getUserOrFail();
   return { user };
 };
 
@@ -86,7 +85,7 @@ export default function Component({
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   try {
-    const user = await auth.getUserOrFail(context.session);
+    const user = await context.auth.getUserOrFail();
     const { name, image } = await updateUserValidator.validate(body);
     const storageKey = await uploadAvatar(user.id, image);
     await updateUser(user.id, name, storageKey);

@@ -16,9 +16,9 @@ import { NavigationProgress } from "~/ui/shared/navigation-progress";
 
 import type { Route } from "./+types/root";
 
+import { auth } from "./.server/auth";
 import { session } from "./.server/session";
 import { limiter } from "./.server/limiter";
-import { authMiddleware as auth } from "./.server/auth";
 
 export const middleware = [
   limiter({ max: 100, window: 60 * 1000 }),

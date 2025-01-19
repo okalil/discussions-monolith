@@ -1,6 +1,5 @@
 import { useFetcher } from "react-router";
 
-import { auth } from "~/.server/auth";
 import { deleteComment } from "~/.server/data/comment";
 import { handleError, handleSuccess } from "~/.server/response";
 
@@ -25,7 +24,7 @@ export function DeleteComment({ commentId }: DeleteCommentProps) {
 
 export const action = async ({ context, params }: Route.ActionArgs) => {
   try {
-    const user = await auth.getUserOrFail(context.session);
+    const user = await context.auth.getUserOrFail();
     await deleteComment(Number(params.id), user.id);
     return handleSuccess();
   } catch (error) {

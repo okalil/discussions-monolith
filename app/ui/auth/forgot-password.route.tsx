@@ -2,11 +2,11 @@ import vine from "@vinejs/vine";
 import { Form, Link, redirect, useNavigation } from "react-router";
 
 import { env } from "~/.server/env";
-import { auth } from "~/.server/auth";
 import { mailer } from "~/.server/mailer";
 import { Button } from "~/ui/shared/button";
 import { handleError } from "~/.server/response";
 import { bodyParser } from "~/.server/body-parser";
+import { createVerificationToken, getUserByEmail } from "~/.server/data/user";
 
 import type { Route } from "./+types/forgot-password.route";
 
@@ -53,23 +53,25 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   try {
     const { email } = await forgetPasswordValidator.validate(body);
-    const { user, token } = await auth.forgetPassword(email);
-    await mailer.send({
-      to: email,
-      from: "me@mail.com",
-      subject: "Discussions Password Reset",
-      body: (
-        <ResetPasswordEmail
-          userFirstname={user.name ?? ""}
-          resetPasswordLink={`${env.SITE_URL}/reset-password?token=${token}`}
-        />
-      ),
-    });
-    const cookie = await context.session.flash(
+    const user = await getUserByEmail(email);
+    if (user) {
+      const token = await createVerificationToken(email);
+      await mailer.send({
+        to: email,
+        subject: "Discussions Password Reset",
+        body: (
+          <ResetPasswordEmail
+            userFirstname={user.name ?? ""}
+            resetPasswordLink={`${env.SITE_URL}/reset-password?token=${token}`}
+          />
+        ),
+      });
+    }
+    context.session.flash(
       "toast",
-      "An email was sent to reset your password, check your inbox!"
+      "If your email is in our system, you will receive instructions to reset your password"
     );
-    throw redirect("/login", { headers: [["set-cookie", cookie]] });
+    throw redirect("/login");
   } catch (error) {
     return handleError(error, { values: body });
   }

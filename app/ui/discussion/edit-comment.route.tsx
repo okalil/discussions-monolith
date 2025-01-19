@@ -3,7 +3,6 @@ import { useFetcher } from "react-router";
 
 import type { CommentsDto } from "~/.server/data/comment";
 
-import { auth } from "~/.server/auth";
 import { bodyParser } from "~/.server/body-parser";
 import { updateComment } from "~/.server/data/comment";
 import { handleError, handleSuccess } from "~/.server/response";
@@ -68,7 +67,7 @@ export const action = async ({
   params,
 }: Route.ActionArgs) => {
   try {
-    const user = await auth.getUserOrFail(context.session);
+    const user = await context.auth.getUserOrFail();
     const form = await bodyParser.parse(request);
     const { body } = await updateCommentValidator.validate(form);
 

@@ -4,7 +4,7 @@ import { render } from "@react-email/components";
 import { env } from "./env";
 
 interface MailMessage {
-  from: string;
+  from?: string;
   to: string;
   subject: string;
   body: React.ReactElement;
@@ -25,6 +25,9 @@ class Mailer {
       render(body),
       render(body, { plainText: true }),
     ]);
+
+    from ??= "me@mail.com"; // default sender
+
     await new Promise((resolve, reject) => {
       this.transporter.sendMail(
         { to, from, subject, html, text },

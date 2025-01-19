@@ -7,10 +7,10 @@ import {
   useSearchParams,
 } from "react-router";
 
-import { auth } from "~/.server/auth";
 import { Button } from "~/ui/shared/button";
 import { handleError } from "~/.server/response";
 import { bodyParser } from "~/.server/body-parser";
+import { resetPassword } from "~/.server/data/user";
 
 import type { Route } from "./+types/reset-password.route";
 
@@ -84,7 +84,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const { email, password, token } = await resetPasswordValidator.validate(
       body
     );
-    await auth.resetPassword(email, password, token);
+    await resetPassword(email, password, token);
 
     throw redirect("/login");
   } catch (error) {

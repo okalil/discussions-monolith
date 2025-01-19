@@ -1,7 +1,6 @@
 import vine from "@vinejs/vine";
 import { useFetcher } from "react-router";
 
-import { auth } from "~/.server/auth";
 import { bodyParser } from "~/.server/body-parser";
 import { handleError, handleSuccess } from "~/.server/response";
 import { unvoteComment, voteComment } from "~/.server/data/comment";
@@ -50,7 +49,7 @@ export const action = async ({
   params,
 }: Route.ActionArgs) => {
   try {
-    const user = await auth.getUserOrFail(context.session);
+    const user = await context.auth.getUserOrFail();
     const body = await bodyParser.parse(request);
     const { voted } = await voteCommentValidator.validate(body);
 
