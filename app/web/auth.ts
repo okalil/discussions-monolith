@@ -6,15 +6,15 @@ import type { Route } from "../+types/root";
 
 type MaybeUser = Awaited<ReturnType<typeof getUser>>;
 export interface Auth {
-  getUser: () => Promise<MaybeUser>;
-  getUserOrFail: () => Promise<NonNullable<MaybeUser>>;
+  getUser: () => MaybeUser;
+  getUserOrFail: () => NonNullable<MaybeUser>;
   login: (userId: number) => void;
   logout: () => void;
 }
 
 export async function auth({ request, context }: Route.MiddlewareArgs) {
   const userId = context.session.get("userId");
-  const user = userId && (await getUser(userId));
+  const user = userId ? await getUser(userId) : null;
   context.auth = {
     getUser() {
       return user;

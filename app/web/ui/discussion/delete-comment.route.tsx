@@ -24,7 +24,7 @@ export function DeleteComment({ commentId }: DeleteCommentProps) {
 
 export const action = async ({ context, params }: Route.ActionArgs) => {
   try {
-    const user = await context.auth.getUserOrFail();
+    const user = context.auth.getUserOrFail();
     await deleteComment(Number(params.id), user.id);
     return handleSuccess();
   } catch (error) {

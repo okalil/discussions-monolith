@@ -67,7 +67,7 @@ export const action = async ({
   params,
 }: Route.ActionArgs) => {
   try {
-    const user = await context.auth.getUserOrFail();
+    const user = context.auth.getUserOrFail();
     const form = await bodyParser.parse(request);
     const { body } = await updateCommentValidator.validate(form);
 

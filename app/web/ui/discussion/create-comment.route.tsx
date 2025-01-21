@@ -15,6 +15,7 @@ interface CreateCommentProps {
 
 export function CreateComment({ discussionId }: CreateCommentProps) {
   const fetcher = useFetcher();
+  const { data } = fetcher.data ?? {};
 
   return (
     <fetcher.Form method="POST" action="comments/new">
@@ -26,7 +27,7 @@ export function CreateComment({ discussionId }: CreateCommentProps) {
         <Textarea
           id="body"
           name="body"
-          key={fetcher.data?.id ?? "noid"}
+          key={data?.id}
           placeholder="Write your comment here..."
           rows={4}
           required
@@ -48,7 +49,7 @@ export function CreateComment({ discussionId }: CreateCommentProps) {
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const form = await bodyParser.parse(request);
   try {
-    const user = await context.auth.getUserOrFail();
+    const user = context.auth.getUserOrFail();
     const { body, discussionId } = await createCommentValidator.validate(form);
     const { id } = await createComment(discussionId, body, user.id);
     return handleSuccess({ id });

@@ -12,7 +12,7 @@ import { CreateComment } from "./create-comment.route";
 import { VoteDiscussion } from "./vote-discussion.route";
 
 export const loader = async ({ context, params }: Route.LoaderArgs) => {
-  const user = await context.auth.getUser();
+  const user = context.auth.getUser();
   const userId = user?.id;
 
   const comments = getComments(Number(params.id), userId);

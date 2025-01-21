@@ -9,7 +9,7 @@ import { Avatar } from "~/web/ui/shared/avatar";
 import type { Route } from "./+types/main.route";
 
 export const loader = async ({ context }: Route.LoaderArgs) => {
-  const user = await context.auth.getUser();
+  const user = context.auth.getUser();
   return { user };
 };
 

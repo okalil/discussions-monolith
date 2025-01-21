@@ -4,16 +4,16 @@ import { Form, useSearchParams } from "react-router";
 import { Button } from "~/web/ui/shared/button";
 import { Pagination } from "~/web/ui/shared/pagination";
 import { getDiscussions } from "~/core/data/discussion";
-import { DiscussionRow } from "~/web/ui/discussions/discussion-row";
 
 import type { Route } from "./+types/discussions.route";
 
 import { Input } from "../shared/input";
+import { DiscussionRow } from "./discussion-row";
 
 export const meta: Route.MetaFunction = () => [{ title: "Top Discussions" }];
 
 export const loader = async ({ request, context }: Route.LoaderArgs) => {
-  const user = await context.auth.getUser();
+  const user = context.auth.getUser();
   const {
     q,
     page = 1,

@@ -52,7 +52,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const form = await bodyParser.parse(request);
   try {
-    const user = await context.auth.getUserOrFail();
+    const user = context.auth.getUserOrFail();
     const { title, body } = await createDiscussionValidator.validate(form);
     const discussion = await createDiscussion(title, body, user.id);
     throw redirect(`/discussions/${discussion.id}`);
