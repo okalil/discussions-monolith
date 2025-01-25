@@ -7,7 +7,7 @@ const routes = [
   route("reset-password", "web/ui/auth/reset-password.route.tsx"),
   route("logout", "web/ui/auth/logout.route.tsx"),
 
-  layout("web/ui/layouts/main.route.tsx", [
+  layout("web/ui/layouts/layout.route.tsx", [
     route(null, "web/ui/discussions/discussions.route.tsx", { index: true }),
     route("discussions/new", "web/ui/discussions/new-discussion.route.tsx"),
     route(

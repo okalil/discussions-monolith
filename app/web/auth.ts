@@ -21,9 +21,9 @@ export async function auth({ request, context }: Route.MiddlewareArgs) {
     },
     getUserOrFail() {
       const url = new URL(request.url);
-      const searchParams =
-        url.pathname &&
-        new URLSearchParams([["redirect", url.pathname + url.search]]);
+      const searchParams = new URLSearchParams([
+        ["to", url.href.replace(url.origin, "")],
+      ]);
       if (!user) throw redirect(`/login?${searchParams}`);
       return user;
     },
@@ -33,5 +33,5 @@ export async function auth({ request, context }: Route.MiddlewareArgs) {
     logout() {
       context.session.unset("userId");
     },
-  } satisfies Auth;
+  };
 }

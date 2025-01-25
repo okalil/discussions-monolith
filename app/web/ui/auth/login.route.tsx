@@ -82,15 +82,11 @@ export default function Component({ actionData }: Route.ComponentProps) {
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   try {
-    const {
-      email,
-      password,
-      redirect: redirectUrl = "/",
-    } = await loginValidator.validate(body);
+    const { email, password, to = "/" } = await loginValidator.validate(body);
     const user = await getUserByCredentials(email, password);
     context.auth.login(user.id);
-    context.session.flash("toast", "Signed in successfully!");
-    throw redirect(redirectUrl);
+    context.session.flash("success", "Signed in successfully!");
+    throw redirect(to);
   } catch (error) {
     delete body.password;
     return handleError(error, { values: body });
@@ -101,13 +97,13 @@ const loginValidator = vine.compile(
   vine.object({
     email: vine.string().email(),
     password: vine.string().minLength(8),
-    redirect: vine
+    to: vine
       .string()
       .optional()
       .transform((value) => {
         try {
           const url = new URL(value, env.SITE_URL);
-          return url.pathname + url.search;
+          return url.href.replace(url.origin, "");
         } catch {
           return;
         }

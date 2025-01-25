@@ -6,9 +6,9 @@ import { cn } from "~/web/ui/shared/utils/cn";
 import { Button } from "~/web/ui/shared/button";
 import { Avatar } from "~/web/ui/shared/avatar";
 
-import type { Route } from "./+types/main.route";
+import type { Route } from "./+types/layout.route";
 
-export const loader = async ({ context }: Route.LoaderArgs) => {
+export const loader = ({ context }: Route.LoaderArgs) => {
   const user = context.auth.getUser();
   return { user };
 };

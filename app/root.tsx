@@ -7,8 +7,6 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useFetchers,
-  useLoaderData,
 } from "react-router";
 
 import stylesheet from "~/root.css?url";
@@ -17,11 +15,11 @@ import { NavigationProgress } from "~/web/ui/shared/navigation-progress";
 import type { Route } from "./+types/root";
 
 import { auth } from "./web/auth";
-import { limiter } from "./web/limiter";
 import { session } from "./web/session";
+import { rateLimit } from "./web/rate-limit";
 
 export const middleware = [
-  limiter({ max: 100, window: 60 * 1000 }),
+  rateLimit({ max: 100, window: 60 * 1000 }),
   session,
   auth,
 ];
@@ -42,48 +40,26 @@ export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
 
-export const loader = async ({ context }: Route.LoaderArgs) => {
-  const message = await context.session.get("toast");
-  return { message };
+export const loader = ({ context }: Route.LoaderArgs) => {
+  return {
+    success: context.session.get("success"),
+    error: context.session.get("error"),
+  };
 };
 
-export default function App() {
-  return (
-    <html lang="en" className="h-full">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Links />
-        <Meta />
-      </head>
-      <body className="h-full">
-        <Outlet />
-        <GlobalToasts />
-        <NavigationProgress />
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
-  );
-}
-
-function GlobalToasts() {
-  const loaderData = useLoaderData<typeof loader>();
-  const fetchers = useFetchers();
-  const messages = fetchers
-    .map((it) => it.data?.error?.message)
-    .filter(Boolean);
-
+export default function App({ loaderData }: Route.ComponentProps) {
   useEffect(() => {
-    if (loaderData.message)
-      toast.success(loaderData.message, { richColors: true });
-  }, [loaderData.message]);
-  useEffect(
-    () =>
-      messages.forEach((message) => toast.error(message, { richColors: true })),
-    [messages]
+    const { success, error } = loaderData;
+    if (success) toast.success(success);
+    if (error) toast.error(error, { duration: 5000 });
+  }, [loaderData]);
+
+  return (
+    <Document>
+      <Outlet />
+      <Toaster richColors closeButton />
+    </Document>
   );
-  return <Toaster />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
@@ -103,14 +79,37 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
+    <Document>
+      <main className="pt-16 p-4 container mx-auto">
+        <h1>{message}</h1>
+        <p>{details}</p>
+        {stack && (
+          <pre className="w-full p-4 overflow-x-auto">
+            <code>{stack}</code>
+          </pre>
+        )}
+      </main>
+    </Document>
+  );
+}
+
+export const shouldRevalidate = () => true;
+
+function Document(props: React.PropsWithChildren) {
+  return (
+    <html lang="en" className="h-full">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Links />
+        <Meta />
+      </head>
+      <body className="h-full">
+        {props.children}
+        <NavigationProgress />
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
   );
 }

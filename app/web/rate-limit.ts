@@ -4,12 +4,12 @@ import type { Route } from "../+types/root";
 
 const rateLimitStorage = new Map();
 
-interface LimiterOptions {
+interface RateLimiterOptions {
   max: number;
   window: number;
 }
 
-export function limiter({ max, window }: LimiterOptions) {
+export function rateLimit({ max, window }: RateLimiterOptions) {
   return function rateLimit({ request }: Route.MiddlewareArgs) {
     const ip =
       ipHeaders

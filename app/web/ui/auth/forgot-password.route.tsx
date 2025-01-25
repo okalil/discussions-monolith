@@ -68,7 +68,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       });
     }
     context.session.flash(
-      "toast",
+      "success",
       "If your email is in our system, you will receive instructions to reset your password"
     );
     throw redirect("/login");

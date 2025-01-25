@@ -3,6 +3,8 @@ import type { UNSAFE_DataWithResponseInit } from "react-router";
 import { data } from "react-router";
 import { errors } from "@vinejs/vine";
 
+import { pullSession as session } from "./session";
+
 type HandleErrorReturn<T> = UNSAFE_DataWithResponseInit<
   {
     status: "error";
@@ -20,23 +22,25 @@ export function handleError<T>(
   const fields = (additionalFields ?? {}) as T;
 
   if (error instanceof errors.E_VALIDATION_ERROR) {
+    const errorMessage = error.messages?.[0]?.message ?? error.message;
+    session().flash("error", errorMessage);
     return data(
       {
         ...fields,
         status: "error",
-        error: new Error(error.messages?.[0]?.message ?? error.message),
+        error: new Error(errorMessage),
       },
       { status: 422 }
     );
   }
-
+  const errorMessage =
+    error instanceof Error ? error.message : "Unknown Server Error";
+  session().flash("error", errorMessage);
   return data(
     {
       ...fields,
       status: "error",
-      error: new Error(
-        error instanceof Error ? error.message : "Unknown Server Error"
-      ),
+      error: new Error(errorMessage),
     },
     { status: 500 }
   );
