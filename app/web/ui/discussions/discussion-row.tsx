@@ -28,7 +28,6 @@ export function DiscussionRow({ discussion, authenticated }: DiscussionProps) {
           <Link
             className="hover:underline text-lg font-medium visited:text-gray-600"
             to={`/discussions/${discussion.id}`}
-            prefetch="intent"
             viewTransition
             style={{ viewTransitionName: `title-${discussion.id}` }}
           >

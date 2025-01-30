@@ -1,8 +1,7 @@
 class BodyParser {
   async parse(request: Request) {
-    const searchParams = new URL(request.url).searchParams;
     const formData = await request.formData();
-    return { ...this.parseForm(searchParams), ...this.parseForm(formData) };
+    return this.parseForm(formData);
   }
 
   parseForm(form: FormData | URLSearchParams) {

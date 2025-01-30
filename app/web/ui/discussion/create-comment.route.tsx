@@ -5,20 +5,22 @@ import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { Textarea } from "~/web/ui/shared/textarea";
 import { createComment } from "~/core/data/comment";
-import { handleError, handleSuccess } from "~/web/response";
 
-import type { Route } from "./+types/create-comment.route";
+import type { Route, Info } from "./+types/create-comment.route";
 
 interface CreateCommentProps {
   discussionId: number;
 }
 
 export function CreateComment({ discussionId }: CreateCommentProps) {
-  const fetcher = useFetcher();
-  const { data } = fetcher.data ?? {};
+  const fetcher = useFetcher<Info["actionData"]>();
 
   return (
-    <fetcher.Form method="POST" action="comments/new">
+    <fetcher.Form
+      method="POST"
+      action="comments/new"
+      key={fetcher.state === "idle" ? fetcher.data?.comment.id : undefined} // resets the form after submission/revalidation
+    >
       <input name="discussionId" value={discussionId} type="hidden" />
       <div>
         <label htmlFor="body" className="text-sm font-medium mb-2">
@@ -27,7 +29,6 @@ export function CreateComment({ discussionId }: CreateCommentProps) {
         <Textarea
           id="body"
           name="body"
-          key={data?.id}
           placeholder="Write your comment here..."
           rows={4}
           required
@@ -48,14 +49,10 @@ export function CreateComment({ discussionId }: CreateCommentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const form = await bodyParser.parse(request);
-  try {
-    const user = context.auth.getUserOrFail();
-    const { body, discussionId } = await createCommentValidator.validate(form);
-    const { id } = await createComment(discussionId, body, user.id);
-    return handleSuccess({ id });
-  } catch (error) {
-    return handleError(error);
-  }
+  const user = context.auth.getUserOrFail();
+  const { body, discussionId } = await createCommentValidator.validate(form);
+  const comment = await createComment(discussionId, body, user.id);
+  return { comment };
 };
 
 const createCommentValidator = vine.compile(

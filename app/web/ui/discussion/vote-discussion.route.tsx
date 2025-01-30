@@ -1,8 +1,7 @@
 import vine from "@vinejs/vine";
-import { useFetcher } from "react-router";
+import { data, useFetcher } from "react-router";
 
 import { bodyParser } from "~/web/body-parser";
-import { handleError, handleSuccess } from "~/web/response";
 import { unvoteDiscussion, voteDiscussion } from "~/core/data/discussion";
 
 import type { Route } from "./+types/vote-discussion.route";
@@ -51,20 +50,19 @@ export const action = async ({
   context,
   params,
 }: Route.ActionArgs) => {
-  try {
-    const user = context.auth.getUserOrFail();
-    const body = await bodyParser.parse(request);
-    const { voted } = await voteDiscussionValidator.validate(body);
-
-    if (voted) {
-      await voteDiscussion(Number(params.id), user.id);
-    } else {
-      await unvoteDiscussion(Number(params.id), user.id);
-    }
-    return handleSuccess();
-  } catch (error) {
-    return handleError(error);
+  const user = context.auth.getUserOrFail();
+  const body = await bodyParser.parse(request);
+  const [error, output] = await voteDiscussionValidator.tryValidate(body);
+  if (error) {
+    return data({ error, values: body }, 422);
   }
+
+  if (output.voted) {
+    await voteDiscussion(Number(params.id), user.id);
+  } else {
+    await unvoteDiscussion(Number(params.id), user.id);
+  }
+  return { ok: true };
 };
 
 const voteDiscussionValidator = vine.compile(

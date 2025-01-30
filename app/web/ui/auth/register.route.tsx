@@ -1,7 +1,6 @@
 import vine from "@vinejs/vine";
-import { Form, Link, redirect, useNavigation } from "react-router";
+import { data, Form, Link, redirect, useNavigation } from "react-router";
 
-import { handleError } from "~/web/response";
 import { createUser } from "~/core/data/user";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
@@ -87,16 +86,16 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  try {
-    const { name, email, password } = await registerValidator.validate(body);
-    const user = await createUser(name, email, password);
-    context.auth.login(user.id);
-    throw redirect("/");
-  } catch (error) {
+  const [error, output] = await registerValidator.tryValidate(body);
+  if (error) {
     delete body.password;
     delete body.password_confirmation;
-    return handleError(error, { values: body });
+    return data({ error, values: body }, 422);
   }
+
+  const user = await createUser(output.name, output.email, output.password);
+  context.auth.login(user.id);
+  throw redirect("/");
 };
 
 const registerValidator = vine.compile(

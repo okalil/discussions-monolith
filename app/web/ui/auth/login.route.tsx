@@ -1,8 +1,7 @@
 import vine from "@vinejs/vine";
-import { Form, Link, redirect, useNavigation } from "react-router";
+import { data, Form, Link, redirect, useNavigation } from "react-router";
 
 import { env } from "~/core/env";
-import { handleError } from "~/web/response";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { getUserByCredentials } from "~/core/data/user";
@@ -81,16 +80,16 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  try {
-    const { email, password, to = "/" } = await loginValidator.validate(body);
-    const user = await getUserByCredentials(email, password);
-    context.auth.login(user.id);
-    context.session.flash("success", "Signed in successfully!");
-    throw redirect(to);
-  } catch (error) {
+  const [error, output] = await loginValidator.tryValidate(body);
+  if (error) {
     delete body.password;
-    return handleError(error, { values: body });
+    return data({ error, values: body }, 422);
   }
+
+  const user = await getUserByCredentials(output.email, output.password);
+  context.auth.login(user.id);
+  context.session.flash("success", "Signed in successfully!");
+  throw redirect(output.to || "/");
 };
 
 const loginValidator = vine.compile(

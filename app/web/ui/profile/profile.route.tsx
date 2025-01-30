@@ -1,9 +1,8 @@
 import vine from "@vinejs/vine";
 import { useMemo, useState } from "react";
-import { Form, redirect, useNavigation } from "react-router";
+import { data, Form, redirect, useNavigation } from "react-router";
 
 import { storage } from "~/core/storage";
-import { handleError } from "~/web/response";
 import { updateUser } from "~/core/data/user";
 import { bodyParser } from "~/web/body-parser";
 import { Avatar } from "~/web/ui/shared/avatar";
@@ -84,15 +83,13 @@ export default function Component({
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  try {
-    const user = context.auth.getUserOrFail();
-    const { name, image } = await updateUserValidator.validate(body);
-    const storageKey = await uploadAvatar(user.id, image);
-    await updateUser(user.id, name, storageKey);
-    throw redirect(".");
-  } catch (error) {
-    return handleError(error, { values: body });
-  }
+  const user = context.auth.getUserOrFail();
+  const [error, output] = await updateUserValidator.tryValidate(body);
+  if (error) return data({ error, body }, 422);
+
+  const storageKey = await uploadAvatar(user.id, output.image);
+  await updateUser(user.id, output.name, storageKey);
+  throw redirect(".");
 };
 
 const updateUserValidator = vine.compile(

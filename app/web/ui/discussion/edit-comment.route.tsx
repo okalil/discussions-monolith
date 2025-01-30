@@ -1,11 +1,10 @@
 import vine from "@vinejs/vine";
-import { useFetcher } from "react-router";
+import { data, useFetcher } from "react-router";
 
 import type { CommentsDto } from "~/core/data/comment";
 
 import { bodyParser } from "~/web/body-parser";
 import { updateComment } from "~/core/data/comment";
-import { handleError, handleSuccess } from "~/web/response";
 
 import type { Route } from "./+types/edit-comment.route";
 
@@ -66,17 +65,15 @@ export const action = async ({
   context,
   params,
 }: Route.ActionArgs) => {
-  try {
-    const user = context.auth.getUserOrFail();
-    const form = await bodyParser.parse(request);
-    const { body } = await updateCommentValidator.validate(form);
-
-    await updateComment(Number(params.id), body, user.id);
-
-    return handleSuccess();
-  } catch (error) {
-    return handleError(error);
+  const user = context.auth.getUserOrFail();
+  const body = await bodyParser.parse(request);
+  const [error, output] = await updateCommentValidator.tryValidate(body);
+  if (error) {
+    return data({ error, body }, 422);
   }
+
+  await updateComment(Number(params.id), output.body, user.id);
+  return { ok: true };
 };
 
 const updateCommentValidator = vine.compile(

@@ -1,7 +1,6 @@
 import vine from "@vinejs/vine";
-import { Form, redirect, useNavigation } from "react-router";
+import { data, Form, redirect, useNavigation } from "react-router";
 
-import { handleError } from "~/web/response";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { createDiscussion } from "~/core/data/discussion";
@@ -50,15 +49,13 @@ export default function Component({ actionData }: Route.ComponentProps) {
 }
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
-  const form = await bodyParser.parse(request);
-  try {
-    const user = context.auth.getUserOrFail();
-    const { title, body } = await createDiscussionValidator.validate(form);
-    const discussion = await createDiscussion(title, body, user.id);
-    throw redirect(`/discussions/${discussion.id}`);
-  } catch (error) {
-    return handleError(error, { values: form });
-  }
+  const body = await bodyParser.parse(request);
+  const user = context.auth.getUserOrFail();
+  const [error, output] = await createDiscussionValidator.tryValidate(body);
+  if (error) return data({ error, values: body }, 422);
+
+  const discussion = await createDiscussion(output.title, output.body, user.id);
+  throw redirect(`/discussions/${discussion.id}`);
 };
 
 const createDiscussionValidator = vine.compile(

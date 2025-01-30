@@ -2,7 +2,6 @@ import vine from "@vinejs/vine";
 import { useFetcher } from "react-router";
 
 import { bodyParser } from "~/web/body-parser";
-import { handleError, handleSuccess } from "~/web/response";
 import { unvoteComment, voteComment } from "~/core/data/comment";
 
 import type { Route } from "./+types/vote-comment.route";
@@ -48,20 +47,16 @@ export const action = async ({
   context,
   params,
 }: Route.ActionArgs) => {
-  try {
-    const user = context.auth.getUserOrFail();
-    const body = await bodyParser.parse(request);
-    const { voted } = await voteCommentValidator.validate(body);
+  const user = context.auth.getUserOrFail();
+  const body = await bodyParser.parse(request);
+  const { voted } = await voteCommentValidator.validate(body);
 
-    if (voted) {
-      await voteComment(Number(params.id), user.id);
-    } else {
-      await unvoteComment(Number(params.id), user.id);
-    }
-    return handleSuccess();
-  } catch (error) {
-    return handleError(error);
+  if (voted) {
+    await voteComment(Number(params.id), user.id);
+  } else {
+    await unvoteComment(Number(params.id), user.id);
   }
+  return { ok: true };
 };
 
 const voteCommentValidator = vine.compile(

@@ -1,9 +1,9 @@
 import vine from "@vinejs/vine";
+import { data } from "react-router";
 import { Form, Link, redirect, useNavigation } from "react-router";
 
 import { env } from "~/core/env";
 import { mailer } from "~/core/mailer";
-import { handleError } from "~/web/response";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { createVerificationToken, getUserByEmail } from "~/core/data/user";
@@ -51,30 +51,30 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  try {
-    const { email } = await forgetPasswordValidator.validate(body);
-    const user = await getUserByEmail(email);
-    if (user) {
-      const token = await createVerificationToken(email);
-      await mailer.send({
-        to: email,
-        subject: "Discussions Password Reset",
-        body: (
-          <ResetPasswordEmail
-            userFirstname={user.name ?? ""}
-            resetPasswordLink={`${env.SITE_URL}/reset-password?token=${token}`}
-          />
-        ),
-      });
-    }
-    context.session.flash(
-      "success",
-      "If your email is in our system, you will receive instructions to reset your password"
-    );
-    throw redirect("/login");
-  } catch (error) {
-    return handleError(error, { values: body });
+  const [error, output] = await forgetPasswordValidator.tryValidate(body);
+  if (error) {
+    return data({ error, values: body }, 422);
   }
+
+  const user = await getUserByEmail(output.email);
+  if (user && user.email) {
+    const token = await createVerificationToken(user.email);
+    await mailer.send({
+      to: user.email,
+      subject: "Discussions Password Reset",
+      body: (
+        <ResetPasswordEmail
+          userFirstname={user.name ?? ""}
+          resetPasswordLink={`${env.SITE_URL}/reset-password?token=${token}`}
+        />
+      ),
+    });
+  }
+  context.session.flash(
+    "success",
+    "If your email is in our system, you will receive instructions to reset your password"
+  );
+  throw redirect("/login");
 };
 
 const forgetPasswordValidator = vine.compile(

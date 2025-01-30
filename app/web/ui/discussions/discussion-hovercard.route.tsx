@@ -1,21 +1,16 @@
 import { Link, useFetcher } from "react-router";
 import * as HoverCard from "@radix-ui/react-hover-card";
 
-import { handleError, handleSuccess } from "~/web/response";
 import { getDiscussionWithReply } from "~/core/data/discussion";
 
-import type { Route } from "./+types/discussion-hovercard.route";
+import type { Route, Info } from "./+types/discussion-hovercard.route";
 
 import { Avatar } from "../shared/avatar";
 
 export const loader = async ({ params }: Route.LoaderArgs) => {
-  try {
-    const id = Number(params.id);
-    const discussion = await getDiscussionWithReply(id);
-    return handleSuccess(discussion);
-  } catch (error) {
-    return handleError(error);
-  }
+  const id = Number(params.id);
+  const discussion = await getDiscussionWithReply(id);
+  return { discussion };
 };
 
 export const shouldRevalidate = () => false;
@@ -28,11 +23,11 @@ export function DiscussionHoverCard({
   discussionId,
   ...props
 }: DiscussionHoverCardProps) {
-  const fetcher = useFetcher<Route.ComponentProps["loaderData"]>();
-  const { data } = fetcher.data ?? {};
+  const fetcher = useFetcher<Info["loaderData"]>();
+  const discussion = fetcher.data?.discussion;
 
   const onOpen = () => {
-    if (!data && fetcher.state === "idle") {
+    if (!discussion && fetcher.state === "idle") {
       fetcher.load(`/discussions/${discussionId}/hovercard`);
     }
   };
@@ -41,7 +36,7 @@ export function DiscussionHoverCard({
     <HoverCard.Root openDelay={500} onOpenChange={() => onOpen()}>
       <HoverCard.Trigger asChild>{props.children}</HoverCard.Trigger>
       <HoverCard.Portal>
-        {data && (
+        {discussion && (
           <HoverCard.Content
             className="w-[300px] rounded-md bg-white shadow-lg"
             sideOffset={5}
@@ -51,36 +46,36 @@ export function DiscussionHoverCard({
               <div className="mb-1">
                 <p>
                   <Link
-                    to={`/discussions/${data.id}`}
+                    to={`/discussions/${discussion.id}`}
                     className="font-semibold hover:underline"
                   >
-                    {data.title}
+                    {discussion.title}
                   </Link>
                 </p>
-                <span className="text-gray-600">#{data.id}</span>
+                <span className="text-gray-600">#{discussion.id}</span>
               </div>
-              <p className="text-gray-600">{data.body}</p>
+              <p className="text-gray-600">{discussion.body}</p>
             </div>
 
-            {data.reply && (
+            {discussion.reply && (
               <div className="border-t border-gray-200 p-3">
                 <div className="flex items-center mb-2">
                   <Avatar
-                    src={data.reply.author?.image}
-                    alt={`${data.reply.author?.name}'s avatar`}
-                    fallback={data.reply.author?.name?.at(0)}
+                    src={discussion.reply.author?.image}
+                    alt={`${discussion.reply.author?.name}'s avatar`}
+                    fallback={discussion.reply.author?.name?.at(0)}
                     className="w-6 h-6 rounded-full mr-2"
                     size={20}
                   />
 
                   <p className="text-xs text-gray-500">
                     <span className="text-gray-900 font-medium">
-                      {data.reply.author?.name}
+                      {discussion.reply.author?.name}
                     </span>{" "}
                     replied
                   </p>
                 </div>
-                <p className="text-gray-700 text-xs">{data.reply.body}</p>
+                <p className="text-gray-700 text-xs">{discussion.reply.body}</p>
               </div>
             )}
             <HoverCard.Arrow className="fill-white" />

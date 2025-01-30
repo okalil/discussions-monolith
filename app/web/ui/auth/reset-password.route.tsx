@@ -1,5 +1,6 @@
 import vine from "@vinejs/vine";
 import {
+  data,
   Form,
   Link,
   redirect,
@@ -7,7 +8,6 @@ import {
   useSearchParams,
 } from "react-router";
 
-import { handleError } from "~/web/response";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { resetPassword } from "~/core/data/user";
@@ -80,16 +80,13 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  try {
-    const { email, password, token } = await resetPasswordValidator.validate(
-      body
-    );
-    await resetPassword(email, password, token);
-
-    throw redirect("/login");
-  } catch (error) {
-    return handleError(error);
+  const [error, output] = await resetPasswordValidator.tryValidate(body);
+  if (error) {
+    return data({ error }, 422);
   }
+
+  await resetPassword(output.email, output.password, output.token);
+  throw redirect("/login");
 };
 
 const resetPasswordValidator = vine.compile(
