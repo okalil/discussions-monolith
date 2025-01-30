@@ -10,7 +10,7 @@ interface RateLimiterOptions {
 }
 
 export function rateLimit({ max, window }: RateLimiterOptions) {
-  return function rateLimit({ request }: Route.MiddlewareArgs) {
+  return function rateLimiter({ request }: Route.MiddlewareArgs) {
     const ip =
       ipHeaders
         .map((h) => request.headers.get(h))
@@ -28,6 +28,8 @@ export function rateLimit({ max, window }: RateLimiterOptions) {
     } else {
       rateInfo.count += 1;
     }
+
+    rateLimitStorage.set(ip, rateInfo);
 
     if (rateInfo.count > max) {
       throw new Response("Too Many Requests", {
