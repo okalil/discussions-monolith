@@ -1,5 +1,12 @@
 import vine from "@vinejs/vine";
-import { data, Form, Link, redirect, useNavigation } from "react-router";
+import {
+  data,
+  Form,
+  Link,
+  redirect,
+  useNavigation,
+  useSearchParams,
+} from "react-router";
 
 import { env } from "~/core/env";
 import { bodyParser } from "~/web/body-parser";
@@ -14,6 +21,8 @@ export const meta: Route.MetaFunction = () => [{ title: "Login" }];
 
 export default function Component({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("to");
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
@@ -24,6 +33,8 @@ export default function Component({ actionData }: Route.ComponentProps) {
               {actionData.error.message}
             </p>
           )}
+
+          {redirectTo && <input name="to" value={redirectTo} type="hidden" />}
           <div>
             <label
               htmlFor="email"
