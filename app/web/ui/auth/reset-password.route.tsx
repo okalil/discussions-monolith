@@ -81,11 +81,15 @@ export default function Component({ actionData }: Route.ComponentProps) {
 export const action = async ({ request }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   const [error, output] = await resetPasswordValidator.tryValidate(body);
-  if (error) {
-    return data({ error }, 422);
-  }
+  if (error) return data({ error }, 422);
 
-  await resetPassword(output.email, output.password, output.token);
+  const reset = await resetPassword(
+    output.email,
+    output.password,
+    output.token
+  );
+  if (!reset) return data({ error: new Error("Invalid credentials") }, 400);
+
   throw redirect("/login");
 };
 

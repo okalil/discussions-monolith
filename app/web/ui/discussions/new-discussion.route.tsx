@@ -49,8 +49,8 @@ export default function Component({ actionData }: Route.ComponentProps) {
 }
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
-  const body = await bodyParser.parse(request);
   const user = context.auth.getUserOrFail();
+  const body = await bodyParser.parse(request);
   const [error, output] = await createDiscussionValidator.tryValidate(body);
   if (error) return data({ error, values: body }, 422);
 

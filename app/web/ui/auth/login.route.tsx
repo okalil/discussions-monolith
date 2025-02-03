@@ -43,7 +43,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
               Email
             </label>
             <Input
-              defaultValue={actionData?.values?.email}
+              defaultValue={actionData?.email}
               name="email"
               type="email"
               id="email"
@@ -92,12 +92,15 @@ export default function Component({ actionData }: Route.ComponentProps) {
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   const [error, output] = await loginValidator.tryValidate(body);
-  if (error) {
-    delete body.password;
-    return data({ error, values: body }, 422);
-  }
+  if (error) return data({ error, email: body.email }, 422);
 
   const user = await getUserByCredentials(output.email, output.password);
+  if (!user)
+    return data(
+      { error: new Error("Invalid email or password"), email: body.email },
+      400
+    );
+
   context.auth.login(user.id);
   context.session.flash("success", "Signed in successfully!");
   throw redirect(output.to || "/");

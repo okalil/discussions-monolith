@@ -57,11 +57,10 @@ export const getUserByCredentials = async (email: string, password: string) => {
     );
 
   const account = accounts.at(0);
-  if (!account?.user || !account.password)
-    throw new Error("Invalid email or password");
+  if (!account?.user || !account.password) return null;
 
   const isValid = await bcrypt.compare(password, account.password);
-  if (!isValid) throw new Error("Invalid email or password");
+  if (!isValid) return null;
 
   return account.user;
 };
@@ -99,18 +98,19 @@ export const resetPassword = async (
   const verificationToken = await getVerificationToken(email);
 
   if (!verificationToken || new Date(verificationToken.expires) < new Date()) {
-    throw new Error("Invalid or expired token");
+    return false;
   }
 
   const isValid = await bcrypt.compare(token, verificationToken.token);
   if (!isValid) {
-    throw new Error("Invalid token");
+    return false;
   }
 
   password = await bcrypt.hash(password, 10);
 
   await updatePassword(verificationToken.identifier, password);
   await deleteVerificationToken(verificationToken.token);
+  return true;
 };
 
 const getVerificationToken = async (email: string) => {

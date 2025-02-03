@@ -28,7 +28,13 @@ export default function Component({ actionData }: Route.ComponentProps) {
             >
               Name
             </label>
-            <Input name="name" type="text" id="name" required />
+            <Input
+              name="name"
+              type="text"
+              id="name"
+              required
+              defaultValue={actionData?.values?.name}
+            />
           </div>
           <div>
             <label
@@ -37,7 +43,13 @@ export default function Component({ actionData }: Route.ComponentProps) {
             >
               Email
             </label>
-            <Input name="email" type="email" id="email" required />
+            <Input
+              name="email"
+              type="email"
+              id="email"
+              required
+              defaultValue={actionData?.values?.email}
+            />
           </div>
           <div>
             <label
