@@ -4,13 +4,13 @@ import { data, Form, redirect, useNavigation } from "react-router";
 
 import { storage } from "~/core/storage";
 import { updateUser } from "~/core/data/user";
+import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
 import { Avatar } from "~/web/ui/shared/avatar";
 import { Button } from "~/web/ui/shared/button";
+import { ErrorMessage } from "~/web/ui/shared/error-message";
 
 import type { Route } from "./+types/profile.route";
-
-import { Input } from "../shared/input";
 
 export const meta = () => [{ title: "Discussions | Profile" }];
 
@@ -32,9 +32,7 @@ export default function Component({
     <main className="max-w-lg mx-auto px-3 py-6">
       <h1 className="text-xl font-semibold mb-2">Profile</h1>
       <Form replace method="POST" encType="multipart/form-data">
-        {actionData?.error && (
-          <p className="text-red-500 text-center">{actionData.error.message}</p>
-        )}
+        {actionData?.error && <ErrorMessage error={actionData.error} />}
 
         <label className="grid place-items-center mb-4">
           <Avatar

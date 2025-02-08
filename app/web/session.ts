@@ -1,6 +1,6 @@
 import { createCookieSessionStorage } from "react-router";
 
-import { env } from "~/core/env";
+import { env } from "~/config/env";
 
 import type { Route } from "../+types/root";
 

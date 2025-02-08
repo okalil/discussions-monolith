@@ -8,14 +8,14 @@ import {
   useSearchParams,
 } from "react-router";
 
-import { env } from "~/core/env";
+import { env } from "~/config/env";
+import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { getUserByCredentials } from "~/core/data/user";
+import { ErrorMessage } from "~/web/ui/shared/error-message";
 
 import type { Route } from "./+types/login.route";
-
-import { Input } from "../shared/input";
 
 export const meta: Route.MetaFunction = () => [{ title: "Login" }];
 
@@ -28,11 +28,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Login</h2>
         <Form method="POST" className="space-y-4">
-          {actionData?.error && (
-            <p className="text-red-500 text-center">
-              {actionData.error.message}
-            </p>
-          )}
+          {actionData?.error && <ErrorMessage error={actionData.error} />}
 
           {redirectTo && <input name="to" value={redirectTo} type="hidden" />}
           <div>
@@ -92,14 +88,14 @@ export default function Component({ actionData }: Route.ComponentProps) {
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   const [error, output] = await loginValidator.tryValidate(body);
-  if (error) return data({ error, email: body.email }, 422);
+  if (error) {
+    return data({ error, email: body.email }, 422);
+  }
 
   const user = await getUserByCredentials(output.email, output.password);
-  if (!user)
-    return data(
-      { error: new Error("Invalid email or password"), email: body.email },
-      400
-    );
+  if (!user) {
+    return data({ error: "Invalid email or password", email: body.email }, 400);
+  }
 
   context.auth.login(user.id);
   context.session.flash("success", "Signed in successfully!");
@@ -109,7 +105,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 const loginValidator = vine.compile(
   vine.object({
     email: vine.string().email(),
-    password: vine.string().minLength(8),
+    password: vine.string(),
     to: vine
       .string()
       .optional()

@@ -4,12 +4,11 @@ import { data, useFetcher } from "react-router";
 import type { CommentsDto } from "~/core/data/comment";
 
 import { bodyParser } from "~/web/body-parser";
+import { Button } from "~/web/ui/shared/button";
 import { updateComment } from "~/core/data/comment";
+import { Textarea } from "~/web/ui/shared/textarea";
 
 import type { Route } from "./+types/edit-comment.route";
-
-import { Button } from "../shared/button";
-import { Textarea } from "../shared/textarea";
 
 interface EditCommentProps {
   comment: CommentsDto[number];

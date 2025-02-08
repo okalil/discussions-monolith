@@ -48,10 +48,14 @@ export function CreateComment({ discussionId }: CreateCommentProps) {
 }
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
-  const form = await bodyParser.parse(request);
   const user = context.auth.getUserOrFail();
-  const { body, discussionId } = await createCommentValidator.validate(form);
-  const comment = await createComment(discussionId, body, user.id);
+  const body = await bodyParser.parse(request);
+  const output = await createCommentValidator.validate(body);
+  const comment = await createComment(
+    output.discussionId,
+    output.body,
+    user.id
+  );
   return { comment };
 };
 

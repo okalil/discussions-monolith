@@ -1,10 +1,9 @@
 import { useFetcher } from "react-router";
 
+import { Button } from "~/web/ui/shared/button";
 import { deleteComment } from "~/core/data/comment";
 
 import type { Route } from "./+types/delete-comment.route";
-
-import { Button } from "../shared/button";
 
 interface DeleteCommentProps {
   commentId: number;

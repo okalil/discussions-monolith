@@ -2,12 +2,12 @@ import vine from "@vinejs/vine";
 import { data, Form, Link, redirect, useNavigation } from "react-router";
 
 import { createUser } from "~/core/data/user";
+import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
+import { ErrorMessage } from "~/web/ui/shared/error-message";
 
 import type { Route } from "./+types/register.route";
-
-import { Input } from "../shared/input";
 
 export default function Component({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
@@ -16,11 +16,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Register</h2>
         <Form method="post" className="space-y-4">
-          {actionData?.error && (
-            <p className="text-red-500 text-center">
-              {actionData.error.message}
-            </p>
-          )}
+          {actionData?.error && <ErrorMessage error={actionData.error} />}
           <div>
             <label
               htmlFor="name"

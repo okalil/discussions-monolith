@@ -1,14 +1,14 @@
 import vine from "@vinejs/vine";
 import { data, Form, redirect, useNavigation } from "react-router";
 
+import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
+import { Textarea } from "~/web/ui/shared/textarea";
 import { createDiscussion } from "~/core/data/discussion";
+import { ErrorMessage } from "~/web/ui/shared/error-message";
 
 import type { Route } from "./+types/new-discussion.route";
-
-import { Input } from "../shared/input";
-import { Textarea } from "../shared/textarea";
 
 export default function Component({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
@@ -16,9 +16,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
     <main className="max-w-4xl mx-auto px-3 py-6">
       <h1 className="text-xl font-semibold mb-4">Start a new discussion</h1>
       <Form method="POST" className="space-y-3">
-        {actionData?.error && (
-          <p className="text-red-500 text-center">{actionData.error.message}</p>
-        )}
+        {actionData?.error && <ErrorMessage error={actionData.error} />}
         <div>
           <Input
             name="title"

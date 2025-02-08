@@ -2,11 +2,10 @@ import vine from "@vinejs/vine";
 import { useFetcher } from "react-router";
 
 import { bodyParser } from "~/web/body-parser";
+import { VoteButton } from "~/web/ui/shared/vote-button";
 import { unvoteComment, voteComment } from "~/core/data/comment";
 
 import type { Route } from "./+types/vote-comment.route";
-
-import { VoteButton } from "../shared/vote-button";
 
 interface VoteCommentProps extends React.ComponentProps<typeof VoteButton> {
   commentId: number;

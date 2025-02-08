@@ -2,15 +2,16 @@ import vine from "@vinejs/vine";
 import { data } from "react-router";
 import { Form, Link, redirect, useNavigation } from "react-router";
 
-import { env } from "~/core/env";
+import { env } from "~/config/env";
 import { mailer } from "~/core/mailer";
+import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
+import { ErrorMessage } from "~/web/ui/shared/error-message";
 import { createVerificationToken, getUserByEmail } from "~/core/data/user";
 
 import type { Route } from "./+types/forgot-password.route";
 
-import { Input } from "../shared/input";
 import { ResetPasswordEmail } from "./emails/reset-password-email";
 
 export default function Component({ actionData }: Route.ComponentProps) {
@@ -20,11 +21,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Forgot Password</h2>
         <Form method="POST" className="space-y-4">
-          {actionData?.error && (
-            <p className="text-red-500 text-center">
-              {actionData.error.message}
-            </p>
-          )}
+          {actionData?.error && <ErrorMessage error={actionData.error} />}
           <div>
             <label
               htmlFor="email"
@@ -64,7 +61,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       subject: "Discussions Password Reset",
       body: (
         <ResetPasswordEmail
-          userFirstname={user.name ?? ""}
+          userFirstname={user.name}
           resetPasswordLink={`${env.SITE_URL}/reset-password?token=${token}`}
         />
       ),

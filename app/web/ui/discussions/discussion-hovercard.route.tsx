@@ -1,16 +1,23 @@
 import { Link, useFetcher } from "react-router";
 import * as HoverCard from "@radix-ui/react-hover-card";
 
+import { Avatar } from "~/web/ui/shared/avatar";
 import { getDiscussionWithReply } from "~/core/data/discussion";
 
 import type { Route, Info } from "./+types/discussion-hovercard.route";
-
-import { Avatar } from "../shared/avatar";
 
 export const loader = async ({ params }: Route.LoaderArgs) => {
   const id = Number(params.id);
   const discussion = await getDiscussionWithReply(id);
   return { discussion };
+};
+
+export const clientLoader = async (_: Route.ClientLoaderArgs) => {
+  try {
+    return await _.serverLoader();
+  } catch {
+    return; // prevents throwing error for unexpected/network issues
+  }
 };
 
 export const shouldRevalidate = () => false;

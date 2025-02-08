@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { render } from "@react-email/components";
 
-import { env } from "./env";
+import { env } from "~/config/env";
 
 interface MailMessage {
   from?: string;

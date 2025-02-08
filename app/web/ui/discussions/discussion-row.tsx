@@ -3,8 +3,9 @@ import { MdChatBubbleOutline } from "react-icons/md";
 
 import type { DiscussionsDto } from "~/core/data/discussion";
 
-import { cn } from "../shared/utils/cn";
-import { Avatar } from "../shared/avatar";
+import { cn } from "~/web/ui/shared/utils/cn";
+import { Avatar } from "~/web/ui/shared/avatar";
+
 import { DiscussionHoverCard } from "./discussion-hovercard.route";
 import { VoteDiscussion } from "../discussion/vote-discussion.route";
 

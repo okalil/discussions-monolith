@@ -2,11 +2,10 @@ import vine from "@vinejs/vine";
 import { data, useFetcher } from "react-router";
 
 import { bodyParser } from "~/web/body-parser";
+import { VoteButton } from "~/web/ui/shared/vote-button";
 import { unvoteDiscussion, voteDiscussion } from "~/core/data/discussion";
 
 import type { Route } from "./+types/vote-discussion.route";
-
-import { VoteButton } from "../shared/vote-button";
 
 interface VoteDiscussionProps extends React.ComponentProps<typeof VoteButton> {
   discussionId: number;

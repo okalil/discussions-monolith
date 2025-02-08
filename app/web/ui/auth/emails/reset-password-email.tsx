@@ -11,12 +11,12 @@ import {
   Text,
 } from "@react-email/components";
 
+import { env } from "~/config/env";
+
 interface ResetPasswordEmailProps {
-  userFirstname?: string;
+  userFirstname?: string | null;
   resetPasswordLink?: string;
 }
-
-const baseUrl = process.env.BASE_URL ? `https://${process.env.BASE_URL}` : "";
 
 export const ResetPasswordEmail = ({
   userFirstname,
@@ -29,7 +29,7 @@ export const ResetPasswordEmail = ({
       <Body style={main}>
         <Container style={container}>
           <Img
-            src={`${baseUrl}/logo.png`}
+            src={`${env.SITE_URL}/logo.png`}
             width="40"
             height="33"
             alt="Discussions"
@@ -50,7 +50,7 @@ export const ResetPasswordEmail = ({
             <Text style={text}>
               To keep your account secure, please don&apos;t forward this email
               to anyone. See our Help Center for{" "}
-              <Link style={anchor} href="https://discussions.com">
+              <Link style={anchor} href={env.SITE_URL}>
                 more security tips.
               </Link>
             </Text>

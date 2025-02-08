@@ -8,13 +8,13 @@ import {
   useSearchParams,
 } from "react-router";
 
+import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { resetPassword } from "~/core/data/user";
+import { ErrorMessage } from "~/web/ui/shared/error-message";
 
 import type { Route } from "./+types/reset-password.route";
-
-import { Input } from "../shared/input";
 
 export default function Component({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
@@ -25,11 +25,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Reset Password</h2>
         <Form method="POST" className="space-y-4">
-          {actionData?.error && (
-            <p className="text-red-500 text-sm max-w-xs mx-auto text-center">
-              {actionData.error.message}
-            </p>
-          )}
+          {actionData?.error && <ErrorMessage error={actionData.error} />}
           <input name="token" value={token} type="hidden" />
           <div>
             <label
@@ -88,7 +84,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     output.password,
     output.token
   );
-  if (!reset) return data({ error: new Error("Invalid credentials") }, 400);
+  if (!reset) return data({ error: "Invalid credentials" }, 400);
 
   throw redirect("/login");
 };

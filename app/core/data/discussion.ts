@@ -152,7 +152,7 @@ export const getDiscussionWithReply = async (id: number) => {
   const discussion = discussions.at(0);
   const reply = comments.at(0);
 
-  if (!discussion) throw new Error("Discussion not found");
+  if (!discussion) return null;
 
   return { ...discussion, reply };
 };

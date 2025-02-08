@@ -1,13 +1,13 @@
 import vine from "@vinejs/vine";
 import { Form, useSearchParams } from "react-router";
 
+import { Input } from "~/web/ui/shared/input";
 import { Button } from "~/web/ui/shared/button";
 import { Pagination } from "~/web/ui/shared/pagination";
 import { getDiscussions } from "~/core/data/discussion";
 
 import type { Route } from "./+types/discussions.route";
 
-import { Input } from "../shared/input";
 import { DiscussionRow } from "./discussion-row";
 
 export const meta: Route.MetaFunction = () => [{ title: "Top Discussions" }];
