@@ -15,7 +15,7 @@ import type { Route } from "./+types/profile.route";
 
 export const meta = () => [{ title: "Discussions | Profile" }];
 
-export const loader = async ({ context }: Route.LoaderArgs) => {
+export const loader = ({ context }: Route.LoaderArgs) => {
   const user = context.get(authContext).getUserOrFail();
   return { user };
 };
@@ -81,8 +81,8 @@ export default function Component({
 }
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
-  const body = await bodyParser.parse(request);
   const user = context.get(authContext).getUserOrFail();
+  const body = await bodyParser.parse(request);
   const [error, output] = await updateUserValidator.tryValidate(body);
   if (error) return data({ error, body }, 422);
 

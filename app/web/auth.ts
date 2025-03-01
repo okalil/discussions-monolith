@@ -28,11 +28,13 @@ export const authMiddleware: MiddlewareFunction = async ({
       return user;
     },
     getUserOrFail() {
-      const url = new URL(request.url);
-      const searchParams = new URLSearchParams([
-        ["to", url.href.replace(url.origin, "")],
-      ]);
-      if (!user) throw redirect(`/login?${searchParams}`);
+      if (!user) {
+        const url = new URL(request.url);
+        const searchParams = new URLSearchParams([
+          ["to", url.href.replace(url.origin, "")],
+        ]);
+        throw redirect(`/login?${searchParams}`);
+      }
       return user;
     },
     login(userId: number) {

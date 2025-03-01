@@ -29,7 +29,7 @@ const routes = [
     route("profile", "web/ui/profile/profile.route.tsx"),
   ]),
 
-  route("uploads/*", "web/resources/uploads.tsx"),
+  route("uploads/*", "web/resources/uploads.route.tsx"),
 ];
 
 export default routes satisfies RouteConfig;
