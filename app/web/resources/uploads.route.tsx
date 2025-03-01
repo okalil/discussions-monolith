@@ -1,6 +1,6 @@
 import { storage } from "~/core/storage";
 
-import type { Route } from "./+types/uploads";
+import type { Route } from "./+types/uploads.route";
 
 export async function loader({ params }: Route.LoaderArgs) {
   const key = params["*"];
