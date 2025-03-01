@@ -1,8 +1,12 @@
-import type { unstable_MiddlewareFunction as MiddlewareFunction } from "react-router";
-
 import net from "node:net";
+import {
+  unstable_createContext,
+  type unstable_MiddlewareFunction as MiddlewareFunction,
+} from "react-router";
 
 const rateLimitStorage = new Map();
+
+const rateLimitContext = unstable_createContext("");
 
 interface RateLimiterOptions {
   max: number;
@@ -13,11 +17,8 @@ export function rateLimitMiddleware({
   max,
   window,
 }: RateLimiterOptions): MiddlewareFunction {
-  return function ({ request }) {
-    const ip =
-      ipHeaders
-        .map((h) => request.headers.get(h))
-        .find((value) => value && net.isIP(value)) || "unknown";
+  return function ({ request, context }) {
+    const ip = getRequestIP(request) || "unknown";
     const resource = new URL(request.url).pathname;
     const rateLimitId = ip + resource;
 
@@ -27,14 +28,19 @@ export function rateLimitMiddleware({
       resetTime: now + window,
     };
 
+    const hasUpperRateLimit = !!context.get(rateLimitContext);
+    if (hasUpperRateLimit) rateInfo.hits--; // Revert upper middleware hit count
+
     if (now > rateInfo.resetTime) {
-      rateInfo.hits = 1;
+      rateInfo.hits = 0;
       rateInfo.resetTime = now + window;
-    } else {
-      rateInfo.hits++;
     }
 
+    rateInfo.hits++;
     rateLimitStorage.set(rateLimitId, rateInfo);
+
+    context.set(rateLimitContext, rateLimitId);
+
     if (rateInfo.hits > max) {
       throw new Response("Too Many Requests", {
         status: 429,
@@ -44,6 +50,14 @@ export function rateLimitMiddleware({
       });
     }
   };
+}
+
+function getRequestIP(request: Request) {
+  return (
+    ipHeaders
+      .map((h) => request.headers.get(h))
+      .find((value) => value && net.isIP(value)) || "unknown"
+  );
 }
 
 const ipHeaders = [
