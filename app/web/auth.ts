@@ -1,21 +1,29 @@
-import { redirect } from "react-router";
+import type { unstable_MiddlewareFunction as MiddlewareFunction } from "react-router";
+
+import { redirect, unstable_createContext } from "react-router";
 
 import { getUser } from "~/core/data/user";
 
-import type { Route } from "../+types/root";
+import { sessionContext } from "./session";
 
 type MaybeUser = Awaited<ReturnType<typeof getUser>>;
-export interface Auth {
+interface Auth {
   getUser: () => MaybeUser;
   getUserOrFail: () => NonNullable<MaybeUser>;
   login: (userId: number) => void;
   logout: () => void;
 }
 
-export async function auth({ request, context }: Route.MiddlewareArgs) {
-  const userId = context.session.get("userId");
+export const authContext = unstable_createContext<Auth>();
+
+export const authMiddleware: MiddlewareFunction = async ({
+  request,
+  context,
+}) => {
+  const session = context.get(sessionContext);
+  const userId = session.get("userId");
   const user = userId ? await getUser(userId) : null;
-  context.auth = {
+  context.set(authContext, {
     getUser() {
       return user;
     },
@@ -28,10 +36,10 @@ export async function auth({ request, context }: Route.MiddlewareArgs) {
       return user;
     },
     login(userId: number) {
-      context.session.set("userId", userId);
+      session.set("userId", userId);
     },
     logout() {
-      context.session.unset("userId");
+      session.unset("userId");
     },
-  };
-}
+  });
+};

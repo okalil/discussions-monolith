@@ -1,6 +1,6 @@
-import net from "node:net";
+import type { unstable_MiddlewareFunction as MiddlewareFunction } from "react-router";
 
-import type { Route } from "../+types/root";
+import net from "node:net";
 
 const rateLimitStorage = new Map();
 
@@ -9,35 +9,38 @@ interface RateLimiterOptions {
   window: number;
 }
 
-export function rateLimit({ max, window }: RateLimiterOptions) {
-  return function rateLimiter({ request }: Route.MiddlewareArgs) {
+export function rateLimitMiddleware({
+  max,
+  window,
+}: RateLimiterOptions): MiddlewareFunction {
+  return function ({ request }) {
     const ip =
       ipHeaders
         .map((h) => request.headers.get(h))
         .find((value) => value && net.isIP(value)) || "unknown";
-    const now = Date.now();
+    const resource = new URL(request.url).pathname;
+    const rateLimitId = ip + resource;
 
-    const rateInfo = rateLimitStorage.get(ip) || {
-      count: 0,
+    const now = Date.now();
+    const rateInfo = rateLimitStorage.get(rateLimitId) || {
+      hits: 0,
       resetTime: now + window,
     };
 
     if (now > rateInfo.resetTime) {
-      rateInfo.count = 1;
+      rateInfo.hits = 1;
       rateInfo.resetTime = now + window;
     } else {
-      rateInfo.count += 1;
+      rateInfo.hits++;
     }
 
-    rateLimitStorage.set(ip, rateInfo);
-
-    if (rateInfo.count > max) {
+    rateLimitStorage.set(rateLimitId, rateInfo);
+    if (rateInfo.hits > max) {
       throw new Response("Too Many Requests", {
         status: 429,
-        headers: {
-          "Retry-After": `${Math.ceil((rateInfo.resetTime - now) / 1000)}`,
-          "Content-Type": "text/plain",
-        },
+        headers: [
+          ["Retry-After", `${Math.ceil((rateInfo.resetTime - now) / 1000)}`],
+        ],
       });
     }
   };

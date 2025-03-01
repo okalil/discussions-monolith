@@ -2,6 +2,7 @@ import type { ShouldRevalidateFunction } from "react-router";
 
 import { Link, Outlet, Form } from "react-router";
 
+import { authContext } from "~/web/auth";
 import { cn } from "~/web/ui/shared/utils/cn";
 import { Button } from "~/web/ui/shared/button";
 import { Avatar } from "~/web/ui/shared/avatar";
@@ -9,7 +10,7 @@ import { Avatar } from "~/web/ui/shared/avatar";
 import type { Route } from "./+types/layout.route";
 
 export const loader = ({ context }: Route.LoaderArgs) => {
-  const user = context.auth.getUser();
+  const user = context.get(authContext).getUser();
   return { user };
 };
 

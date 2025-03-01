@@ -1,6 +1,7 @@
 import vine from "@vinejs/vine";
 import { data, Form, redirect, useNavigation } from "react-router";
 
+import { authContext } from "~/web/auth";
 import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
@@ -47,7 +48,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
 }
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
-  const user = context.auth.getUserOrFail();
+  const user = context.get(authContext).getUserOrFail();
   const body = await bodyParser.parse(request);
   const [error, output] = await createDiscussionValidator.tryValidate(body);
   if (error) return data({ error, values: body }, 422);

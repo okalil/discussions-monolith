@@ -1,6 +1,7 @@
 import vine from "@vinejs/vine";
 import { data, useFetcher } from "react-router";
 
+import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { VoteButton } from "~/web/ui/shared/vote-button";
 import { unvoteDiscussion, voteDiscussion } from "~/core/data/discussion";
@@ -49,7 +50,7 @@ export const action = async ({
   context,
   params,
 }: Route.ActionArgs) => {
-  const user = context.auth.getUserOrFail();
+  const user = context.get(authContext).getUserOrFail();
   const body = await bodyParser.parse(request);
   const [error, output] = await voteDiscussionValidator.tryValidate(body);
   if (error) {

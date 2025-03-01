@@ -6,8 +6,8 @@ const routes = [
     route("register", "web/ui/auth/register.route.tsx"),
     route("forgot-password", "web/ui/auth/forgot-password.route.tsx"),
     route("reset-password", "web/ui/auth/reset-password.route.tsx"),
-    route("logout", "web/ui/auth/logout.route.tsx"),
   ]),
+  route("logout", "web/ui/auth/logout.route.tsx"),
 
   layout("web/ui/layouts/layout.route.tsx", [
     route(null, "web/ui/discussions/discussions.route.tsx", { index: true }),

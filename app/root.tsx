@@ -16,14 +16,14 @@ import { NavigationProgress } from "~/web/ui/shared/navigation-progress";
 
 import type { Route } from "./+types/root";
 
-import { auth } from "./web/auth";
-import { session } from "./web/session";
-import { rateLimit } from "./web/rate-limit";
+import { authMiddleware } from "./web/auth";
+import { rateLimitMiddleware } from "./web/rate-limit";
+import { sessionContext, sessionMiddleware } from "./web/session";
 
-export const middleware = [
-  rateLimit({ max: 100, window: 60 * 1000 }),
-  session,
-  auth,
+export const unstable_middleware = [
+  rateLimitMiddleware({ max: 100, window: 60 * 1000 }),
+  sessionMiddleware,
+  authMiddleware,
 ];
 
 export const meta: Route.MetaFunction = () => [{ title: "Discussions" }];
@@ -43,10 +43,8 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export const loader = ({ context }: Route.LoaderArgs) => {
-  return {
-    success: context.session.get("success"),
-    error: context.session.get("error"),
-  };
+  const session = context.get(sessionContext);
+  return { success: session.get("success"), error: session.get("error") };
 };
 
 export default function App({ loaderData }: Route.ComponentProps) {

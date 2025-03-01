@@ -9,7 +9,9 @@ import {
 } from "react-router";
 
 import { env } from "~/config/env";
+import { authContext } from "~/web/auth";
 import { Input } from "~/web/ui/shared/input";
+import { sessionContext } from "~/web/session";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { getUserByCredentials } from "~/core/data/user";
@@ -97,8 +99,8 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     return data({ error: "Invalid email or password", email: body.email }, 400);
   }
 
-  context.auth.login(user.id);
-  context.session.flash("success", "Signed in successfully!");
+  context.get(authContext).login(user.id);
+  context.get(sessionContext).flash("success", "Signed in successfully!");
   throw redirect(output.to || "/");
 };
 

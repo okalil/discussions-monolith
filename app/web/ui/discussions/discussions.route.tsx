@@ -1,6 +1,7 @@
 import vine from "@vinejs/vine";
 import { Form, useSearchParams } from "react-router";
 
+import { authContext } from "~/web/auth";
 import { Input } from "~/web/ui/shared/input";
 import { Button } from "~/web/ui/shared/button";
 import { Pagination } from "~/web/ui/shared/pagination";
@@ -13,7 +14,7 @@ import { DiscussionRow } from "./discussion-row";
 export const meta: Route.MetaFunction = () => [{ title: "Top Discussions" }];
 
 export const loader = async ({ request, context }: Route.LoaderArgs) => {
-  const user = context.auth.getUser();
+  const user = context.get(authContext).getUser();
   const {
     q,
     page = 1,

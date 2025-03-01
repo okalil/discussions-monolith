@@ -1,6 +1,7 @@
 import vine from "@vinejs/vine";
 import { data, Form, Link, redirect, useNavigation } from "react-router";
 
+import { authContext } from "~/web/auth";
 import { createUser } from "~/core/data/user";
 import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
@@ -102,7 +103,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   }
 
   const user = await createUser(output.name, output.email, output.password);
-  context.auth.login(user.id);
+  context.get(authContext).login(user.id);
   throw redirect("/");
 };
 

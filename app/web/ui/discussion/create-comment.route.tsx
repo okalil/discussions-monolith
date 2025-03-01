@@ -1,6 +1,7 @@
 import vine from "@vinejs/vine";
 import { useFetcher } from "react-router";
 
+import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { Textarea } from "~/web/ui/shared/textarea";
@@ -48,7 +49,7 @@ export function CreateComment({ discussionId }: CreateCommentProps) {
 }
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
-  const user = context.auth.getUserOrFail();
+  const user = context.get(authContext).getUserOrFail();
   const body = await bodyParser.parse(request);
   const output = await createCommentValidator.validate(body);
   const comment = await createComment(

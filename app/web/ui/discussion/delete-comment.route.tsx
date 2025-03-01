@@ -1,5 +1,6 @@
 import { useFetcher } from "react-router";
 
+import { authContext } from "~/web/auth";
 import { Button } from "~/web/ui/shared/button";
 import { deleteComment } from "~/core/data/comment";
 
@@ -21,7 +22,7 @@ export function DeleteComment({ commentId }: DeleteCommentProps) {
 }
 
 export const action = async ({ context, params }: Route.ActionArgs) => {
-  const user = context.auth.getUserOrFail();
+  const user = context.get(authContext).getUserOrFail();
   await deleteComment(Number(params.id), user.id);
   return { ok: true };
 };

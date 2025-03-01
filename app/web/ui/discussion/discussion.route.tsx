@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Link } from "react-router";
 
+import { authContext } from "~/web/auth";
 import { Avatar } from "~/web/ui/shared/avatar";
 import { getComments } from "~/core/data/comment";
 import { getDiscussion } from "~/core/data/discussion";
@@ -12,7 +13,7 @@ import { CreateComment } from "./create-comment.route";
 import { VoteDiscussion } from "./vote-discussion.route";
 
 export const loader = async ({ context, params }: Route.LoaderArgs) => {
-  const user = context.auth.getUser();
+  const user = context.get(authContext).getUser();
   const userId = user?.id;
 
   const comments = getComments(Number(params.id), userId);

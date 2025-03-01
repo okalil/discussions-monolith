@@ -5,6 +5,7 @@ import { Form, Link, redirect, useNavigation } from "react-router";
 import { env } from "~/config/env";
 import { mailer } from "~/core/mailer";
 import { Input } from "~/web/ui/shared/input";
+import { sessionContext } from "~/web/session";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
@@ -67,10 +68,12 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       ),
     });
   }
-  context.session.flash(
-    "success",
-    "If your email is in our system, you will receive instructions to reset your password"
-  );
+  context
+    .get(sessionContext)
+    .flash(
+      "success",
+      "If your email is in our system, you will receive instructions to reset your password"
+    );
   throw redirect("/login");
 };
 
