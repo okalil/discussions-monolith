@@ -1,11 +1,13 @@
 import { layout, route, type RouteConfig } from "@react-router/dev/routes";
 
 const routes = [
-  route("login", "web/ui/auth/login.route.tsx"),
-  route("register", "web/ui/auth/register.route.tsx"),
-  route("forgot-password", "web/ui/auth/forgot-password.route.tsx"),
-  route("reset-password", "web/ui/auth/reset-password.route.tsx"),
-  route("logout", "web/ui/auth/logout.route.tsx"),
+  layout("web/ui/auth/auth.route.tsx", [
+    route("login", "web/ui/auth/login.route.tsx"),
+    route("register", "web/ui/auth/register.route.tsx"),
+    route("forgot-password", "web/ui/auth/forgot-password.route.tsx"),
+    route("reset-password", "web/ui/auth/reset-password.route.tsx"),
+    route("logout", "web/ui/auth/logout.route.tsx"),
+  ]),
 
   layout("web/ui/layouts/layout.route.tsx", [
     route(null, "web/ui/discussions/discussions.route.tsx", { index: true }),

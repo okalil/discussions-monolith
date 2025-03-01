@@ -1,3 +1,5 @@
+import type { ShouldRevalidateFunction } from "react-router";
+
 import { useEffect } from "react";
 import { Toaster, toast } from "sonner";
 import {
@@ -93,7 +95,10 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   );
 }
 
-export const shouldRevalidate = () => true;
+// the root loader is only being used to fetch toasts added in server actions
+// so it only needs to revalidate when there is an action result
+export const shouldRevalidate: ShouldRevalidateFunction = (args) =>
+  !!args.actionResult;
 
 function Document(props: React.PropsWithChildren) {
   return (
