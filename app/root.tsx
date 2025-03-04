@@ -20,8 +20,8 @@ import { authMiddleware } from "./web/auth";
 import { rateLimitMiddleware } from "./web/rate-limit";
 import { sessionContext, sessionMiddleware } from "./web/session";
 
-export const unstable_middleware = [
-  rateLimitMiddleware({ max: 100, window: 60 * 1000 }),
+export const unstable_middleware: Route.unstable_MiddlewareFunction[] = [
+  rateLimitMiddleware,
   sessionMiddleware,
   authMiddleware,
 ];

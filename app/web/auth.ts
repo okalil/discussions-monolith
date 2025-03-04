@@ -1,8 +1,8 @@
-import type { unstable_MiddlewareFunction as MiddlewareFunction } from "react-router";
-
 import { redirect, unstable_createContext } from "react-router";
 
 import { getUser } from "~/core/data/user";
+
+import type { Route } from "../+types/root";
 
 import { sessionContext } from "./session";
 
@@ -16,7 +16,7 @@ interface Auth {
 
 export const authContext = unstable_createContext<Auth>();
 
-export const authMiddleware: MiddlewareFunction = async ({
+export const authMiddleware: Route.unstable_MiddlewareFunction = async ({
   request,
   context,
 }) => {
