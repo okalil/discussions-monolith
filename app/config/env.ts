@@ -11,5 +11,7 @@ export const env = await vine.validate({
     SMTP_PASS: vine.string(),
     SITE_URL: vine.string(),
     SESSION_SECRET: vine.string(),
+    GITHUB_CLIENT_ID: vine.string(),
+    GITHUB_CLIENT_SECRET: vine.string(),
   }),
 });

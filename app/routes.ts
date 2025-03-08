@@ -6,6 +6,7 @@ const routes = [
     route("register", "web/ui/auth/register.route.tsx"),
     route("forgot-password", "web/ui/auth/forgot-password.route.tsx"),
     route("reset-password", "web/ui/auth/reset-password.route.tsx"),
+    route("auth/social/:provider", "web/ui/auth/social.route.tsx"),
   ]),
   route("logout", "web/ui/auth/logout.route.tsx"),
 

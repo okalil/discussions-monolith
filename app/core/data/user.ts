@@ -65,6 +65,56 @@ export const getUserByCredentials = async (email: string, password: string) => {
   return account.user;
 };
 
+export const linkProviderAccount = async (
+  provider: string,
+  externalId: string,
+  externalEmail: string,
+  externalName: string,
+  externalImage: string
+) => {
+  let [user] = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.email, externalEmail));
+  let [account] = await db
+    .select()
+    .from(schema.accounts)
+    .where(
+      and(
+        eq(schema.accounts.providerAccountId, externalId),
+        eq(schema.accounts.provider, provider)
+      )
+    );
+
+  await db.transaction(async (tx) => {
+    // If user is not found, create a new one
+    if (!user) {
+      [user] = await tx
+        .insert(schema.users)
+        .values({
+          email: externalEmail,
+          name: externalName,
+          image: externalImage,
+        })
+        .returning();
+    }
+
+    // If user is not linked to that provider yet, link it
+    if (!account) {
+      [account] = await tx
+        .insert(schema.accounts)
+        .values({
+          type: "oauth",
+          provider: provider,
+          providerAccountId: externalId,
+          userId: user.id,
+        })
+        .returning();
+    }
+  });
+  return user;
+};
+
 export const updateUser = async (
   userId: number,
   name: string,

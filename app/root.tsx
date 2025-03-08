@@ -94,9 +94,11 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 }
 
 // the root loader is only being used to fetch toasts added in server actions
-// so it only needs to revalidate when there is an action result
-export const shouldRevalidate: ShouldRevalidateFunction = (args) =>
-  !!args.actionResult;
+// so it only needs to revalidate when it's a POST form submission
+export const shouldRevalidate: ShouldRevalidateFunction = (args) => {
+  if (args.formMethod === "POST") return false;
+  return args.defaultShouldRevalidate;
+};
 
 function Document(props: React.PropsWithChildren) {
   return (

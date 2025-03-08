@@ -19,6 +19,7 @@
     "@react-router/node": "7.3.0",
     "@react-router/serve": "7.3.0",
     "@vinejs/vine": "^3.0.0",
+    "arctic": "^3.5.0",
     "bcrypt": "^5.1.1",
     "better-sqlite3": "^11.7.0",
     "drizzle-orm": "^0.38.2",
