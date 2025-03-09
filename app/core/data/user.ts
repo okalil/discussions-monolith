@@ -115,6 +115,12 @@ export const linkProviderAccount = async (
   return user;
 };
 
+export const unlinkProviderAccount = async (provider: string) => {
+  await db
+    .delete(schema.accounts)
+    .where(eq(schema.accounts.provider, provider));
+};
+
 export const updateUser = async (
   userId: number,
   name: string,
