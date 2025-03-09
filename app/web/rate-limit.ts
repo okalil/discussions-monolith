@@ -7,38 +7,42 @@ const rateLimitStorage = new Map();
 export const rateLimitMiddleware: Route.unstable_MiddlewareFunction = ({
   request,
 }) => {
+  const isAction = !["GET", "HEAD"].includes(request.method);
   const isStrongRoute = strongRoutes.some(
     (pathname) => new URL(request.url).pathname === pathname
   );
-  const { max, window } = isStrongRoute
+  const shouldStrongRateLimit = isStrongRoute && isAction;
+
+  const { maxTokens, refillRate, window } = shouldStrongRateLimit
     ? strongRateLimitConfig
     : defaultRateLimitConfig;
 
   const ip = getRequestIP(request) || "unknown";
-  const resource = new URL(request.url).pathname;
-  const rateLimitId = ip + resource;
 
   const now = Date.now();
-  const rateInfo = rateLimitStorage.get(rateLimitId) || {
-    hits: 0,
-    resetTime: now + window,
+  const rateInfo = rateLimitStorage.get(ip) || {
+    tokens: maxTokens,
+    lastRefillTime: now,
   };
 
-  if (now > rateInfo.resetTime) {
-    rateInfo.hits = 0;
-    rateInfo.resetTime = now + window;
-  }
+  const elapsed = now - rateInfo.lastRefillTime;
+  const tokensToAdd = Math.floor((elapsed * refillRate) / 1000);
+  rateInfo.tokens = Math.min(rateInfo.tokens + tokensToAdd, maxTokens);
+  rateInfo.lastRefillTime = now;
 
-  rateInfo.hits++;
-  rateLimitStorage.set(rateLimitId, rateInfo);
-  if (rateInfo.hits > max) {
+  const hasAvailableTokens = rateInfo.tokens > 0;
+  if (!hasAvailableTokens) {
+    const retryAfter = Math.ceil(
+      (rateInfo.lastRefillTime + window - now) / 1000
+    );
     throw new Response("Too Many Requests", {
       status: 429,
-      headers: [
-        ["Retry-After", `${Math.ceil((rateInfo.resetTime - now) / 1000)}`],
-      ],
+      headers: [["Retry-After", String(retryAfter)]],
     });
   }
+
+  rateInfo.tokens--;
+  rateLimitStorage.set(ip, rateInfo);
 };
 
 const strongRoutes = [
@@ -48,8 +52,17 @@ const strongRoutes = [
   "/reset-password",
 ];
 
-const defaultRateLimitConfig = { max: 100, window: 60_000 };
-const strongRateLimitConfig = { max: 10, window: 10_000 };
+const defaultRateLimitConfig = {
+  maxTokens: 100,
+  refillRate: 1,
+  window: 60_000,
+};
+
+const strongRateLimitConfig = {
+  maxTokens: 10,
+  refillRate: 3,
+  window: 60_000,
+};
 
 const getRequestIP = (request: Request) =>
   ipHeaders
