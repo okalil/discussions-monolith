@@ -11,5 +11,6 @@ export default {
   prerender: ["/login", "/register", "/forgot-password", "/reset-password"],
   future: {
     unstable_middleware: true,
+    unstable_viteEnvironmentApi: true,
   },
 } satisfies Config;
