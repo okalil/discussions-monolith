@@ -1,3 +1,7 @@
+/**
+ * Body Parser is meant to translate the raw request body into a simple JS object
+ * that can be more easily used and validated.
+ */
 class BodyParser {
   async parse(request: Request) {
     const formData = await request.formData();

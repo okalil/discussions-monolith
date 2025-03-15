@@ -41,4 +41,11 @@ class Mailer {
   }
 }
 
+/**
+ * Mailer is the core interface for sending emails.
+ *
+ * For the sake of simplicity, it is set up with nodemailer and SMTP transport,
+ * but for the production environment we can easily replace it by a professional
+ * email service like Resend or MailGun.
+ */
 export const mailer = new Mailer();

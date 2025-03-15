@@ -2,7 +2,7 @@ import * as arctic from "arctic";
 
 import { env } from "~/config/env";
 
-class GithubProvider {
+class GithubClient {
   private github = new arctic.GitHub(
     env.GITHUB_CLIENT_ID,
     env.GITHUB_CLIENT_SECRET,
@@ -30,4 +30,4 @@ class GithubProvider {
   }
 }
 
-export const github = new GithubProvider();
+export const github = new GithubClient();

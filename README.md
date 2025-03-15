@@ -1,28 +1,17 @@
 # Discussions Monolith
 
-This project is a discussion web application (based on Github Discussions), designed with a clear architecture and understandable code organization.
+This project is a discussion web application (based on Github Discussions), designed with a clear architecture and code organization.
 The purpose is to provide a reference implementation for monolithic applications with React and React Router.
 
-## Code Organization
+## Directory Structure
 
-The application code is organized in two main folders:
+### The app/core directory
 
-1. `core`: This contain the core application logic and data access, and integration with other services like mailing, queues etc.
-2. `web`: This contains all web specific code, like session management and UI code
+The `core` directory hosts the core application logic, decoupling it from the framework. That's where we define functions for queries and commands, and integration with third party services. What this directory won't include is code related to the presentation layer (like React and React Router stuff).
 
-### Why not implement services code directly in router loaders/actions?
+### The app/web directory
 
-Some essential services like database, file storage and mailing are abstracted away from the main application code. This has two main benefits:
-
-1. A service can be reused across various routes;
-2. We can easily change the service implementation without changing code in various routes
-
-### Why not use flat routes convention?
-
-The UI routes are implemented with manual configuration for two reasons:
-
-1. Sub components colocation: file system based routing doesn't provide much flexibility for colocating sub components next to the route where it is used;
-2. Confusing file name patterns: UI routes may use a lot of special patterns, like optional segments, pathless layouts, layoutless paths etc, translating this to the file system makes the filename complex.
+The `web` directory holds the web-related parts of the application, including cookies, middlewares, route modules and UI components. We can think of it as both the View and Controller from MVC architecture.
 
 ## Getting Started
 

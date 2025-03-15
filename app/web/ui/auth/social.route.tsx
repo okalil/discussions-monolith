@@ -62,5 +62,5 @@ export const loader = async ({
 
 const providers = new Map([
   ["github", github],
-  // Add more providers if needed...
+  // Add more providers as needed...
 ]);
