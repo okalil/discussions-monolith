@@ -17,16 +17,15 @@ const routes = [
       "discussions/:id/hovercard",
       "web/ui/discussions/discussion-hovercard.route.tsx"
     ),
-    route("discussions/:id", "web/ui/discussion/discussion.route.tsx", [
-      route("vote", "web/ui/discussion/vote-discussion.route.tsx"),
-      route("comments/new", "web/ui/discussion/create-comment.route.tsx"),
-      route("comments/:id/edit", "web/ui/discussion/edit-comment.route.tsx"),
-      route(
-        "comments/:id/delete",
-        "web/ui/discussion/delete-comment.route.tsx"
-      ),
-      route("comments/:id/vote", "web/ui/discussion/vote-comment.route.tsx"),
-    ]),
+    route(
+      "discussions/:id/vote",
+      "web/ui/discussion/vote-discussion.route.tsx"
+    ),
+    route("discussions/:id", "web/ui/discussion/discussion.route.tsx"),
+    route("comments/new", "web/ui/discussion/create-comment.route.tsx"),
+    route("comments/:id/edit", "web/ui/discussion/edit-comment.route.tsx"),
+    route("comments/:id/delete", "web/ui/discussion/delete-comment.route.tsx"),
+    route("comments/:id/vote", "web/ui/discussion/vote-comment.route.tsx"),
     route("profile", "web/ui/profile/profile.route.tsx"),
   ]),
 

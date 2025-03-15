@@ -1,4 +1,4 @@
-import { useFetcher } from "react-router";
+import { href, useFetcher } from "react-router";
 
 import { authContext } from "~/web/auth";
 import { Button } from "~/web/ui/shared/button";
@@ -13,7 +13,10 @@ interface DeleteCommentProps {
 export function DeleteComment({ commentId }: DeleteCommentProps) {
   const fetcher = useFetcher();
   return (
-    <fetcher.Form method="POST" action={`comments/${commentId}/delete`}>
+    <fetcher.Form
+      method="POST"
+      action={href("/comments/:id/delete", { id: commentId.toString() })}
+    >
       <Button variant="danger" loading={fetcher.state !== "idle"}>
         Delete Comment
       </Button>

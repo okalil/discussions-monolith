@@ -1,5 +1,5 @@
 import vine from "@vinejs/vine";
-import { useFetcher } from "react-router";
+import { href, useFetcher } from "react-router";
 
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
@@ -19,7 +19,7 @@ export function CreateComment({ discussionId }: CreateCommentProps) {
   return (
     <fetcher.Form
       method="POST"
-      action="comments/new"
+      action={href("/comments/new")}
       key={fetcher.state === "idle" ? fetcher.data?.comment.id : undefined} // resets the form after submission/revalidation
     >
       <input name="discussionId" value={discussionId} type="hidden" />

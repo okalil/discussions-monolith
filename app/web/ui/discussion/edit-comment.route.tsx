@@ -1,5 +1,5 @@
 import vine from "@vinejs/vine";
-import { data, useFetcher } from "react-router";
+import { data, href, useFetcher } from "react-router";
 
 import type { CommentsDto } from "~/core/data/comment";
 
@@ -21,7 +21,7 @@ export function EditComment({ comment, onCancel }: EditCommentProps) {
   return (
     <fetcher.Form
       method="POST"
-      action={`comments/${comment.id}/edit`}
+      action={href("/comments/:id/edit", { id: comment.id.toString() })}
       className="px-3 py-3 border border-gray-300 rounded-md"
     >
       <input type="hidden" name="id" value={comment.id} />

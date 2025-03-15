@@ -1,3 +1,5 @@
+import type { ShouldRevalidateFunctionArgs } from "react-router";
+
 import { Suspense } from "react";
 import { Link } from "react-router";
 
@@ -102,4 +104,12 @@ export default function Component({
       )}
     </main>
   );
+}
+
+// This shouldRevalidate shouldn't be necessary since the default behavior
+// is to skip revalidation after a non-200 status action result
+// Open issue: https://github.com/remix-run/react-router/issues/13062
+export function shouldRevalidate(args: ShouldRevalidateFunctionArgs) {
+  if (args.actionStatus !== 200) return false;
+  return args.defaultShouldRevalidate;
 }

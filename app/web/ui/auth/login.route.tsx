@@ -31,8 +31,6 @@ export default function Component({ actionData }: Route.ComponentProps) {
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Login</h2>
         <div>
-          {actionData?.error && <ErrorMessage error={actionData.error} />}
-
           <form
             method="POST"
             action={href("/auth/social/:provider", { provider: "github" })}
@@ -62,6 +60,8 @@ export default function Component({ actionData }: Route.ComponentProps) {
           </div>
 
           <Form method="POST" className="space-y-4">
+            {actionData?.error && <ErrorMessage error={actionData.error} />}
+
             {redirectTo && <input name="to" value={redirectTo} type="hidden" />}
             <div>
               <label

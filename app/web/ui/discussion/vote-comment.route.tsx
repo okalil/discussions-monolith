@@ -1,5 +1,5 @@
 import vine from "@vinejs/vine";
-import { useFetcher } from "react-router";
+import { href, useFetcher } from "react-router";
 
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
@@ -33,7 +33,10 @@ export function VoteComment({ commentId, ...props }: VoteCommentProps) {
       onClick={() =>
         fetcher.submit(
           { voted: !voted },
-          { action: `comments/${commentId}/vote`, method: "POST" }
+          {
+            action: href("/comments/:id/vote", { id: commentId.toString() }),
+            method: "POST",
+          }
         )
       }
       active={voted}

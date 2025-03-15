@@ -94,9 +94,9 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 }
 
 // the root loader is only being used to fetch toasts added in server actions
-// so it only needs to revalidate when it's a POST form submission
+// so it only needs to revalidate when it's a non-GET form submission
 export const shouldRevalidate: ShouldRevalidateFunction = (args) => {
-  if (args.formMethod !== "POST") return false;
+  if (args.formAction && args.formAction !== "GET") return true;
   return args.defaultShouldRevalidate;
 };
 
