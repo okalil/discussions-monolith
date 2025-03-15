@@ -2,8 +2,19 @@ import net from "node:net";
 
 import type { Route } from "../+types/root";
 
-const rateLimitStorage = new Map();
+interface RateLimitInfo {
+  tokens: number;
+  lastRefillTime: number;
+}
+const rateLimitStorage = new Map<string, RateLimitInfo>();
 
+/**
+ * Rate Limit Middleware is meant to control the number of requests a user can make
+ * to a server or API within a specified time period.
+ *
+ * For simplicity, a Map object is being used to store the request IP with the corresponding
+ * rate info, but we could switch to something like Redis for better scalability.
+ */
 export const rateLimitMiddleware: Route.unstable_MiddlewareFunction = ({
   request,
 }) => {
@@ -64,24 +75,12 @@ const strongRateLimitConfig = {
   window: 60_000,
 };
 
-const getRequestIP = (request: Request) =>
-  ipHeaders
-    .map((h) => request.headers.get(h))
-    .find((value) => value && net.isIP(value));
-
-const ipHeaders = [
-  "X-Client-IP",
-  "X-Forwarded-For",
-  "HTTP-X-Forwarded-For",
-  "Fly-Client-IP",
-  "CF-Connecting-IP",
-  "Fastly-Client-Ip",
-  "True-Client-Ip",
-  "X-Real-IP",
-  "X-Cluster-Client-IP",
-  "X-Forwarded",
-  "Forwarded-For",
-  "Forwarded",
-  "DO-Connecting-IP",
-  "oxygen-buyer-ip",
-];
+/**
+ * Looks up the value from Fly-Client-IP header (fly.io hosting),
+ * should be adapted for other hosting services or servers
+ */
+function getRequestIP(request: Request) {
+  const flyClientIP = request.headers.get("Fly-Client-IP");
+  if (flyClientIP && net.isIP(flyClientIP)) return flyClientIP;
+  return null;
+}

@@ -1,4 +1,4 @@
-import type { ShouldRevalidateFunction } from "react-router";
+import type { ShouldRevalidateFunctionArgs } from "react-router";
 
 import { useEffect } from "react";
 import { Toaster, toast } from "sonner";
@@ -95,10 +95,9 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
 // the root loader is only being used to fetch toasts added in server actions
 // so it only needs to revalidate when it's a non-GET form submission
-export const shouldRevalidate: ShouldRevalidateFunction = (args) => {
-  if (args.formAction && args.formAction !== "GET") return true;
-  return args.defaultShouldRevalidate;
-};
+export function shouldRevalidate(args: ShouldRevalidateFunctionArgs) {
+  return args.formMethod && args.formMethod !== "GET";
+}
 
 function Document(props: React.PropsWithChildren) {
   return (
