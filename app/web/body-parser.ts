@@ -8,6 +8,24 @@ class BodyParser {
     return this.parseForm(formData);
   }
 
+  // Example with @mjackson/form-data-parser
+  // async parse(
+  //   request: Request,
+  //   fileUploads?: Record<string, FileUploadHandler>,
+  //   multipartParserOptions?: MultipartParserOptions
+  // ) {
+  //   const formData = await parseFormData(
+  //     request,
+  //     multipartParserOptions ?? {},
+  //     (fileUpload) => {
+  //       if (!fileUpload.fieldName || !fileUpload.name) return;
+  //       const handler = fileUploads?.[fileUpload.fieldName];
+  //       return handler?.(fileUpload);
+  //     }
+  //   );
+  //   return this.parseForm(formData);
+  // }
+
   parseForm(form: FormData | URLSearchParams) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const object: Record<string, any> = {};

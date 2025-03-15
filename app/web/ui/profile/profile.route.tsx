@@ -7,6 +7,7 @@ import { authContext } from "~/web/auth";
 import { updateUser } from "~/core/data/user";
 import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
+import { sessionContext } from "~/web/session";
 import { Avatar } from "~/web/ui/shared/avatar";
 import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
@@ -88,6 +89,8 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 
   const storageKey = await uploadAvatar(user.id, output.image);
   await updateUser(user.id, output.name, storageKey);
+
+  context.get(sessionContext).flash("success", "Successfully updated!");
   throw redirect(".");
 };
 
