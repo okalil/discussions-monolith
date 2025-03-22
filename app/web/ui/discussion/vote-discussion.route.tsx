@@ -4,7 +4,7 @@ import { data, useFetcher } from "react-router";
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { VoteButton } from "~/web/ui/shared/vote-button";
-import { unvoteDiscussion, voteDiscussion } from "~/core/data/discussion";
+import { unvoteDiscussion, voteDiscussion } from "~/core/discussion";
 
 import type { Route } from "./+types/vote-discussion.route";
 

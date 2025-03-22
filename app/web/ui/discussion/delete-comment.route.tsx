@@ -1,8 +1,8 @@
 import { href, useFetcher } from "react-router";
 
 import { authContext } from "~/web/auth";
+import { deleteComment } from "~/core/comment";
 import { Button } from "~/web/ui/shared/button";
-import { deleteComment } from "~/core/data/comment";
 
 import type { Route } from "./+types/delete-comment.route";
 

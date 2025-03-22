@@ -3,9 +3,9 @@ import { href, useFetcher } from "react-router";
 
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
+import { createComment } from "~/core/comment";
 import { Button } from "~/web/ui/shared/button";
 import { Textarea } from "~/web/ui/shared/textarea";
-import { createComment } from "~/core/data/comment";
 
 import type { Route, Info } from "./+types/create-comment.route";
 

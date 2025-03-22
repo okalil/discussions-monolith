@@ -4,7 +4,7 @@ import { href, useFetcher } from "react-router";
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { VoteButton } from "~/web/ui/shared/vote-button";
-import { unvoteComment, voteComment } from "~/core/data/comment";
+import { unvoteComment, voteComment } from "~/core/comment";
 
 import type { Route } from "./+types/vote-comment.route";
 

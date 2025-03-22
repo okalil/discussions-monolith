@@ -1,7 +1,6 @@
 import { Form, Link } from "react-router";
-import { MdChatBubbleOutline } from "react-icons/md";
 
-import type { DiscussionsDto } from "~/core/data/discussion";
+import type { DiscussionsDto } from "~/core/discussion";
 
 import { cn } from "~/web/ui/shared/utils/cn";
 import { Avatar } from "~/web/ui/shared/avatar";
@@ -57,7 +56,15 @@ export function DiscussionRow({ discussion, authenticated }: DiscussionProps) {
           )}
           aria-label={`${discussion.commentsCount} comentários`}
         >
-          <MdChatBubbleOutline size={16} />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            height="16px"
+            width="16px"
+            viewBox="0 -960 960 960"
+            fill="currentColor"
+          >
+            <path d="M80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z" />
+          </svg>
           {discussion.commentsCount}
         </button>
       </Form>

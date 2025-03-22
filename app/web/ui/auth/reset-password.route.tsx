@@ -10,8 +10,8 @@ import {
 
 import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
+import { resetPassword } from "~/core/account";
 import { Button } from "~/web/ui/shared/button";
-import { resetPassword } from "~/core/data/user";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
 
 import type { Route } from "./+types/reset-password.route";

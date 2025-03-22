@@ -1,15 +1,16 @@
 import vine from "@vinejs/vine";
 import { data } from "react-router";
+import { render } from "@react-email/components";
 import { Form, Link, redirect, useNavigation } from "react-router";
 
 import { env } from "~/config/env";
-import { mailer } from "~/core/mailer";
+import { getUserByEmail } from "~/core/user";
 import { Input } from "~/web/ui/shared/input";
 import { sessionContext } from "~/web/session";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
+import { forgetPassword } from "~/core/account";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
-import { createVerificationToken, getUserByEmail } from "~/core/data/user";
 
 import type { Route } from "./+types/forgot-password.route";
 
@@ -56,16 +57,18 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 
   const user = await getUserByEmail(output.email);
   if (user && user.email) {
-    const token = await createVerificationToken(user.email);
-    await mailer.send({
-      to: user.email,
-      subject: "Discussions Password Reset",
-      body: (
+    await forgetPassword(user.email, async (token) => {
+      const body = (
         <ResetPasswordEmail
           userFirstname={user.name}
           resetPasswordLink={`${env.SITE_URL}/reset-password?token=${token}`}
         />
-      ),
+      );
+      const [html, text] = await Promise.all([
+        render(body),
+        render(body, { plainText: true }),
+      ]);
+      return { html, text };
     });
   }
   context

@@ -2,14 +2,13 @@ import vine from "@vinejs/vine";
 import { useMemo, useState } from "react";
 import { data, Form, redirect, useNavigation } from "react-router";
 
-import { storage } from "~/core/storage";
 import { authContext } from "~/web/auth";
-import { updateUser } from "~/core/data/user";
 import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
 import { sessionContext } from "~/web/session";
 import { Avatar } from "~/web/ui/shared/avatar";
 import { Button } from "~/web/ui/shared/button";
+import { updateUser, uploadUserImage } from "~/core/user";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
 
 import type { Route } from "./+types/profile.route";
@@ -87,8 +86,8 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   const [error, output] = await updateUserValidator.tryValidate(body);
   if (error) return data({ error, body }, 422);
 
-  const storageKey = await uploadAvatar(user.id, output.image);
-  await updateUser(user.id, output.name, storageKey);
+  const fileKey = await uploadUserImage(user.id, output.image);
+  await updateUser(user.id, output.name, fileKey);
 
   context.get(sessionContext).flash("success", "Successfully updated!");
   throw redirect(".");
@@ -122,11 +121,3 @@ const updateUserValidator = vine.compile(
     ),
   })
 );
-
-async function uploadAvatar(userId: number, file?: unknown) {
-  if (!file || !(file instanceof File)) return;
-  if (!file.name) return;
-  const key = `avatars/${userId}_${Date.now()}`;
-  await storage.set(key, file);
-  return key;
-}

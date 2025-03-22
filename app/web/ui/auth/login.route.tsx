@@ -15,7 +15,7 @@ import { Input } from "~/web/ui/shared/input";
 import { sessionContext } from "~/web/session";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
-import { getUserByCredentials } from "~/core/data/user";
+import { getUserByCredentials } from "~/core/user";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
 
 import type { Route } from "./+types/login.route";

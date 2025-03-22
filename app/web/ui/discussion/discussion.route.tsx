@@ -4,9 +4,9 @@ import { Suspense } from "react";
 import { Link } from "react-router";
 
 import { authContext } from "~/web/auth";
+import { getComments } from "~/core/comment";
 import { Avatar } from "~/web/ui/shared/avatar";
-import { getComments } from "~/core/data/comment";
-import { getDiscussion } from "~/core/data/discussion";
+import { getDiscussion } from "~/core/discussion";
 import { CommentsList } from "~/web/ui/discussion/comments-list";
 
 import type { Route } from "./+types/discussion.route";

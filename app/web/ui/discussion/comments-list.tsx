@@ -1,6 +1,6 @@
 import { use, useState, useEffect } from "react";
 
-import type { CommentsDto } from "~/core/data/comment";
+import type { CommentsDto } from "~/core/comment";
 
 import { cn } from "~/web/ui/shared/utils/cn";
 import { Avatar } from "~/web/ui/shared/avatar";

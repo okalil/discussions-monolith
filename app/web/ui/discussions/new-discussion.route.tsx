@@ -6,7 +6,7 @@ import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { Textarea } from "~/web/ui/shared/textarea";
-import { createDiscussion } from "~/core/data/discussion";
+import { createDiscussion } from "~/core/discussion";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
 
 import type { Route } from "./+types/new-discussion.route";

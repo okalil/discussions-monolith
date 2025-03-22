@@ -1,6 +1,6 @@
 import { redirect, unstable_createContext } from "react-router";
 
-import { getUser } from "~/core/data/user";
+import { getUser } from "~/core/user";
 
 import type { Route } from "../+types/root";
 

@@ -4,8 +4,10 @@ import { createCookie, redirect } from "react-router";
 import { env } from "~/config/env";
 import { authContext } from "~/web/auth";
 import { sessionContext } from "~/web/session";
-import { github } from "~/core/integrations/github";
-import { linkProviderAccount } from "~/core/data/user";
+import {
+  createProviderAuthorizationURL,
+  linkProviderAccount,
+} from "~/core/account";
 
 import type { Route } from "./+types/social.route";
 
@@ -17,11 +19,8 @@ const cookie = createCookie("state", {
 });
 
 export const action = async ({ params }: Route.ActionArgs) => {
-  const provider = providers.get(params.provider);
-  if (!provider) throw new Response("Invalid Provider", { status: 400 });
-
   const state = arctic.generateState();
-  const url = provider.createAuthorizationURL(state);
+  const url = createProviderAuthorizationURL(params.provider, state);
   return redirect(url, {
     headers: [["set-cookie", await cookie.serialize(state)]],
   });
@@ -41,26 +40,9 @@ export const loader = async ({
   if (!state || state !== sessionState)
     throw new Response("Invalid State", { status: 400 });
 
-  const providerId = params.provider;
-  const provider = providers.get(providerId);
-  if (!provider) throw new Response("Invalid Provider", { status: 400 });
-
-  const accessToken = await provider.getAccessToken(code);
-  const providerUser = await provider.getUser(accessToken);
-  const user = await linkProviderAccount(
-    providerId,
-    providerUser.id,
-    providerUser.email,
-    providerUser.name,
-    providerUser.image
-  );
+  const user = await linkProviderAccount(params.provider, code);
 
   context.get(authContext).login(user.id);
   context.get(sessionContext).flash("success", "Signed in successfully!");
   return redirect("/");
 };
-
-const providers = new Map([
-  ["github", github],
-  // Add more providers as needed...
-]);

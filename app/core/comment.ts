@@ -1,6 +1,6 @@
 import { and, asc, countDistinct, eq, getTableColumns, sql } from "drizzle-orm";
 
-import { db, schema } from "../db";
+import { db, schema } from "./services/db";
 
 export const getComments = async (discussionId: number, userId = 0) => {
   const comments = await db

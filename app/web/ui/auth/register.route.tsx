@@ -2,10 +2,10 @@ import vine from "@vinejs/vine";
 import { data, Form, Link, redirect, useNavigation } from "react-router";
 
 import { authContext } from "~/web/auth";
-import { createUser } from "~/core/data/user";
 import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
+import { createCredentialAccount } from "~/core/account";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
 
 import type { Route } from "./+types/register.route";
@@ -102,7 +102,11 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     return data({ error, values: body }, 422);
   }
 
-  const user = await createUser(output.name, output.email, output.password);
+  const user = await createCredentialAccount(
+    output.name,
+    output.email,
+    output.password
+  );
   context.get(authContext).login(user.id);
   throw redirect("/");
 };
