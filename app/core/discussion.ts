@@ -91,7 +91,7 @@ export const getDiscussions = async (
 export type DiscussionsDto = Awaited<ReturnType<typeof getDiscussions>>;
 
 export const getDiscussion = async (id: number, userId = 0) => {
-  const [discussion] = await db
+  const discussions = await db
     .select({
       id: schema.discussions.id,
       title: schema.discussions.title,
@@ -118,9 +118,10 @@ export const getDiscussion = async (id: number, userId = 0) => {
       schema.discussionVotes,
       eq(schema.discussionVotes.discussionId, schema.discussions.id)
     )
+    .groupBy(schema.discussions.id)
     .where(eq(schema.discussions.id, id))
     .limit(1);
-  return discussion;
+  return discussions.at(0);
 };
 export type DiscussionDto = Awaited<ReturnType<typeof getDiscussion>>;
 

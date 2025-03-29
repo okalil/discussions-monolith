@@ -20,6 +20,11 @@ export const loader = async ({ context, params }: Route.LoaderArgs) => {
 
   const comments = getComments(Number(params.id), userId);
   const discussion = await getDiscussion(Number(params.id), userId);
+
+  console.log({ discussion });
+
+  if (!discussion) throw new Response("Not Found Discussion", { status: 404 });
+
   return { discussion, comments };
 };
 
