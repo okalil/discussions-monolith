@@ -4,6 +4,7 @@ import { data, Form, Link, redirect, useNavigation } from "react-router";
 import { createCredentialAccount } from "~/core/account";
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
+import { sessionContext } from "~/web/session";
 import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
 import { Input } from "~/web/ui/shared/input";
@@ -108,6 +109,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     output.password
   );
   context.get(authContext).login(user.id);
+  context.get(sessionContext).flash("success", "Signed up successfully!");
   throw redirect("/");
 };
 
