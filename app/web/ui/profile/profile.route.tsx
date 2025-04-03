@@ -2,14 +2,14 @@ import vine from "@vinejs/vine";
 import { useMemo, useState } from "react";
 import { data, Form, redirect, useNavigation } from "react-router";
 
+import { updateUser, uploadUserImage } from "~/core/user";
 import { authContext } from "~/web/auth";
-import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
 import { sessionContext } from "~/web/session";
 import { Avatar } from "~/web/ui/shared/avatar";
 import { Button } from "~/web/ui/shared/button";
-import { updateUser, uploadUserImage } from "~/core/user";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
+import { Input } from "~/web/ui/shared/input";
 
 import type { Route } from "./+types/profile.route";
 

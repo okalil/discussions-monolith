@@ -1,7 +1,6 @@
 import type { ShouldRevalidateFunctionArgs } from "react-router";
 
 import { useEffect } from "react";
-import { Toaster, toast } from "sonner";
 import {
   isRouteErrorResponse,
   Links,
@@ -10,6 +9,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { Toaster, toast } from "sonner";
 
 import stylesheet from "~/root.css?url";
 import { NavigationProgress } from "~/web/ui/shared/navigation-progress";

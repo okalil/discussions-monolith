@@ -1,12 +1,12 @@
 import vine from "@vinejs/vine";
 import { data, Form, Link, redirect, useNavigation } from "react-router";
 
+import { createCredentialAccount } from "~/core/account";
 import { authContext } from "~/web/auth";
-import { Input } from "~/web/ui/shared/input";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
-import { createCredentialAccount } from "~/core/account";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
+import { Input } from "~/web/ui/shared/input";
 
 import type { Route } from "./+types/register.route";
 

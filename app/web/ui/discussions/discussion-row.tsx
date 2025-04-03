@@ -2,11 +2,11 @@ import { Form, Link } from "react-router";
 
 import type { DiscussionsDto } from "~/core/discussion";
 
-import { cn } from "~/web/ui/shared/utils/cn";
 import { Avatar } from "~/web/ui/shared/avatar";
+import { cn } from "~/web/ui/shared/utils/cn";
 
-import { DiscussionHoverCard } from "./discussion-hovercard.route";
 import { VoteDiscussion } from "../discussion/vote-discussion.route";
+import { DiscussionHoverCard } from "./discussion-hovercard.route";
 
 interface DiscussionProps {
   discussion: DiscussionsDto["discussions"][number];

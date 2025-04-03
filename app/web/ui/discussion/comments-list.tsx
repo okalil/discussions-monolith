@@ -2,14 +2,14 @@ import { use, useState, useEffect } from "react";
 
 import type { CommentsDto } from "~/core/comment";
 
-import { cn } from "~/web/ui/shared/utils/cn";
-import { Avatar } from "~/web/ui/shared/avatar";
 import { AlertModal } from "~/web/ui/shared/alert-modal";
+import { Avatar } from "~/web/ui/shared/avatar";
 import { DropdownMenu } from "~/web/ui/shared/dropdown-menu";
+import { cn } from "~/web/ui/shared/utils/cn";
 
+import { DeleteComment } from "./delete-comment.route";
 import { EditComment } from "./edit-comment.route";
 import { VoteComment } from "./vote-comment.route";
-import { DeleteComment } from "./delete-comment.route";
 
 interface CommentsListProps {
   comments: Promise<CommentsDto>;

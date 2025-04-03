@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 
+import { getCredentialAccount } from "./account";
 import { db, schema } from "./services/db";
 import { storage } from "./services/storage";
-import { getCredentialAccount } from "./account";
 
 export async function getUser(userId: number) {
   const users = await db

@@ -2,12 +2,12 @@ import * as arctic from "arctic";
 import { createCookie, redirect } from "react-router";
 
 import { env } from "~/config/env";
-import { authContext } from "~/web/auth";
-import { sessionContext } from "~/web/session";
 import {
   createProviderAuthorizationURL,
   linkProviderAccount,
 } from "~/core/account";
+import { authContext } from "~/web/auth";
+import { sessionContext } from "~/web/session";
 
 import type { Route } from "./+types/social.route";
 

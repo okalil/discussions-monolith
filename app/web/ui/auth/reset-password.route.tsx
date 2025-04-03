@@ -8,11 +8,11 @@ import {
   useSearchParams,
 } from "react-router";
 
-import { Input } from "~/web/ui/shared/input";
-import { bodyParser } from "~/web/body-parser";
 import { resetPassword } from "~/core/account";
+import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
+import { Input } from "~/web/ui/shared/input";
 
 import type { Route } from "./+types/reset-password.route";
 

@@ -1,10 +1,10 @@
 import vine from "@vinejs/vine";
 import { data, useFetcher } from "react-router";
 
+import { unvoteDiscussion, voteDiscussion } from "~/core/discussion";
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { VoteButton } from "~/web/ui/shared/vote-button";
-import { unvoteDiscussion, voteDiscussion } from "~/core/discussion";
 
 import type { Route } from "./+types/vote-discussion.route";
 

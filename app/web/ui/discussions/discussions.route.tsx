@@ -1,10 +1,10 @@
 import vine from "@vinejs/vine";
 import { Form, useSearchParams } from "react-router";
 
-import { authContext } from "~/web/auth";
-import { Input } from "~/web/ui/shared/input";
-import { Button } from "~/web/ui/shared/button";
 import { getDiscussions } from "~/core/discussion";
+import { authContext } from "~/web/auth";
+import { Button } from "~/web/ui/shared/button";
+import { Input } from "~/web/ui/shared/input";
 import { Pagination } from "~/web/ui/shared/pagination";
 
 import type { Route } from "./+types/discussions.route";
