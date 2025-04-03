@@ -3,7 +3,7 @@ import { and, eq, getTableColumns, sql } from "drizzle-orm";
 
 import { db, schema } from "./services/db";
 import { mailer } from "./services/mailer";
-import { github } from "./services/api/github";
+import { github } from "./services/oauth/github";
 import {
   createVerificationToken,
   deleteVerificationToken,

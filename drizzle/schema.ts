@@ -21,7 +21,8 @@ export const users = sqliteTable(
       .default(sql`CURRENT_TIMESTAMP`),
     updatedAt: text("updated_at" as string)
       .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
+      .default(sql`CURRENT_TIMESTAMP`)
+      .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
   },
   (table) => [index("user_email_idx" as string).on(table.email)]
 );
@@ -87,7 +88,8 @@ export const discussions = sqliteTable(
       .default(sql`CURRENT_TIMESTAMP`),
     updatedAt: text("updated_at" as string)
       .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
+      .default(sql`CURRENT_TIMESTAMP`)
+      .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
   },
   (table) => [index("discussion_author_idx" as string).on(table.authorId)]
 );
@@ -117,7 +119,8 @@ export const comments = sqliteTable(
       .default(sql`CURRENT_TIMESTAMP`),
     updatedAt: text("updated_at" as string)
       .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
+      .default(sql`CURRENT_TIMESTAMP`)
+      .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
   },
   (table) => [
     index("comment_author_idx" as string).on(table.authorId),

@@ -43,7 +43,7 @@ function CommentRow({ comment, authenticated }: CommentRowProps) {
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => setEditing(false), [comment]);
+  useEffect(() => setEditing(false), [comment.updatedAt]);
 
   if (editing) {
     return (
