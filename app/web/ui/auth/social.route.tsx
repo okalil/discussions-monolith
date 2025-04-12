@@ -41,8 +41,8 @@ export const loader = async ({
     throw new Response("Invalid State", { status: 400 });
 
   const user = await linkProviderAccount(params.provider, code);
+  await context.get(authContext).login(user.id);
 
-  context.get(authContext).login(user.id);
   context.get(sessionContext).flash("success", "Signed in successfully!");
   return redirect("/");
 };

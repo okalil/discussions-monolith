@@ -108,7 +108,8 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     output.email,
     output.password
   );
-  context.get(authContext).login(user.id);
+  await context.get(authContext).login(user.id);
+
   context.get(sessionContext).flash("success", "Signed up successfully!");
   throw redirect("/");
 };

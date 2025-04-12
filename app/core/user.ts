@@ -4,16 +4,12 @@ import { eq } from "drizzle-orm";
 import { getCredentialAccount } from "./account";
 import { db, schema } from "./services/db";
 import { storage } from "./services/storage";
+import { getSession } from "./session";
 
-export async function getUser(userId: number) {
-  const users = await db
-    .select()
-    .from(schema.users)
-    .where(eq(schema.users.id, userId))
-    .limit(1);
-  const user = users.at(0);
-  if (!user) return null;
-  return user;
+export async function getUserBySession(sessionId: string) {
+  const session = await getSession(sessionId);
+  if (!session) return null;
+  return session.user;
 }
 
 export async function getUserByEmail(email: string) {

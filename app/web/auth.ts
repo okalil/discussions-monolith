@@ -1,17 +1,18 @@
 import { redirect, unstable_createContext } from "react-router";
 
-import { getUser } from "~/core/user";
+import { createSession, deleteSession } from "~/core/session";
+import { getUserBySession } from "~/core/user";
 
 import type { Route } from "../+types/root";
 
 import { sessionContext } from "./session";
 
-type MaybeUser = Awaited<ReturnType<typeof getUser>>;
+type MaybeUser = Awaited<ReturnType<typeof getUserBySession>>;
 interface Auth {
   getUser: () => MaybeUser;
   getUserOrFail: () => NonNullable<MaybeUser>;
-  login: (userId: number) => void;
-  logout: () => void;
+  login: (userId: number) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 export const authContext = unstable_createContext<Auth>();
@@ -21,14 +22,16 @@ export const authMiddleware: Route.unstable_MiddlewareFunction = async ({
   context,
 }) => {
   const session = context.get(sessionContext);
-  const userId = session.get("userId");
-  const user = userId ? await getUser(userId) : null;
+  const sessionId = session.get(authSessionKey);
+  const user = sessionId ? await getUserBySession(sessionId) : null;
   context.set(authContext, {
     getUser() {
       return user;
     },
     getUserOrFail() {
       if (!user) {
+        session.flash("error", "Hold up! You need to log in first");
+
         const url = new URL(request.url);
         const searchParams = new URLSearchParams([
           ["to", url.href.replace(url.origin, "")],
@@ -37,11 +40,15 @@ export const authMiddleware: Route.unstable_MiddlewareFunction = async ({
       }
       return user;
     },
-    login(userId: number) {
-      session.set("userId", userId);
+    async login(userId: number) {
+      const { id: sessionId } = await createSession(userId);
+      session.set(authSessionKey, sessionId);
     },
-    logout() {
-      session.unset("userId");
+    async logout() {
+      await deleteSession(sessionId);
+      session.unset(authSessionKey);
     },
   });
 };
+
+const authSessionKey = "sessionId";

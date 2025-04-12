@@ -5,6 +5,6 @@ import { authContext } from "~/web/auth";
 import type { Route } from "./+types/logout.route";
 
 export const action = async ({ context }: Route.ActionArgs) => {
-  context.get(authContext).logout();
+  await context.get(authContext).logout();
   throw redirect("/login");
 };

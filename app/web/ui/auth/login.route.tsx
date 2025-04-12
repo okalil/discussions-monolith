@@ -130,7 +130,8 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     return data({ error: "Invalid email or password", email: body.email }, 400);
   }
 
-  context.get(authContext).login(user.id);
+  await context.get(authContext).login(user.id);
+
   context.get(sessionContext).flash("success", "Signed in successfully!");
   throw redirect(output.to || "/");
 };

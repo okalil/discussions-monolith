@@ -42,7 +42,7 @@ importers:
         specifier: ^5.1.1
         version: 5.1.1
       better-sqlite3:
-        specifier: ^11.7.0
+        specifier: ^11.9.1
         version: 11.9.1
       drizzle-orm:
         specifier: ^0.38.2

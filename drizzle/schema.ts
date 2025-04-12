@@ -35,14 +35,6 @@ export const accounts = sqliteTable(
     type: text("type" as string).notNull(),
     provider: text("provider" as string),
     providerAccountId: text("provider_account_id" as string),
-    refreshToken: text("refresh_token" as string),
-    accessToken: text("access_token" as string),
-    expiresAt: integer("expires_at" as string),
-    tokenType: text("token_type" as string),
-    scope: text("scope" as string),
-    idToken: text("id_token" as string),
-    sessionState: text("session_state" as string),
-    refreshTokenExpiresIn: integer("refresh_token_expires_in" as string),
     password: text("password" as string),
   },
   () => []
@@ -51,10 +43,9 @@ export const accounts = sqliteTable(
 export const sessions = sqliteTable(
   "sessions",
   {
-    id: integer("id" as string).primaryKey(),
-    sessionToken: text("session_token" as string)
-      .notNull()
-      .unique(),
+    id: text("id" as string)
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     userId: integer("user_id" as string).notNull(),
     expires: text("expires" as string).notNull(),
   },
