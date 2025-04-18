@@ -2,7 +2,7 @@ import * as arctic from "arctic";
 
 import { env } from "~/config/env";
 
-import type { OAuthProvider } from "./provider";
+import type { OAuthProvider } from "../provider";
 
 const arcticGithubApi = new arctic.GitHub(
   env.GITHUB_CLIENT_ID,

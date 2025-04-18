@@ -3,7 +3,7 @@ import { and, eq, getTableColumns, sql } from "drizzle-orm";
 
 import { db, schema } from "./services/db";
 import { mailer } from "./services/mailer";
-import { github } from "./services/oauth/github";
+import { github } from "./services/oauth/providers/github";
 import {
   createVerificationToken,
   deleteVerificationToken,
@@ -124,21 +124,21 @@ export async function linkProviderAccount(provider: string, code: string) {
   const accessToken = await providerApi.getAccessToken(code);
   const providerUser = await providerApi.getUser(accessToken);
 
-  let [user] = await db
-    .select()
-    .from(schema.users)
-    .where(eq(schema.users.email, providerUser.email));
-  let [account] = await db
-    .select()
-    .from(schema.accounts)
-    .where(
-      and(
-        eq(schema.accounts.providerAccountId, providerUser.id),
-        eq(schema.accounts.provider, provider)
-      )
-    );
+  const user = await db.transaction(async (tx) => {
+    let [user] = await db
+      .select()
+      .from(schema.users)
+      .where(eq(schema.users.email, providerUser.email));
+    let [account] = await db
+      .select()
+      .from(schema.accounts)
+      .where(
+        and(
+          eq(schema.accounts.providerAccountId, providerUser.id),
+          eq(schema.accounts.provider, provider)
+        )
+      );
 
-  await db.transaction(async (tx) => {
     // If user is not found, create a new one
     if (!user) {
       [user] = await tx
@@ -163,6 +163,9 @@ export async function linkProviderAccount(provider: string, code: string) {
         })
         .returning();
     }
+
+    return user;
   });
+
   return user;
 }
