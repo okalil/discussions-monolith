@@ -1,6 +1,5 @@
 import type { ShouldRevalidateFunctionArgs } from "react-router";
 
-import { useEffect } from "react";
 import {
   isRouteErrorResponse,
   Links,
@@ -28,32 +27,19 @@ export const unstable_middleware: Route.unstable_MiddlewareFunction[] = [
 
 export const meta: Route.MetaFunction = () => [{ title: "Discussions" }];
 
-export const links: Route.LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  },
-  { rel: "stylesheet", href: stylesheet },
-];
-
-export const loader = ({ context }: Route.LoaderArgs) => {
+export async function loader({ context }: Route.LoaderArgs) {
   const session = context.get(sessionContext);
   return { success: session.get("success"), error: session.get("error") };
-};
+}
 
-export default function App({ loaderData }: Route.ComponentProps) {
-  useEffect(() => {
-    const { success, error } = loaderData;
-    if (success) toast.success(success);
-    if (error) toast.error(error, { duration: 5000 });
-  }, [loaderData]);
+export async function clientLoader({ serverLoader }: Route.ClientLoaderArgs) {
+  const { success, error } = await serverLoader();
+  if (success) toast.success(success);
+  if (error) toast.error(error, { duration: 5000 });
+}
+clientLoader.hydrate = true;
 
+export default function App() {
   return (
     <Document>
       <Outlet />
@@ -105,6 +91,17 @@ function Document(props: React.PropsWithChildren) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        />
+        <link rel="stylesheet" href={stylesheet} />
         <Links />
         <Meta />
       </head>
