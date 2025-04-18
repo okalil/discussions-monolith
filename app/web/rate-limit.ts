@@ -66,13 +66,13 @@ const strongRoutes = [
 const defaultRateLimitConfig = {
   maxTokens: 100,
   refillRate: 1,
-  window: 60_000,
+  window: 60 * 1000 * 5,
 };
 
 const strongRateLimitConfig = {
   maxTokens: 10,
   refillRate: 3,
-  window: 60_000,
+  window: 60 * 1000,
 };
 
 /**

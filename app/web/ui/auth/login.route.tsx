@@ -88,12 +88,26 @@ export default function Component({ actionData }: Route.ComponentProps) {
                 </label>
                 <Link
                   to="/forgot-password"
-                  className="text-sm text-indigo-600 hover:text-indigo-500"
+                  className="text-sm text-indigo-600 hover:text-indigo-500 hover:underline"
                 >
                   Forgot Password?
                 </Link>
               </div>
               <Input name="password" type="password" id="password" required />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                className="w-4 h-4 accent-black border"
+                name="remember"
+                id="remember"
+              />
+              <label
+                htmlFor="remember"
+                className="text-sm text-gray-600 cursor-pointer"
+              >
+                Remember me
+              </label>
             </div>
             <Button
               variant="primary"
@@ -120,36 +134,37 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  const [error, output] = await loginValidator.tryValidate(body);
+  const [error, input] = await loginValidator.tryValidate(body);
   if (error) {
     return data({ error, email: body.email }, 422);
   }
 
-  const user = await getUserByCredentials(output.email, output.password);
+  const user = await getUserByCredentials(input.email, input.password);
   if (!user) {
     return data({ error: "Invalid email or password", email: body.email }, 400);
   }
 
-  await context.get(authContext).login(user.id);
+  await context.get(authContext).login(user.id, input.remember);
 
   context.get(sessionContext).flash("success", "Signed in successfully!");
-  throw redirect(output.to || "/");
+  throw redirect(safeUrl(input.to) || "/");
 };
 
 const loginValidator = vine.compile(
   vine.object({
     email: vine.string().email(),
     password: vine.string(),
-    to: vine
-      .string()
-      .optional()
-      .transform((value) => {
-        try {
-          const url = new URL(value, env.SITE_URL);
-          return url.href.replace(url.origin, "");
-        } catch {
-          return;
-        }
-      }),
+    remember: vine.boolean().optional(),
+    to: vine.string().optional(),
   })
 );
+
+function safeUrl(value?: string) {
+  try {
+    if (!value) return;
+    const url = new URL(value, env.SITE_URL);
+    return url.href.replace(url.origin, "");
+  } catch {
+    return;
+  }
+}
