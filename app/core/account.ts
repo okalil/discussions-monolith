@@ -17,8 +17,15 @@ export async function createCredentialAccount(
   email: string,
   password: string
 ) {
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const users = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.email, email))
+    .limit(1);
+  const isEmailTaken = users.length > 0;
+  if (isEmailTaken) return null;
 
+  const hashedPassword = await bcrypt.hash(password, 10);
   const user = await db.transaction(async (tx) => {
     const [user] = await tx
       .insert(schema.users)

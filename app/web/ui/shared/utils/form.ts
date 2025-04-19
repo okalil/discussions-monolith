@@ -6,10 +6,17 @@ import { bodyParser } from "~/web/body-parser";
 
 interface UseFormProps<T> {
   validator: Validator<T>;
+  data?: { error: unknown };
 }
-export function useForm<T>({ validator }: UseFormProps<T>) {
+export function useForm<T>({ validator, data }: UseFormProps<T>) {
   type FormError = ValidationResult<T>[0];
-  const [error, setError] = useState<FormError>();
+  const [error, setError] = useState<FormError>(() => {
+    const isValidationError =
+      typeof data?.error === "object" &&
+      data?.error !== null &&
+      "properties" in data.error;
+    if (isValidationError) return data.error as FormError;
+  });
   const submitCount = useRef(0);
 
   function validateForm(form: HTMLFormElement) {

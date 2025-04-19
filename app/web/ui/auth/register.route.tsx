@@ -1,5 +1,5 @@
-import vine from "@vinejs/vine";
 import { data, Form, Link, redirect, useNavigation } from "react-router";
+import z from "zod";
 
 import { createCredentialAccount } from "~/core/account";
 import { authContext } from "~/web/auth";
@@ -7,71 +7,59 @@ import { bodyParser } from "~/web/body-parser";
 import { sessionContext } from "~/web/session";
 import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
+import { Field } from "~/web/ui/shared/field";
 import { Input } from "~/web/ui/shared/input";
+import { useForm } from "~/web/ui/shared/utils/form";
+import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/register.route";
 
 export default function Component({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
+  const form = useForm({ validator: registerValidator, data: actionData });
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Register</h2>
-        <Form method="post" className="space-y-4">
+        <Form method="post" className="space-y-4" {...form}>
           {actionData?.error && <ErrorMessage error={actionData.error} />}
-          <div>
-            <label
-              htmlFor="name"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Name
-            </label>
+
+          <Field label="Name" error={form.error?.properties?.name?.errors}>
             <Input
               name="name"
               type="text"
-              id="name"
-              required
+              aria-required="true"
               defaultValue={actionData?.values?.name}
             />
-          </div>
-          <div>
-            <label
-              htmlFor="email"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
+          </Field>
+
+          <Field label="Email" error={form.error?.properties?.email?.errors}>
             <Input
               name="email"
               type="email"
-              id="email"
-              required
+              aria-required="true"
               defaultValue={actionData?.values?.email}
             />
-          </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <Input name="password" type="password" id="password" required />
-          </div>
-          <div>
-            <label
-              htmlFor="password_confirmation"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Confirm Password
-            </label>
+          </Field>
+
+          <Field
+            label="Password"
+            error={form.error?.properties?.password?.errors}
+          >
+            <Input name="password" type="password" aria-required="true" />
+          </Field>
+
+          <Field
+            label="Confirm Password"
+            error={form.error?.properties?.passwordConfirmation?.errors}
+          >
             <Input
-              name="password_confirmation"
+              name="passwordConfirmation"
               type="password"
-              id="password_confirmation"
-              required
+              aria-required="true"
             />
-          </div>
+          </Field>
+
           <Button
             variant="primary"
             className="w-full h-12"
@@ -96,28 +84,41 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  const [error, output] = await registerValidator.tryValidate(body);
+  const [error, input] = registerValidator.tryValidate(body);
   if (error) {
     delete body.password;
-    delete body.password_confirmation;
+    delete body.passwordConfirmation;
     return data({ error, values: body }, 422);
   }
 
   const user = await createCredentialAccount(
-    output.name,
-    output.email,
-    output.password
+    input.name,
+    input.email,
+    input.password
   );
+  if (!user) {
+    return data({ error: "Email already taken", values: void 0 }, 400);
+  }
+
   await context.get(authContext).login(user.id);
 
   context.get(sessionContext).flash("success", "Signed up successfully!");
   throw redirect("/");
 };
 
-const registerValidator = vine.compile(
-  vine.object({
-    name: vine.string().trim(),
-    email: vine.string().email(),
-    password: vine.string().minLength(6).confirmed(),
-  })
+const registerValidator = validator(
+  z
+    .object({
+      name: z.string().trim().min(1, { error: "Name is required" }),
+      email: z.email({
+        error: (issue) =>
+          issue.input ? "Email is invalid" : "Email is required",
+      }),
+      password: z.string().min(1, { error: "Password is required" }),
+      passwordConfirmation: z.string(),
+    })
+    .refine((data) => data.password === data.passwordConfirmation, {
+      path: ["passwordConfirmation"],
+      error: "Passwords do not match",
+    })
 );

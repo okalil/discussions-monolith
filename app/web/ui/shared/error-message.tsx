@@ -9,8 +9,9 @@ export function ErrorMessage({ error, ...props }: Props) {
     error instanceof Error
       ? error.message
       : error && typeof error === "object" && "errors" in error
-      ? error.errors.join("")
+      ? error.errors.join(", ")
       : error;
+  if (!errorMessage) return null;
   return (
     <div
       {...props}

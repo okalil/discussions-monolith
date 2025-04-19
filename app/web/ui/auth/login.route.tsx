@@ -30,7 +30,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("to");
 
-  const form = useForm({ validator: loginValidator });
+  const form = useForm({ validator: loginValidator, data: actionData });
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
