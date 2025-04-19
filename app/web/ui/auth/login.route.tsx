@@ -1,4 +1,4 @@
-import vine from "@vinejs/vine";
+import { cloneElement, useId } from "react";
 import {
   data,
   Form,
@@ -8,6 +8,7 @@ import {
   useNavigation,
   useSearchParams,
 } from "react-router";
+import * as z from "zod";
 
 import { env } from "~/config/env";
 import { getUserByCredentials } from "~/core/user";
@@ -15,10 +16,14 @@ import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { sessionContext } from "~/web/session";
 import { Button } from "~/web/ui/shared/button";
-import { ErrorMessage } from "~/web/ui/shared/error-message";
+// import { ErrorMessage } from "~/web/ui/shared/error-message";
 import { Input } from "~/web/ui/shared/input";
+import { useForm } from "~/web/ui/shared/utils/form";
+import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/login.route";
+
+import { ErrorMessage } from "../shared/error-message";
 
 export const meta: Route.MetaFunction = () => [{ title: "Login" }];
 
@@ -26,6 +31,9 @@ export default function Component({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("to");
+
+  const form = useForm({ validator: loginValidator });
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
@@ -59,56 +67,51 @@ export default function Component({ actionData }: Route.ComponentProps) {
             </span>
           </div>
 
-          <Form method="POST" className="space-y-4">
+          <Form method="POST" className="space-y-4" {...form}>
             {actionData?.error && <ErrorMessage error={actionData.error} />}
 
             {redirectTo && <input name="to" value={redirectTo} type="hidden" />}
-            <div>
-              <label
-                htmlFor="email"
-                className="mb-1 block text-sm font-medium text-gray-700"
-              >
-                Email
-              </label>
+
+            <Field label="Email" error={form.error?.properties?.email?.errors}>
               <Input
                 defaultValue={actionData?.email}
                 name="email"
                 type="email"
-                id="email"
-                required
+                aria-required
               />
-            </div>
-            <div>
-              <div className="flex justify-between items-center">
+            </Field>
+
+            <Field
+              label="Password"
+              error={form.error?.properties?.password?.errors}
+            >
+              <Input name="password" type="password" aria-required />
+            </Field>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 accent-black border"
+                  name="remember"
+                  id="remember"
+                />
                 <label
-                  htmlFor="password"
-                  className="mb-1 block text-sm font-medium text-gray-700"
+                  htmlFor="remember"
+                  className="text-sm text-gray-600 cursor-pointer"
                 >
-                  Password
+                  Remember me
                 </label>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-indigo-600 hover:text-indigo-500 hover:underline"
-                >
-                  Forgot Password?
-                </Link>
               </div>
-              <Input name="password" type="password" id="password" required />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                className="w-4 h-4 accent-black border"
-                name="remember"
-                id="remember"
-              />
-              <label
-                htmlFor="remember"
-                className="text-sm text-gray-600 cursor-pointer"
+
+              <Link
+                to="/forgot-password"
+                className="text-sm text-indigo-600 hover:text-indigo-500 hover:underline"
               >
-                Remember me
-              </label>
+                Forgot Password?
+              </Link>
             </div>
+
             <Button
               variant="primary"
               className="h-12 w-full"
@@ -122,7 +125,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
                 to="/register"
                 className="text-indigo-600 hover:text-indigo-500 hover:underline"
               >
-                Register
+                Register now
               </Link>
             </p>
           </Form>
@@ -134,7 +137,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  const [error, input] = await loginValidator.tryValidate(body);
+  const [error, input] = loginValidator.tryValidate(body);
   if (error) {
     return data({ error, email: body.email }, 422);
   }
@@ -150,15 +153,54 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   throw redirect(safeUrl(input.to) || "/");
 };
 
-const loginValidator = vine.compile(
-  vine.object({
-    email: vine.string().email(),
-    password: vine.string(),
-    remember: vine.boolean().optional(),
-    to: vine.string().optional(),
+const loginValidator = validator(
+  z.object({
+    email: z.email({
+      error: (issue) =>
+        issue.input ? "Email is invalid" : "Email is required",
+    }),
+    password: z.string().min(1, { error: "Password is required" }),
+    remember: z.stringbool().optional(),
+    to: z.string().optional(),
   })
 );
 
+function Field({
+  label,
+  error,
+  children,
+}: {
+  label: string;
+  error?: string | string[];
+  children: React.JSX.Element;
+}) {
+  const errors = Array.isArray(error) ? error.join(", ") : error;
+  const inputId = useId();
+  const errorId = `${inputId}-error`;
+  const hasError = !!error;
+  return (
+    <div>
+      <label
+        htmlFor={inputId}
+        className="mb-1 block text-sm font-medium text-gray-700"
+      >
+        {label}
+      </label>
+      {cloneElement(children, {
+        ...children.props,
+        id: inputId,
+        "aria-invalid": hasError,
+        "aria-describedby": hasError ? errorId : undefined,
+        autoFocus: children.props.autoFocus || hasError,
+      })}
+      {errors && (
+        <span className="text-sm text-red-500" id={errorId}>
+          {errors}
+        </span>
+      )}
+    </div>
+  );
+}
 function safeUrl(value?: string) {
   try {
     if (!value) return;
