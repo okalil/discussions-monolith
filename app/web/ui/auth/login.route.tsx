@@ -1,4 +1,3 @@
-import { cloneElement, useId } from "react";
 import {
   data,
   Form,
@@ -16,14 +15,13 @@ import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { sessionContext } from "~/web/session";
 import { Button } from "~/web/ui/shared/button";
-// import { ErrorMessage } from "~/web/ui/shared/error-message";
+import { ErrorMessage } from "~/web/ui/shared/error-message";
+import { Field } from "~/web/ui/shared/field";
 import { Input } from "~/web/ui/shared/input";
 import { useForm } from "~/web/ui/shared/utils/form";
 import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/login.route";
-
-import { ErrorMessage } from "../shared/error-message";
 
 export const meta: Route.MetaFunction = () => [{ title: "Login" }];
 
@@ -165,42 +163,6 @@ const loginValidator = validator(
   })
 );
 
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string | string[];
-  children: React.JSX.Element;
-}) {
-  const errors = Array.isArray(error) ? error.join(", ") : error;
-  const inputId = useId();
-  const errorId = `${inputId}-error`;
-  const hasError = !!error;
-  return (
-    <div>
-      <label
-        htmlFor={inputId}
-        className="mb-1 block text-sm font-medium text-gray-700"
-      >
-        {label}
-      </label>
-      {cloneElement(children, {
-        ...children.props,
-        id: inputId,
-        "aria-invalid": hasError,
-        "aria-describedby": hasError ? errorId : undefined,
-        autoFocus: children.props.autoFocus || hasError,
-      })}
-      {errors && (
-        <span className="text-sm text-red-500" id={errorId}>
-          {errors}
-        </span>
-      )}
-    </div>
-  );
-}
 function safeUrl(value?: string) {
   try {
     if (!value) return;
