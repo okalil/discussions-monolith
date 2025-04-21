@@ -1,7 +1,7 @@
 import { render } from "@react-email/components";
-import vine from "@vinejs/vine";
 import { data } from "react-router";
 import { Form, Link, redirect, useNavigation } from "react-router";
+import z from "zod";
 
 import { env } from "~/config/env";
 import { forgetPassword } from "~/core/account";
@@ -11,6 +11,7 @@ import { sessionContext } from "~/web/session";
 import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
 import { Input } from "~/web/ui/shared/input";
+import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/forgot-password.route";
 
@@ -50,12 +51,12 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  const [error, output] = await forgetPasswordValidator.tryValidate(body);
+  const [error, input] = forgetPasswordValidator.tryValidate(body);
   if (error) {
     return data({ error, values: body }, 422);
   }
 
-  const user = await getUserByEmail(output.email);
+  const user = await getUserByEmail(input.email);
   if (user && user.email) {
     await forgetPassword(user.email, async (token) => {
       const body = (
@@ -80,8 +81,8 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   throw redirect("/login");
 };
 
-const forgetPasswordValidator = vine.compile(
-  vine.object({
-    email: vine.string().email(),
+const forgetPasswordValidator = validator(
+  z.object({
+    email: z.email(),
   })
 );

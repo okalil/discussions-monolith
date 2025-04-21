@@ -6,7 +6,6 @@ interface Props extends React.ComponentProps<"p"> {
 
 export function ErrorMessage({ error, ...props }: Props) {
   const errorMessage = typeof error == "string" ? error : error.message;
-  if (!errorMessage) return null;
   return (
     <div
       {...props}

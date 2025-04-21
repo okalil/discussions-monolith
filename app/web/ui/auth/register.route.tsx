@@ -10,31 +10,20 @@ import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
 import { Field } from "~/web/ui/shared/field";
 import { Input } from "~/web/ui/shared/input";
-import { validator, useValidation } from "~/web/validator";
+import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/register.route";
 
 export default function Component({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
-  const validation = useValidation(registerValidator, actionData?.error);
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Register</h2>
-        <Form
-          method="POST"
-          className="space-y-4"
-          onSubmit={validation.onSubmit}
-          onChange={validation.onChange}
-        >
-          {actionData?.error.message && (
-            <ErrorMessage error={actionData.error.message} />
-          )}
+        <Form method="POST" className="space-y-4">
+          {actionData?.error && <ErrorMessage error={actionData.error} />}
 
-          <Field
-            label="Name"
-            error={validation.error?.properties?.name?.errors}
-          >
+          <Field label="Name">
             <Input
               name="name"
               type="text"
@@ -43,10 +32,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
             />
           </Field>
 
-          <Field
-            label="Email"
-            error={validation.error?.properties?.email?.errors}
-          >
+          <Field label="Email">
             <Input
               name="email"
               type="email"
@@ -55,17 +41,11 @@ export default function Component({ actionData }: Route.ComponentProps) {
             />
           </Field>
 
-          <Field
-            label="Password"
-            error={validation.error?.properties?.password?.errors}
-          >
+          <Field label="Password">
             <Input name="password" type="password" aria-required />
           </Field>
 
-          <Field
-            label="Confirm Password"
-            error={validation.error?.properties?.passwordConfirmation?.errors}
-          >
+          <Field label="Confirm Password">
             <Input name="passwordConfirmation" type="password" aria-required />
           </Field>
 
@@ -93,7 +73,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  const [error, input] = await registerValidator.tryValidate(body);
+  const [error, input] = registerValidator.tryValidate(body);
 
   if (error || (await getUserByEmail(input.email))) {
     delete body.password;
@@ -119,12 +99,9 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 const registerValidator = validator(
   z
     .object({
-      name: z.string().trim().min(1, { error: "Name is required" }),
-      email: z.email({
-        error: (issue) =>
-          issue.input ? "Email is invalid" : "Email is required",
-      }),
-      password: z.string().min(1, { error: "Password is required" }),
+      name: z.string().trim().min(1),
+      email: z.email(),
+      password: z.string().min(1),
       passwordConfirmation: z.string(),
     })
     .refine((data) => data.password === data.passwordConfirmation, {

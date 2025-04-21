@@ -18,7 +18,7 @@ import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
 import { Field } from "~/web/ui/shared/field";
 import { Input } from "~/web/ui/shared/input";
-import { validator, useValidation } from "~/web/validator";
+import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/login.route";
 
@@ -28,9 +28,6 @@ export default function Component({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("to");
-
-  const validation = useValidation(loginValidator, actionData?.error);
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
@@ -64,22 +61,12 @@ export default function Component({ actionData }: Route.ComponentProps) {
             </span>
           </div>
 
-          <Form
-            method="POST"
-            className="space-y-4"
-            onSubmit={validation.onSubmit}
-            onChange={validation.onChange}
-          >
-            {actionData?.error.message && (
-              <ErrorMessage error={actionData.error.message} />
-            )}
+          <Form method="POST" className="space-y-4">
+            {actionData?.error && <ErrorMessage error={actionData.error} />}
 
             {redirectTo && <input name="to" value={redirectTo} type="hidden" />}
 
-            <Field
-              label="Email"
-              error={validation.error?.properties?.email?.errors}
-            >
+            <Field label="Email">
               <Input
                 defaultValue={actionData?.email}
                 name="email"
@@ -88,10 +75,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
               />
             </Field>
 
-            <Field
-              label="Password"
-              error={validation.error?.properties?.password?.errors}
-            >
+            <Field label="Password">
               <Input name="password" type="password" aria-required />
             </Field>
 
@@ -144,7 +128,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  const [error, input] = await loginValidator.tryValidate(body);
+  const [error, input] = loginValidator.tryValidate(body);
   if (error) {
     return data({ error, email: body.email }, 422);
   }
@@ -165,11 +149,8 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 
 const loginValidator = validator(
   z.object({
-    email: z.email({
-      error: (issue) =>
-        issue.input ? "Email is invalid" : "Email is required",
-    }),
-    password: z.string().min(1, { error: "Password is required" }),
+    email: z.email(),
+    password: z.string(),
     remember: z.stringbool().optional(),
     to: z.string().optional(),
   })

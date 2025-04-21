@@ -29,7 +29,7 @@
     "react-dom": "^19.0.0",
     "react-router": "7.3.0",
     "sonner": "^1.7.1",
-    "zod": "4.0.0-beta.20250417T043022"
+    "zod": "4.0.0-beta.20250420T053007"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

@@ -66,8 +66,8 @@ importers:
         specifier: ^1.7.1
         version: 1.7.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       zod:
-        specifier: 4.0.0-beta.20250417T043022
-        version: 4.0.0-beta.20250417T043022
+        specifier: 4.0.0-beta.20250420T053007
+        version: 4.0.0-beta.20250420T053007
     devDependencies:
       '@eslint/js':
         specifier: ^9.17.0
@@ -1537,8 +1537,8 @@ packages:
     resolution: {integrity: sha512-ZtvYkYpZOYdvbws3uaOAvTFuvFXoQGAtmzeiXu+XSMGxi5GVsODpoI9Xu9TplEMuD/5fmAtBbKb9cQHkWkLXDQ==}
     engines: {node: '>=18.16.0'}
 
-  '@zod/core@0.6.2':
-    resolution: {integrity: sha512-KdH7bT0BRG1CvJ1LWH8oyNnkvLpjVZ5qVGpRu7Vq8WsFTKRDWfdr3rFfBYh8atZJSWDgD0ibhOyff1AyRvG1DA==}
+  '@zod/core@0.8.1':
+    resolution: {integrity: sha512-djj8hPhxIHcG8ptxITaw/Bout5HJZ9NyRbKr95Eilqwt9R0kvITwUQGDU+n+MVdsBIka5KwztmZSLti22F+P0A==}
 
   abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
@@ -3384,8 +3384,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod@4.0.0-beta.20250417T043022:
-    resolution: {integrity: sha512-zjfYudLXPgHvRdCWzy/iJqhB6suE8tBqnGubbFHSkMvcknI4iexEP53QCO13FoC/EIALseuZReVykCY8yd/skA==}
+  zod@4.0.0-beta.20250420T053007:
+    resolution: {integrity: sha512-5pp8Q0PNDaNcUptGiBE9akyioJh3RJpagIxrLtAVMR9IxwcSZiOsJD/1/98CyhItdTlI2H91MfhhLzRlU+fifA==}
 
 snapshots:
 
@@ -4681,7 +4681,7 @@ snapshots:
       normalize-url: 8.0.1
       validator: 13.15.0
 
-  '@zod/core@0.6.2': {}
+  '@zod/core@0.8.1': {}
 
   abbrev@1.1.1: {}
 
@@ -6480,6 +6480,6 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod@4.0.0-beta.20250417T043022:
+  zod@4.0.0-beta.20250420T053007:
     dependencies:
-      '@zod/core': 0.6.2
+      '@zod/core': 0.8.1
