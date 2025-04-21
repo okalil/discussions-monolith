@@ -1,16 +1,11 @@
 import { cn } from "./utils/cn";
 
 interface Props extends React.ComponentProps<"p"> {
-  error: Error | string | { errors: string[] };
+  error: string | Error;
 }
 
 export function ErrorMessage({ error, ...props }: Props) {
-  const errorMessage =
-    error instanceof Error
-      ? error.message
-      : error && typeof error === "object" && "errors" in error
-      ? error.errors.join(", ")
-      : error;
+  const errorMessage = typeof error == "string" ? error : error.message;
   if (!errorMessage) return null;
   return (
     <div
