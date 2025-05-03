@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-import { env } from "~/config/env";
+import { env } from "~/config/env.server";
 
 interface MailMessage {
   from?: string;

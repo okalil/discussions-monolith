@@ -1,6 +1,6 @@
 import { createCookie, redirect, unstable_createContext } from "react-router";
 
-import { env } from "~/config/env";
+import { env } from "~/config/env.server";
 import { createSession, deleteSession } from "~/core/session";
 import { getUserBySession } from "~/core/user";
 

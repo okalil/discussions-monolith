@@ -9,7 +9,7 @@ import {
   useSearchParams,
 } from "react-router";
 
-import { env } from "~/config/env";
+import { env } from "~/config/env.server";
 import { getUserByCredentials } from "~/core/user";
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";

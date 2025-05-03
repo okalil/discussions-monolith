@@ -3,7 +3,7 @@ import vine from "@vinejs/vine";
 import { data } from "react-router";
 import { Form, Link, redirect, useNavigation } from "react-router";
 
-import { env } from "~/config/env";
+import { env } from "~/config/env.server";
 import { forgetPassword } from "~/core/account";
 import { getUserByEmail } from "~/core/user";
 import { bodyParser } from "~/web/body-parser";

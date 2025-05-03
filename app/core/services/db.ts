@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/better-sqlite3";
 
-import { env } from "~/config/env";
+import { env } from "~/config/env.server";
 
 import * as schema from "../../../drizzle/schema";
 
