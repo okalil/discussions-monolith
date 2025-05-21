@@ -1,13 +1,14 @@
+import { useForm } from "react-hook-form";
 import {
   data,
   Form,
   href,
   Link,
   redirect,
-  useNavigation,
   useSearchParams,
+  useSubmit,
 } from "react-router";
-import * as z from "zod";
+import { z } from "zod";
 
 import { env } from "~/config/env";
 import { getUserByCredentials } from "~/core/user";
@@ -25,9 +26,18 @@ import type { Route } from "./+types/login.route";
 export const meta: Route.MetaFunction = () => [{ title: "Login" }];
 
 export default function Component({ actionData }: Route.ComponentProps) {
-  const navigation = useNavigation();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("to");
+
+  const submit = useSubmit();
+  const form = useForm({
+    resolver: loginValidator.resolver,
+    errors: actionData?.errors,
+  });
+
+  const errors = form.formState.errors;
+  const pending = form.formState.isSubmitting;
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
@@ -61,22 +71,32 @@ export default function Component({ actionData }: Route.ComponentProps) {
             </span>
           </div>
 
-          <Form method="POST" className="space-y-4">
-            {actionData?.error && <ErrorMessage error={actionData.error} />}
+          <Form
+            method="POST"
+            className="space-y-4"
+            onSubmit={form.handleSubmit((_, e) => submit(e?.target))}
+          >
+            {errors.root?.message && (
+              <ErrorMessage error={errors.root.message} />
+            )}
 
             {redirectTo && <input name="to" value={redirectTo} type="hidden" />}
 
-            <Field label="Email">
+            <Field label="Email" error={errors.email?.message}>
               <Input
+                {...form.register("email")}
                 defaultValue={actionData?.email}
-                name="email"
                 type="email"
                 aria-required
               />
             </Field>
 
-            <Field label="Password">
-              <Input name="password" type="password" aria-required />
+            <Field label="Password" error={errors.password?.message}>
+              <Input
+                {...form.register("password")}
+                type="password"
+                aria-required
+              />
             </Field>
 
             <div className="flex items-center justify-between">
@@ -103,11 +123,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
               </Link>
             </div>
 
-            <Button
-              variant="primary"
-              className="h-12 w-full"
-              loading={navigation.state === "submitting"}
-            >
+            <Button variant="primary" className="h-12 w-full" loading={pending}>
               Login
             </Button>
             <p className="text-center text-sm text-gray-600">
@@ -128,20 +144,23 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  const [error, input] = loginValidator.tryValidate(body);
-  if (error) {
-    return data({ error, email: body.email }, 422);
+  const [errors, input] = await loginValidator.tryValidate(body);
+  if (errors) {
+    return data({ errors, email: body.email }, 422);
   }
 
   const user = await getUserByCredentials(input.email, input.password);
   if (!user) {
     return data(
-      { error: Error("Invalid email or password"), email: body.email },
+      {
+        errors: { root: { message: "Invalid email or password" } },
+        email: body.email,
+      },
       400
     );
   }
 
-  await context.get(authContext).login(user.id, input.remember);
+  await context.get(authContext).login(user.id, !!input.remember);
 
   context.get(sessionContext).flash("success", "Signed in successfully!");
   throw redirect(safeUrl(input.to) || "/");
@@ -149,9 +168,9 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 
 const loginValidator = validator(
   z.object({
-    email: z.email(),
-    password: z.string(),
-    remember: z.stringbool().optional(),
+    email: z.string().email(),
+    password: z.string().min(1, "Password is required"),
+    remember: z.string().optional(),
     to: z.string().optional(),
   })
 );

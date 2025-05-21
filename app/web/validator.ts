@@ -1,19 +1,27 @@
-import type * as z from "zod";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { z } from "zod";
 
-type ValidationResult<T> = [Error, undefined] | [undefined, T];
+import { zodResolver } from "@hookform/resolvers/zod";
 
-class Validator<T> {
-  constructor(private schema: z.ZodType<T>) {}
+type ValidationResult<T> = [Record<string, any>, undefined] | [undefined, T];
 
-  tryValidate(body: unknown): ValidationResult<T> {
-    const result = this.schema.safeParse(body);
-    if (!result.success) {
-      return [new Error(result.error.issues[0].message), undefined];
-    }
-    return [undefined, result.data];
-  }
-}
+export function validator<T, U extends { [x: string]: any }>(
+  schema: z.ZodSchema<T, any, U>
+) {
+  return {
+    async tryValidate(body: unknown): Promise<ValidationResult<T>> {
+      const { errors, values } = await this.resolver(body as U, undefined, {
+        shouldUseNativeValidation: false,
+        fields: {},
+      });
+      if (Object.values(errors).length) {
+        return [errors, undefined];
+      }
+      return [undefined, values as T];
+    },
 
-export function validator<T>(schema: z.ZodType<T>): Validator<T> {
-  return new Validator(schema);
+    get resolver() {
+      return zodResolver(schema);
+    },
+  };
 }

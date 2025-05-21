@@ -1,5 +1,6 @@
-import { data, Form, Link, redirect, useNavigation } from "react-router";
-import z from "zod";
+import { useForm } from "react-hook-form";
+import { data, Form, Link, redirect } from "react-router";
+import { z } from "zod";
 
 import { createCredentialAccount } from "~/core/account";
 import { getUserByEmail } from "~/core/user";
@@ -15,13 +16,18 @@ import { validator } from "~/web/validator";
 import type { Route } from "./+types/register.route";
 
 export default function Component({ actionData }: Route.ComponentProps) {
-  const navigation = useNavigation();
+  const form = useForm({
+    resolver: registerValidator.resolver,
+    errors: actionData?.errors,
+  });
+  const { errors, isSubmitting } = form.formState;
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Register</h2>
         <Form method="POST" className="space-y-4">
-          {actionData?.error && <ErrorMessage error={actionData.error} />}
+          {errors.root?.message && <ErrorMessage error={errors.root.message} />}
 
           <Field label="Name">
             <Input
@@ -52,7 +58,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
           <Button
             variant="primary"
             className="w-full h-12"
-            loading={navigation.state === "submitting"}
+            loading={isSubmitting}
           >
             Register
           </Button>
@@ -73,13 +79,16 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  const [error, input] = registerValidator.tryValidate(body);
+  const [errors, input] = await registerValidator.tryValidate(body);
 
-  if (error || (await getUserByEmail(input.email))) {
+  if (errors || (await getUserByEmail(input.email))) {
     delete body.password;
     delete body.passwordConfirmation;
     return data(
-      { error: error || Error("Email already taken"), values: body },
+      {
+        errors: errors || { root: { message: "Email already taken" } },
+        values: body,
+      },
       422
     );
   }
@@ -100,12 +109,12 @@ const registerValidator = validator(
   z
     .object({
       name: z.string().trim().min(1),
-      email: z.email(),
+      email: z.string().email(),
       password: z.string().min(1),
       passwordConfirmation: z.string(),
     })
     .refine((data) => data.password === data.passwordConfirmation, {
       path: ["passwordConfirmation"],
-      error: "Passwords do not match",
+      message: "Passwords do not match",
     })
 );

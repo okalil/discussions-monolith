@@ -27,7 +27,7 @@ export function Field({ label, error, children }: FieldProps) {
         autoFocus: children.props.autoFocus || hasError,
       })}
       {errors && (
-        <span className="text-sm text-red-500" id={errorId}>
+        <span className="text-sm text-red-600" id={errorId}>
           {errors}
         </span>
       )}

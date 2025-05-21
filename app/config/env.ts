@@ -1,7 +1,7 @@
-import z from "zod";
+import { z } from "zod";
 
-export const env = z.parse(
-  z.object({
+export const env = z
+  .object({
     NODE_ENV: z.string(),
     DATABASE_URL: z.string(),
     SMTP_HOST: z.string(),
@@ -12,6 +12,5 @@ export const env = z.parse(
     SESSION_SECRET: z.string(),
     GITHUB_CLIENT_ID: z.string(),
     GITHUB_CLIENT_SECRET: z.string(),
-  }),
-  process.env
-);
+  })
+  .parse(process.env);
