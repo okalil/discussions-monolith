@@ -34,9 +34,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
     resolver: loginValidator.resolver,
     errors: actionData?.errors,
   });
-
-  const errors = form.formState.errors;
-  const pending = form.formState.isSubmitting;
+  const { errors, isSubmitting } = form.formState;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -123,7 +121,11 @@ export default function Component({ actionData }: Route.ComponentProps) {
               </Link>
             </div>
 
-            <Button variant="primary" className="h-12 w-full" loading={pending}>
+            <Button
+              variant="primary"
+              className="h-12 w-full"
+              loading={isSubmitting}
+            >
               Login
             </Button>
             <p className="text-center text-sm text-gray-600">
