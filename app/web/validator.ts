@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { z } from "zod";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 
 type ValidationResult<T> = [Record<string, any>, undefined] | [undefined, T];
 
@@ -21,7 +21,7 @@ export function validator<T, U extends { [x: string]: any }>(
     },
 
     get resolver() {
-      return zodResolver(schema);
+      return standardSchemaResolver<U, unknown, T>(schema);
     },
   };
 }
