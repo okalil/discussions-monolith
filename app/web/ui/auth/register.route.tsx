@@ -124,10 +124,12 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 const registerValidator = validator(
   z
     .object({
-      name: z.string().trim().min(1),
-      email: z.email(),
-      password: z.string().trim().min(1),
-      passwordConfirmation: z.string(),
+      name: z.string().trim().min(1, "Name is required"),
+      email: z.email("Inform a valid email address"),
+      password: z.string().trim().min(1, "Password is required"),
+      passwordConfirmation: z
+        .string()
+        .min(1, "Password confirmation is required"),
     })
     .refine((data) => data.password === data.passwordConfirmation, {
       path: ["passwordConfirmation"],

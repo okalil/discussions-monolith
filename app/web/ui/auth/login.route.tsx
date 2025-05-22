@@ -160,7 +160,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 
 const loginValidator = validator(
   z.object({
-    email: z.email(),
+    email: z.email("Inform a valid email address"),
     password: z.string().min(1, "Password is required"),
     remember: z.string().optional(),
     to: z.string().optional(),

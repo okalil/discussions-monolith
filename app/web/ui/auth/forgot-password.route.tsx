@@ -80,6 +80,6 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 
 const forgetPasswordValidator = validator(
   z.object({
-    email: z.email(),
+    email: z.email("Inform a valid email address"),
   })
 );
