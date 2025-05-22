@@ -1,7 +1,7 @@
 import * as arctic from "arctic";
 import { createCookie, redirect } from "react-router";
 
-import { env } from "~/config/env";
+import { env } from "~/config/env.server";
 import {
   createProviderAuthorizationURL,
   linkProviderAccount,

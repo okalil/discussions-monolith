@@ -11,7 +11,7 @@ import {
   Text,
 } from "@react-email/components";
 
-import { env } from "~/config/env";
+import { env } from "~/config/env.server";
 
 interface ResetPasswordEmailProps {
   userFirstname?: string | null;

@@ -5,6 +5,7 @@ import type { CommentsDto } from "~/core/comment";
 import { AlertModal } from "~/web/ui/shared/alert-modal";
 import { Avatar } from "~/web/ui/shared/avatar";
 import { DropdownMenu } from "~/web/ui/shared/dropdown-menu";
+import { Icon } from "~/web/ui/shared/icon";
 import { cn } from "~/web/ui/shared/utils/cn";
 
 import { DeleteComment } from "./delete-comment.route";
@@ -101,18 +102,7 @@ function CommentRow({ comment, authenticated }: CommentRowProps) {
                   title="Comment options"
                   className="grid place-items-center p-2 rounded-md hover:bg-gray-100"
                 >
-                  <svg
-                    stroke="currentColor"
-                    fill="currentColor"
-                    strokeWidth="0"
-                    viewBox="0 0 24 24"
-                    height="20"
-                    width="20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path fill="none" d="M0 0h24v24H0z" />
-                    <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-                  </svg>
+                  <Icon name="dots" size={20} />
                 </button>
               }
             >

@@ -1,6 +1,6 @@
 import * as arctic from "arctic";
 
-import { env } from "~/config/env";
+import { env } from "~/config/env.server";
 
 import type { OAuthProvider } from "../provider";
 

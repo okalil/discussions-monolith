@@ -4,7 +4,7 @@ import { data } from "react-router";
 import { Form, Link, redirect } from "react-router";
 import { z } from "zod/v4";
 
-import { env } from "~/config/env";
+import { env } from "~/config/env.server";
 import { forgetPassword } from "~/core/account";
 import { getUserByEmail } from "~/core/user";
 import { bodyParser } from "~/web/body-parser";
