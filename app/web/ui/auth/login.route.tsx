@@ -8,7 +8,7 @@ import {
   useSearchParams,
   useSubmit,
 } from "react-router";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 import { env } from "~/config/env";
 import { getUserByCredentials } from "~/core/user";
@@ -170,7 +170,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 
 const loginValidator = validator(
   z.object({
-    email: z.string().email(),
+    email: z.email(),
     password: z.string().min(1, "Password is required"),
     remember: z.string().optional(),
     to: z.string().optional(),

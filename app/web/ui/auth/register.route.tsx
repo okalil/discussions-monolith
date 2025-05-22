@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { data, Form, Link, redirect, useSubmit } from "react-router";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 import { createCredentialAccount } from "~/core/account";
 import { getUserByEmail } from "~/core/user";
@@ -102,7 +102,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     delete body.passwordConfirmation;
     return data(
       {
-        errors: errors || { root: { message: "Email already taken" } },
+        errors: errors || { email: { message: "Email already taken" } },
         values: body,
       },
       422
@@ -125,7 +125,7 @@ const registerValidator = validator(
   z
     .object({
       name: z.string().trim().min(1),
-      email: z.string().email(),
+      email: z.email(),
       password: z.string().trim().min(1),
       passwordConfirmation: z.string(),
     })

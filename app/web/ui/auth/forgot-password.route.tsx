@@ -2,7 +2,7 @@ import { render } from "@react-email/components";
 import { useForm } from "react-hook-form";
 import { data } from "react-router";
 import { Form, Link, redirect } from "react-router";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 import { env } from "~/config/env";
 import { forgetPassword } from "~/core/account";
@@ -80,6 +80,6 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 
 const forgetPasswordValidator = validator(
   z.object({
-    email: z.string().email(),
+    email: z.email(),
   })
 );
