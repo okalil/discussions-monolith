@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { data, Form, Link, redirect } from "react-router";
+import { data, Form, Link, redirect, useSubmit } from "react-router";
 import { z } from "zod";
 
 import { createCredentialAccount } from "~/core/account";
@@ -16,6 +16,7 @@ import { validator } from "~/web/validator";
 import type { Route } from "./+types/register.route";
 
 export default function Component({ actionData }: Route.ComponentProps) {
+  const submit = useSubmit();
   const form = useForm({
     resolver: registerValidator.resolver,
     errors: actionData?.errors,
@@ -26,33 +27,48 @@ export default function Component({ actionData }: Route.ComponentProps) {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Register</h2>
-        <Form method="POST" className="space-y-4">
+        <Form
+          method="POST"
+          className="space-y-4"
+          onSubmit={form.handleSubmit((_, e) => submit(e?.target))}
+        >
           {errors.root?.message && <ErrorMessage error={errors.root.message} />}
 
-          <Field label="Name">
+          <Field label="Name" error={errors.name?.message}>
             <Input
-              name="name"
+              {...form.register("name")}
               type="text"
               aria-required
               defaultValue={actionData?.values?.name}
             />
           </Field>
 
-          <Field label="Email">
+          <Field label="Email" error={errors.email?.message}>
             <Input
-              name="email"
+              {...form.register("email")}
               type="email"
               aria-required
               defaultValue={actionData?.values?.email}
             />
           </Field>
 
-          <Field label="Password">
-            <Input name="password" type="password" aria-required />
+          <Field label="Password" error={errors.password?.message}>
+            <Input
+              {...form.register("password")}
+              type="password"
+              aria-required
+            />
           </Field>
 
-          <Field label="Confirm Password">
-            <Input name="passwordConfirmation" type="password" aria-required />
+          <Field
+            label="Confirm Password"
+            error={errors.passwordConfirmation?.message}
+          >
+            <Input
+              {...form.register("passwordConfirmation")}
+              type="password"
+              aria-required
+            />
           </Field>
 
           <Button
@@ -110,7 +126,7 @@ const registerValidator = validator(
     .object({
       name: z.string().trim().min(1),
       email: z.string().email(),
-      password: z.string().min(1),
+      password: z.string().trim().min(1),
       passwordConfirmation: z.string(),
     })
     .refine((data) => data.password === data.passwordConfirmation, {
