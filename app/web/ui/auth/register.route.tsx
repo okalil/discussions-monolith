@@ -126,7 +126,7 @@ const registerValidator = validator(
     .object({
       name: z.string().trim().min(1, "Name is required"),
       email: z.email("Inform a valid email address"),
-      password: z.string().trim().min(1, "Password is required"),
+      password: z.string().min(1, "Password is required"),
       passwordConfirmation: z
         .string()
         .min(1, "Password confirmation is required"),
