@@ -126,7 +126,10 @@ const registerValidator = validator(
     .object({
       name: z.string().trim().min(1, "Name is required"),
       email: z.email("Inform a valid email address"),
-      password: z.string().min(1, "Password is required"),
+      password: z
+        .string()
+        .min(8, "Password must be at least 8 characters long")
+        .max(72, "Password can't be longer than 72 characters"),
       passwordConfirmation: z
         .string()
         .min(1, "Password confirmation is required"),

@@ -105,7 +105,8 @@ const resetPasswordValidator = validator(
       email: z.email("Inform a valid email address"),
       password: z
         .string()
-        .min(8, "Password must be at least 8 characters long"),
+        .min(8, "Password must be at least 8 characters long")
+        .max(72, "Password can't be longer than 72 characters"),
       passwordConfirmation: z
         .string()
         .min(8, "Password confirmation must be at least 8 characters long"),
