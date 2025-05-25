@@ -28,14 +28,14 @@ export const meta: Route.MetaFunction = () => [{ title: "Login" }];
 
 export default function Component({ actionData }: Route.ComponentProps) {
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("to");
-
   const submit = useSubmit();
   const form = useForm({
     resolver: loginValidator.resolver,
     errors: actionData?.errors,
   });
+
   const { errors, isSubmitting } = form.formState;
+  const redirectTo = searchParams.get("to");
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -152,7 +152,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     );
   }
 
-  await context.get(authContext).login(user.id, !!input.remember);
+  await context.get(authContext).login(user.id, input.remember);
 
   context.get(sessionContext).flash("success", "Signed in successfully!");
   throw redirect(safeUrl(input.to) || "/");
@@ -162,7 +162,7 @@ const loginValidator = validator(
   z.object({
     email: z.email("Inform a valid email address"),
     password: z.string().min(1, "Password is required"),
-    remember: z.string().optional(),
+    remember: z.stringbool().optional(),
     to: z.string().optional(),
   })
 );

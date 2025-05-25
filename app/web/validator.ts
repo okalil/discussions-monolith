@@ -3,27 +3,30 @@ import type { z } from "zod/v4";
 
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 
-type ValidationResult<T> = [Record<string, any>, undefined] | [undefined, T];
+type ErrorResult = [Record<string, any>, null];
+type SuccessResult<T> = [null, T];
 
-export function validator<
-  S extends z.ZodObject,
-  T = z.output<S>,
-  U extends { [x: string]: any } = z.input<S>
->(schema: S) {
+export function validator<S extends z.ZodObject>(schema: S) {
+  type Input = z.input<S>;
+  type Output = z.output<S>;
+
+  const resolver = standardSchemaResolver<Input, unknown, Output>(schema);
   return {
-    async tryValidate(body: unknown): Promise<ValidationResult<T>> {
-      const { errors, values } = await this.resolver(body as U, undefined, {
+    resolver,
+    async tryValidate(body: unknown) {
+      const { errors, values } = await resolver(body as Input, undefined, {
         shouldUseNativeValidation: false,
         fields: {},
       });
       if (Object.values(errors).length) {
-        return [errors, undefined];
+        return [errors, null] as ErrorResult;
       }
-      return [undefined, values as T];
+      return [null, values] as SuccessResult<Output>;
     },
-
-    get resolver() {
-      return standardSchemaResolver<U, unknown, T>(schema);
+    async validate(body: unknown) {
+      const [errors, data] = await this.tryValidate(body);
+      if (errors) throw errors;
+      return data;
     },
   };
 }

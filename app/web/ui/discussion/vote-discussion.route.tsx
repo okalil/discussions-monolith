@@ -1,10 +1,11 @@
-import vine from "@vinejs/vine";
 import { data, useFetcher } from "react-router";
+import { z } from "zod/v4";
 
 import { unvoteDiscussion, voteDiscussion } from "~/core/discussion";
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { VoteButton } from "~/web/ui/shared/vote-button";
+import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/vote-discussion.route";
 
@@ -52,12 +53,12 @@ export const action = async ({
 }: Route.ActionArgs) => {
   const user = context.get(authContext).getUserOrFail();
   const body = await bodyParser.parse(request);
-  const [error, output] = await voteDiscussionValidator.tryValidate(body);
-  if (error) {
-    return data({ error, values: body }, 422);
+  const [errors, input] = await voteDiscussionValidator.tryValidate(body);
+  if (errors) {
+    return data({ errors, values: body }, 422);
   }
 
-  if (output.voted) {
+  if (input.voted) {
     await voteDiscussion(Number(params.id), user.id);
   } else {
     await unvoteDiscussion(Number(params.id), user.id);
@@ -65,8 +66,8 @@ export const action = async ({
   return { ok: true };
 };
 
-const voteDiscussionValidator = vine.compile(
-  vine.object({
-    voted: vine.boolean(),
+const voteDiscussionValidator = validator(
+  z.object({
+    voted: z.stringbool(),
   })
 );

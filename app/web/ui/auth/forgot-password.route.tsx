@@ -1,6 +1,6 @@
 import { render } from "@react-email/components";
 import { useForm } from "react-hook-form";
-import { data } from "react-router";
+import { data, useSubmit } from "react-router";
 import { Form, Link, redirect } from "react-router";
 import { z } from "zod/v4";
 
@@ -19,20 +19,30 @@ import { Field } from "../shared/field";
 import { ResetPasswordEmail } from "./emails/reset-password-email";
 
 export default function Component({ actionData }: Route.ComponentProps) {
+  const submit = useSubmit();
   const form = useForm({
     resolver: forgetPasswordValidator.resolver,
     errors: actionData?.errors,
   });
+  const { errors, isSubmitting } = form.formState;
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Forgot Password</h2>
-        <Form method="POST" className="space-y-4">
-          <Field label="Email" error={form.formState.errors.email?.message}>
-            <Input name="email" type="email" id="email" required />
+        <Form
+          method="POST"
+          className="space-y-4"
+          onSubmit={form.handleSubmit((_, e) => submit(e?.target))}
+        >
+          <Field label="Email" error={errors.email?.message}>
+            <Input {...form.register("email")} type="email" aria-required />
           </Field>
-          <Button variant="primary" className="w-full">
-            {form.formState.isSubmitting ? "Submitting..." : "Submit"}
+          <Button
+            variant="primary"
+            className="w-full h-12"
+            loading={isSubmitting}
+          >
+            Submit
           </Button>
         </Form>
         <p className="text-center text-sm text-gray-600">
