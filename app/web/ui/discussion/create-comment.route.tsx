@@ -17,12 +17,17 @@ interface CreateCommentProps {
 
 export function CreateComment({ discussionId }: CreateCommentProps) {
   const fetcher = useFetcher<typeof action>();
-
+  const pending = fetcher.state !== "idle";
   return (
     <fetcher.Form
       method="POST"
       action={href("/comments/new")}
-      key={fetcher.state === "idle" ? fetcher.data?.comment.id : undefined} // resets the form after submission/revalidation
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        await fetcher.submit(form);
+        form.reset();
+      }}
     >
       <input name="discussionId" value={discussionId} type="hidden" />
       <Field label="Write">
@@ -37,7 +42,7 @@ export function CreateComment({ discussionId }: CreateCommentProps) {
         <Button
           variant="primary"
           className="h-10 w-24 ml-auto"
-          loading={fetcher.state !== "idle"}
+          loading={pending}
         >
           Comment
         </Button>
