@@ -21,7 +21,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
     resolver: registerValidator.resolver,
     errors: actionData?.errors,
   });
-  const { errors, isSubmitting } = form.formState;
+  const { errors } = form.formState;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -71,11 +71,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
             />
           </Field>
 
-          <Button
-            variant="primary"
-            className="w-full h-12"
-            loading={isSubmitting}
-          >
+          <Button variant="primary" className="w-full h-12">
             Register
           </Button>
         </Form>

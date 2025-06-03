@@ -33,7 +33,7 @@ export default function Component({
     resolver: updateUserValidator.resolver,
     errors: actionData?.errors,
   });
-  const { errors, isSubmitting } = form.formState;
+  const { errors } = form.formState;
 
   const file = form.watch("image");
   const fileUrl = useMemo(() => file && URL.createObjectURL(file), [file]);
@@ -81,11 +81,7 @@ export default function Component({
           />
         </Field>
 
-        <Button
-          variant="primary"
-          className="h-12 mt-5 w-40 ml-auto"
-          loading={isSubmitting}
-        >
+        <Button variant="primary" className="h-12 mt-5 w-40 ml-auto">
           Save
         </Button>
       </Form>

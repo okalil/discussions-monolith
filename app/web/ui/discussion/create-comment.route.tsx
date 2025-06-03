@@ -17,7 +17,6 @@ interface CreateCommentProps {
 
 export function CreateComment({ discussionId }: CreateCommentProps) {
   const fetcher = useFetcher<typeof action>();
-  const pending = fetcher.state !== "idle";
   return (
     <fetcher.Form
       method="POST"
@@ -39,11 +38,7 @@ export function CreateComment({ discussionId }: CreateCommentProps) {
         />
       </Field>
       <div>
-        <Button
-          variant="primary"
-          className="h-10 w-24 ml-auto"
-          loading={pending}
-        >
+        <Button variant="primary" className="h-10 w-24 ml-auto">
           Comment
         </Button>
       </div>

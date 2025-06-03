@@ -46,11 +46,7 @@ export function EditComment({ comment, onCancel }: EditCommentProps) {
         >
           Cancel
         </Button>
-        <Button
-          variant="primary"
-          className="h-10 w-48"
-          loading={fetcher.state !== "idle"}
-        >
+        <Button variant="primary" className="h-10 w-48">
           Update comment
         </Button>
       </div>

@@ -34,7 +34,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
     errors: actionData?.errors,
   });
 
-  const { errors, isSubmitting } = form.formState;
+  const { errors } = form.formState;
   const redirectTo = searchParams.get("to");
 
   return (
@@ -111,11 +111,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
               </Link>
             </div>
 
-            <Button
-              variant="primary"
-              className="h-12 w-full"
-              loading={isSubmitting}
-            >
+            <Button variant="primary" className="h-12 w-full">
               Login
             </Button>
             <p className="text-center text-sm text-gray-600">

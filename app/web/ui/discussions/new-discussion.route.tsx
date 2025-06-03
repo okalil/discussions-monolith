@@ -20,7 +20,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
     resolver: createDiscussionValidator.resolver,
     errors: actionData?.errors,
   });
-  const { errors, isSubmitting } = form.formState;
+  const { errors } = form.formState;
   return (
     <main className="max-w-4xl mx-auto px-3 py-6">
       <h1 className="text-xl font-semibold mb-4">Start a new discussion</h1>
@@ -48,7 +48,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
             defaultValue={actionData?.values?.body}
           />
         </Field>
-        <Button className="ml-auto" variant="primary" loading={isSubmitting}>
+        <Button className="ml-auto" variant="primary">
           Start Discussion
         </Button>
       </Form>
