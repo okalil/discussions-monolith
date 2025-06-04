@@ -76,8 +76,8 @@ export default function Component({
 
 const getDiscussionsValidator = validator(
   z.object({
-    page: z.coerce.number().default(1),
-    limit: z.coerce.number().default(20),
+    page: z.coerce.number().catch(1),
+    limit: z.coerce.number().catch(20),
     q: z.string().optional(),
   })
 );

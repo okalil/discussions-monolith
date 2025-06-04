@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { z } from "zod/v4";
 
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 
-type ErrorResult = [Record<string, any>, null];
+type ErrorResult = [Record<string, unknown>, null];
 type SuccessResult<T> = [null, T];
 
 export function validator<S extends z.ZodObject>(schema: S) {
@@ -24,9 +23,7 @@ export function validator<S extends z.ZodObject>(schema: S) {
       return [null, values] as SuccessResult<Output>;
     },
     async validate(body: unknown) {
-      const [errors, data] = await this.tryValidate(body);
-      if (errors) throw errors;
-      return data;
+      return await schema.parseAsync(body);
     },
   };
 }
