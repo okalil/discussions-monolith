@@ -11,14 +11,14 @@ import {
 } from "react-router";
 import { Toaster, toast } from "sonner";
 
-import stylesheet from "~/root.css?url";
+import { authMiddleware } from "~/web/auth";
+import { rateLimitMiddleware } from "~/web/rate-limit";
+import { sessionContext, sessionMiddleware } from "~/web/session";
 import { NavigationProgress } from "~/web/ui/shared/navigation-progress";
 
 import type { Route } from "./+types/root";
 
-import { authMiddleware } from "./web/auth";
-import { rateLimitMiddleware } from "./web/rate-limit";
-import { sessionContext, sessionMiddleware } from "./web/session";
+import stylesheet from "./root.css?url";
 
 export const unstable_middleware: Route.unstable_MiddlewareFunction[] = [
   rateLimitMiddleware,

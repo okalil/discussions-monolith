@@ -28,6 +28,7 @@ export default function Component({
   actionData,
 }: Route.ComponentProps) {
   const { user } = loaderData;
+
   const submit = useSubmit();
   const form = useForm({
     resolver: updateUserValidator.resolver,

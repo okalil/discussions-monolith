@@ -20,14 +20,14 @@ import { validator } from "~/web/validator";
 import type { Route } from "./+types/reset-password.route";
 
 export default function Component({ actionData }: Route.ComponentProps) {
-  const [searchParams] = useSearchParams();
   const submit = useSubmit();
   const form = useForm({
     resolver: resetPasswordValidator.resolver,
     errors: actionData?.errors,
   });
-
   const { errors } = form.formState;
+
+  const [searchParams] = useSearchParams();
   const token = searchParams.get("token") ?? "";
 
   return (

@@ -21,6 +21,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
     errors: actionData?.errors,
   });
   const { errors } = form.formState;
+
   return (
     <main className="max-w-4xl mx-auto px-3 py-6">
       <h1 className="text-xl font-semibold mb-4">Start a new discussion</h1>

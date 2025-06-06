@@ -27,14 +27,14 @@ import type { Route } from "./+types/login.route";
 export const meta: Route.MetaFunction = () => [{ title: "Login" }];
 
 export default function Component({ actionData }: Route.ComponentProps) {
-  const [searchParams] = useSearchParams();
   const submit = useSubmit();
   const form = useForm({
     resolver: loginValidator.resolver,
     errors: actionData?.errors,
   });
-
   const { errors } = form.formState;
+
+  const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("to");
 
   return (
