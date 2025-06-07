@@ -1,17 +1,28 @@
 # Discussions Monolith
 
-This project is a discussion web application (based on Github Discussions), designed with a clear architecture and code organization.
+This project is a discussion web application (inspired by Github Discussions), designed with a clear architecture and modular code organization.
 The purpose is to provide a reference implementation for monolithic applications with React and React Router.
 
-## Architecture
+## Table of Contents
 
-A arquitetura é baseado em duas camadas principais: uma camada de "domínio" e uma camada de "apresentação"
+- [Design Principles](#design-principles)
+- [Architecture](#architecture)
+- [Directory Structure](#directory-structure)
+- [Patterns and Conventions](#patterns-and-conventions)
 
 ## Design Principles
 
-- **Organização pragmática**: buscar uma estrutura organizada, limpa e manutenível, mas sem cair em abstrações que aumentam demais a complexidade.
-- **Mínimo de dependências**: evitar utilizar bibliotecas quando o problema que elas resolvem é relativamente fácil de implementar por conta própria.
-- **Conformidade com o framework**: sempre que possível, seguir ao máximo a abordagem "idiomática" do framework e das bibliotecas utilizadas.
+- **Pragmatic organization**: aim for a clean, organized, and maintainable structure, but without falling into abstractions that add excessive complexity.
+- **Minimal dependencies**: avoid using libraries when the problem they solve is relatively simple to implement on your own.
+- **Framework conformity**: whenever possible, stick closely to the idiomatic approach of the framework and libraries being used.
+
+## Architecture
+
+The project architecture is composed of two main layers: a *domain* layer, containing all business logic and data access code, and a *presentation* layer, containing routes, UI and orchestration logic code.
+
+This *domain layer* is responsible for domain and application logic, and is designed to be agnostic to framework-specific concerns. Ideally, it should be "copy-pasteable" in a way that would work with any JavaScript framework. For the sake of simplicity, there is no strict separation between core logic and infrastructure services.
+
+The *presentation layer* includes our React components and React Router route modules. It depends on the domain layer to perform business operations and access data. This layer should remain as lean as possible, delegating complex logic to the domain layer whenever appropriate.
 
 ## Directory Structure
 
@@ -21,25 +32,25 @@ The `config` directory keeps configuration files for the project, including envi
 
 ### The app/core directory
 
-The `core` directory hosts the core application logic, decoupled it from the framework. That's where we define functions for queries and commands, and integration with third party services.
+The `core` directory hosts the core application logic, where we define domain functions, and integration with third party services.
 
 ### The app/web directory
 
-The `web` directory holds the web-related parts of the application, including cookies, middlewares, route modules and UI components. We can think of it as both the View and Controller from MVC architecture.
+The `web` directory holds the web-related parts of the application, including cookies, middlewares, route modules and UI components.
 
 ## Patterns and Conventions
 
 ### Sessions and authentication
 
-- A aplicação usa um [cookie de sessão](https://github.com/okalil/discussions-monolith/blob/main/app/web/session.ts) dedicado para armazenar dados temporários como _flash messages_.
+- The application uses a dedicated [session cookie](https://github.com/okalil/discussions-monolith/blob/main/app/web/session.ts) to store temporary data such as _flash messages_.
 
-- A autenticação é feita por meio de um cookie separado, o que permite maior controle sobre opções de expiração. Existe uma sessão de usuário persistida no banco de dados, e o cookie de autenticação armazena apenas o ID dessa sessão.
+- Authentication is handled through a separate cookie, which allows for more control over expiration options. There is a user session persisted in the database, and the authentication cookie stores only the ID of that session.
 
-- Um [middleware de autenticação](https://github.com/okalil/discussions-monolith/blob/main/app/web/auth.ts) lê esse cookie, recupera os dados da sessão e do usuário, e os expõe através de um contexto do React Router.
+- An [authentication middleware](https://github.com/okalil/discussions-monolith/blob/main/app/web/auth.ts) reads this cookie, retrieves the session and user data, and exposes them via a React Router context.
 
-- O controle de acesso é feito nos "controllers" (`loader`/`action`), permitindo que cada rota defina de forma flexível se exige ou não um usuário autenticado.
+- Access control is performed in the "controllers" (`loader`/`action`), allowing each route to flexibly define whether or not an authenticated user is required.
 
-Quando um usuário autenticado é **obrigatório**, usaríamos:
+When an authenticated user is **required**, we use:
 
 ```ts
 export const loader = async ({ context }: Route.LoaderArgs) => {
@@ -48,18 +59,81 @@ export const loader = async ({ context }: Route.LoaderArgs) => {
 };
 ```
 
-Para um usuário autenticado **opcional**, teríamos:
+For an **optional** authenticated user, we have:
 
 ```ts
 export const loader = async ({ context }: Route.LoaderArgs) => {
   const user = context.get(authContext).getUser();
-  // User is nullable here, the loader data will be public but may show slightly different when user is present.
+  // User is nullable here, the loader data will be public but may be slightly different when user is present.
 };
 ```
 
 ### Form validation
 
-- Para compartilhar validação entre cliente e servidor, uma utilidade [`validator`](https://github.com/okalil/discussions-monolith/blob/main/app/web/validator.ts) encapsula um objeto "resolver" (para validação client-side via hook form) e um método "tryValidate" (para validação server-side via route action)
+- To share validation logic between client and server, a utility called [`validator`](https://github.com/okalil/discussions-monolith/blob/main/app/web/validator.ts) is used. It encapsulates a `resolver` (for client-side validation) and a `tryValidate` method (for server-side validation).
+- Although the React Router's form API *does not require* an external library, using `react-hook-form` enhances the user experience by providing real-time validation and automatic focusing on invalid fields.
+- The `handleSubmit` function is used to perform validation and apply focus. Once the data is validated, the submission is delegated back to React Router using `useSubmit`. This is important to keep *consistency* between document/fetch submissions.
+- Errors returned by the `action` are automatically synchronized with the form state, allowing `formState.errors` to be used as the *single source of truth* for form errors.
+
+See a simplified example of a form following this pattern ([or check full code](https://github.com/okalil/discussions-monolith/blob/main/app/web/ui/discussions/new-discussion.route.tsx)):
+```tsx
+export default function Component({ actionData }: Route.ComponentProps) {
+  const submit = useSubmit();
+  const form = useForm({
+    resolver: createDiscussionValidator.resolver,
+    errors: actionData?.errors,
+  });
+  const { errors } = form.formState;
+
+  return (
+    <Form
+      method="POST"
+      onSubmit={form.handleSubmit((_, e) => submit(e?.target))}
+    >
+      {errors.root?.message && <ErrorMessage error={errors.root?.message} />}
+
+      <Field label="Title" error={errors.title?.message}>
+        <Input
+          {...form.register("title")}
+          defaultValue={actionData?.values?.title}
+        />
+      </Field>
+      <Field label="Body" error={errors.body?.message}>
+        <Textarea
+          {...form.register("body")}
+          defaultValue={actionData?.values?.body}
+        />
+      </Field>
+      <Button className="ml-auto" variant="primary">
+        Start Discussion
+      </Button>
+    </Form>
+  );
+}
+
+export const action = async ({ request, context }: Route.ActionArgs) => {
+  const user = context.get(authContext).getUserOrFail();
+  const body = await bodyParser.parse(request);
+  const [errors, input] = await createDiscussionValidator.tryValidate(body);
+  if (errors) return data({ errors, values: body }, 422);
+
+  const discussion = await createDiscussion(input.title, input.body, user.id);
+  throw redirect(`/discussions/${discussion.id}`);
+};
+
+const createDiscussionValidator = validator(
+  z.object({
+    title: z.string().trim().min(1, "Title is required"),
+    body: z.string().trim().min(1, "Body is required"),
+  })
+);
+
+```
+
+### Pending submit button
+
+- Instead of handling loading state for a submit button every time, we can take advantage of React Router's `useFetchers` and `useNavigation` hooks to access the state of any inflight form submissions.
+- Then, we can check whether the button's form's action matches any of them to know if [it should be disabled or showing a spinner](https://github.com/okalil/discussions-monolith/blob/validation/app/web/ui/shared/button.tsx).
 
 ## Getting Started
 
