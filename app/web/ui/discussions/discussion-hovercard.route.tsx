@@ -4,11 +4,10 @@ import { Link, useFetcher } from "react-router";
 import { getDiscussionWithReply } from "~/core/discussion";
 import { Avatar } from "~/web/ui/shared/avatar";
 
-import type { Route, Info } from "./+types/discussion-hovercard.route";
+import type { Route } from "./+types/discussion-hovercard.route";
 
 export const loader = async ({ params }: Route.LoaderArgs) => {
-  const id = Number(params.id);
-  const discussion = await getDiscussionWithReply(id);
+  const discussion = await getDiscussionWithReply(+params.id);
   return { discussion };
 };
 
@@ -30,7 +29,7 @@ export function DiscussionHoverCard({
   discussionId,
   ...props
 }: DiscussionHoverCardProps) {
-  const fetcher = useFetcher<Info["loaderData"]>();
+  const fetcher = useFetcher<typeof loader>();
   const discussion = fetcher.data?.discussion;
 
   const onOpen = () => {

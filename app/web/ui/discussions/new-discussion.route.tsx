@@ -1,45 +1,55 @@
-import vine from "@vinejs/vine";
-import { data, Form, redirect, useNavigation } from "react-router";
+import { useForm } from "react-hook-form";
+import { data, Form, redirect, useSubmit } from "react-router";
+import { z } from "zod/v4";
 
 import { createDiscussion } from "~/core/discussion";
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
+import { Field } from "~/web/ui/shared/field";
 import { Input } from "~/web/ui/shared/input";
 import { Textarea } from "~/web/ui/shared/textarea";
+import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/new-discussion.route";
 
 export default function Component({ actionData }: Route.ComponentProps) {
-  const navigation = useNavigation();
+  const submit = useSubmit();
+  const form = useForm({
+    resolver: createDiscussionValidator.resolver,
+    errors: actionData?.errors,
+  });
+  const { errors } = form.formState;
+
   return (
     <main className="max-w-4xl mx-auto px-3 py-6">
       <h1 className="text-xl font-semibold mb-4">Start a new discussion</h1>
-      <Form method="POST" className="space-y-3">
-        {actionData?.error && <ErrorMessage error={actionData.error} />}
-        <div>
+      <Form
+        method="POST"
+        className="space-y-3"
+        onSubmit={form.handleSubmit((_, e) => submit(e?.target))}
+      >
+        {errors.root?.message && <ErrorMessage error={errors.root?.message} />}
+
+        <Field label="Title" error={errors.title?.message}>
           <Input
-            name="title"
+            {...form.register("title")}
             placeholder="Title"
-            required
+            aria-required
             defaultValue={actionData?.values?.title}
           />
-        </div>
-        <div>
+        </Field>
+        <Field label="Body" error={errors.body?.message}>
           <Textarea
-            name="body"
+            {...form.register("body")}
             placeholder="Body"
-            required
+            aria-required
             rows={16}
             defaultValue={actionData?.values?.body}
           />
-        </div>
-        <Button
-          className="ml-auto"
-          variant="primary"
-          loading={navigation.state === "submitting"}
-        >
+        </Field>
+        <Button className="ml-auto" variant="primary">
           Start Discussion
         </Button>
       </Form>
@@ -50,16 +60,16 @@ export default function Component({ actionData }: Route.ComponentProps) {
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const user = context.get(authContext).getUserOrFail();
   const body = await bodyParser.parse(request);
-  const [error, output] = await createDiscussionValidator.tryValidate(body);
-  if (error) return data({ error, values: body }, 422);
+  const [errors, input] = await createDiscussionValidator.tryValidate(body);
+  if (errors) return data({ errors, values: body }, 422);
 
-  const discussion = await createDiscussion(output.title, output.body, user.id);
+  const discussion = await createDiscussion(input.title, input.body, user.id);
   throw redirect(`/discussions/${discussion.id}`);
 };
 
-const createDiscussionValidator = vine.compile(
-  vine.object({
-    title: vine.string().trim().minLength(1),
-    body: vine.string().trim().minLength(1),
+const createDiscussionValidator = validator(
+  z.object({
+    title: z.string().trim().min(1, "Title is required"),
+    body: z.string().trim().min(1, "Body is required"),
   })
 );

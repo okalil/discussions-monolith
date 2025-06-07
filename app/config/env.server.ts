@@ -1,17 +1,16 @@
-import vine from "@vinejs/vine";
+import { z } from "zod/v4";
 
-export const env = await vine.validate({
-  data: process.env,
-  schema: vine.object({
-    NODE_ENV: vine.string(),
-    DATABASE_URL: vine.string(),
-    SMTP_HOST: vine.string(),
-    SMTP_PORT: vine.number(),
-    SMTP_USER: vine.string(),
-    SMTP_PASS: vine.string(),
-    SITE_URL: vine.string(),
-    SESSION_SECRET: vine.string(),
-    GITHUB_CLIENT_ID: vine.string(),
-    GITHUB_CLIENT_SECRET: vine.string(),
-  }),
-});
+export const env = z
+  .object({
+    NODE_ENV: z.string(),
+    DATABASE_URL: z.string(),
+    SMTP_HOST: z.string(),
+    SMTP_PORT: z.coerce.number(),
+    SMTP_USER: z.string(),
+    SMTP_PASS: z.string(),
+    SITE_URL: z.string(),
+    SESSION_SECRET: z.string(),
+    GITHUB_CLIENT_ID: z.string(),
+    GITHUB_CLIENT_SECRET: z.string(),
+  })
+  .parse(process.env);

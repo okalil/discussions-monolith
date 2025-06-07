@@ -1,13 +1,14 @@
-import vine from "@vinejs/vine";
+import { useForm } from "react-hook-form";
 import {
   data,
   Form,
   href,
   Link,
   redirect,
-  useNavigation,
   useSearchParams,
+  useSubmit,
 } from "react-router";
+import { z } from "zod/v4";
 
 import { env } from "~/config/env.server";
 import { getUserByCredentials } from "~/core/user";
@@ -16,17 +17,26 @@ import { bodyParser } from "~/web/body-parser";
 import { sessionContext } from "~/web/session";
 import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
+import { Field } from "~/web/ui/shared/field";
 import { Icon } from "~/web/ui/shared/icon";
 import { Input } from "~/web/ui/shared/input";
+import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/login.route";
 
 export const meta: Route.MetaFunction = () => [{ title: "Login" }];
 
 export default function Component({ actionData }: Route.ComponentProps) {
-  const navigation = useNavigation();
+  const submit = useSubmit();
+  const form = useForm({
+    resolver: loginValidator.resolver,
+    errors: actionData?.errors,
+  });
+  const { errors } = form.formState;
+
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("to");
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
@@ -49,61 +59,59 @@ export default function Component({ actionData }: Route.ComponentProps) {
             </span>
           </div>
 
-          <Form method="POST" className="space-y-4">
-            {actionData?.error && <ErrorMessage error={actionData.error} />}
+          <Form
+            method="POST"
+            className="space-y-4"
+            onSubmit={form.handleSubmit((_, e) => submit(e?.target))}
+          >
+            {errors.root?.message && (
+              <ErrorMessage error={errors.root.message} />
+            )}
 
             {redirectTo && <input name="to" value={redirectTo} type="hidden" />}
-            <div>
-              <label
-                htmlFor="email"
-                className="mb-1 block text-sm font-medium text-gray-700"
-              >
-                Email
-              </label>
+
+            <Field label="Email" error={errors.email?.message}>
               <Input
+                {...form.register("email")}
                 defaultValue={actionData?.email}
-                name="email"
                 type="email"
-                id="email"
-                required
+                aria-required
               />
-            </div>
-            <div>
-              <div className="flex justify-between items-center">
+            </Field>
+
+            <Field label="Password" error={errors.password?.message}>
+              <Input
+                {...form.register("password")}
+                type="password"
+                aria-required
+              />
+            </Field>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 accent-black border"
+                  name="remember"
+                  id="remember"
+                />
                 <label
-                  htmlFor="password"
-                  className="mb-1 block text-sm font-medium text-gray-700"
+                  htmlFor="remember"
+                  className="text-sm text-gray-600 cursor-pointer"
                 >
-                  Password
+                  Remember me
                 </label>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-indigo-600 hover:text-indigo-500 hover:underline"
-                >
-                  Forgot Password?
-                </Link>
               </div>
-              <Input name="password" type="password" id="password" required />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                className="w-4 h-4 accent-black border"
-                name="remember"
-                id="remember"
-              />
-              <label
-                htmlFor="remember"
-                className="text-sm text-gray-600 cursor-pointer"
+
+              <Link
+                to="/forgot-password"
+                className="text-sm text-indigo-600 hover:text-indigo-500 hover:underline"
               >
-                Remember me
-              </label>
+                Forgot Password?
+              </Link>
             </div>
-            <Button
-              variant="primary"
-              className="h-12 w-full"
-              loading={navigation.state === "submitting"}
-            >
+
+            <Button variant="primary" className="h-12 w-full">
               Login
             </Button>
             <p className="text-center text-sm text-gray-600">
@@ -112,7 +120,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
                 to="/register"
                 className="text-indigo-600 hover:text-indigo-500 hover:underline"
               >
-                Register
+                Register now
               </Link>
             </p>
           </Form>
@@ -124,14 +132,20 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  const [error, input] = await loginValidator.tryValidate(body);
-  if (error) {
-    return data({ error, email: body.email }, 422);
+  const [errors, input] = await loginValidator.tryValidate(body);
+  if (errors) {
+    return data({ errors, email: body.email }, 422);
   }
 
   const user = await getUserByCredentials(input.email, input.password);
   if (!user) {
-    return data({ error: "Invalid email or password", email: body.email }, 400);
+    return data(
+      {
+        errors: { root: { message: "Invalid email or password" } },
+        email: body.email,
+      },
+      400
+    );
   }
 
   await context.get(authContext).login(user.id, input.remember);
@@ -140,12 +154,12 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   throw redirect(safeUrl(input.to) || "/");
 };
 
-const loginValidator = vine.compile(
-  vine.object({
-    email: vine.string().email(),
-    password: vine.string(),
-    remember: vine.boolean().optional(),
-    to: vine.string().optional(),
+const loginValidator = validator(
+  z.object({
+    email: z.email("Inform a valid email address"),
+    password: z.string().min(1, "Password is required"),
+    remember: z.stringbool().optional(),
+    to: z.string().optional(),
   })
 );
 

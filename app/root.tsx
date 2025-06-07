@@ -1,5 +1,6 @@
 import type { ShouldRevalidateFunctionArgs } from "react-router";
 
+import { useEffect } from "react";
 import {
   isRouteErrorResponse,
   Links,
@@ -10,14 +11,14 @@ import {
 } from "react-router";
 import { Toaster, toast } from "sonner";
 
-import stylesheet from "~/root.css?url";
+import { authMiddleware } from "~/web/auth";
+import { rateLimitMiddleware } from "~/web/rate-limit";
+import { sessionContext, sessionMiddleware } from "~/web/session";
 import { NavigationProgress } from "~/web/ui/shared/navigation-progress";
 
 import type { Route } from "./+types/root";
 
-import { authMiddleware } from "./web/auth";
-import { rateLimitMiddleware } from "./web/rate-limit";
-import { sessionContext, sessionMiddleware } from "./web/session";
+import stylesheet from "./root.css?url";
 
 export const unstable_middleware: Route.unstable_MiddlewareFunction[] = [
   rateLimitMiddleware,
@@ -32,18 +33,17 @@ export async function loader({ context }: Route.LoaderArgs) {
   return { success: session.get("success"), error: session.get("error") };
 }
 
-export async function clientLoader({ serverLoader }: Route.ClientLoaderArgs) {
-  const { success, error } = await serverLoader();
-  if (success) toast.success(success);
-  if (error) toast.error(error, { duration: 5000 });
-}
-clientLoader.hydrate = true;
+export default function App({ loaderData }: Route.ComponentProps) {
+  useEffect(() => {
+    const { success, error } = loaderData;
+    if (success) toast.success(success);
+    if (error) toast.error(error, { duration: 5000 });
+  }, [loaderData]);
 
-export default function App() {
   return (
     <Document>
       <Outlet />
-      <Toaster richColors closeButton />
+      <Toaster richColors closeButton position="top-right" />
     </Document>
   );
 }

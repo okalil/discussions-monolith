@@ -1,82 +1,77 @@
-import vine from "@vinejs/vine";
-import { data, Form, Link, redirect, useNavigation } from "react-router";
+import { useForm } from "react-hook-form";
+import { data, Form, Link, redirect, useSubmit } from "react-router";
+import { z } from "zod/v4";
 
 import { createCredentialAccount } from "~/core/account";
+import { getUserByEmail } from "~/core/user";
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { sessionContext } from "~/web/session";
 import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
+import { Field } from "~/web/ui/shared/field";
 import { Input } from "~/web/ui/shared/input";
+import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/register.route";
 
 export default function Component({ actionData }: Route.ComponentProps) {
-  const navigation = useNavigation();
+  const submit = useSubmit();
+  const form = useForm({
+    resolver: registerValidator.resolver,
+    errors: actionData?.errors,
+  });
+  const { errors } = form.formState;
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Register</h2>
-        <Form method="post" className="space-y-4">
-          {actionData?.error && <ErrorMessage error={actionData.error} />}
-          <div>
-            <label
-              htmlFor="name"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Name
-            </label>
+        <Form
+          method="POST"
+          className="space-y-4"
+          onSubmit={form.handleSubmit((_, e) => submit(e?.target))}
+        >
+          {errors.root?.message && <ErrorMessage error={errors.root.message} />}
+
+          <Field label="Name" error={errors.name?.message}>
             <Input
-              name="name"
+              {...form.register("name")}
               type="text"
-              id="name"
-              required
+              aria-required
               defaultValue={actionData?.values?.name}
             />
-          </div>
-          <div>
-            <label
-              htmlFor="email"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
+          </Field>
+
+          <Field label="Email" error={errors.email?.message}>
             <Input
-              name="email"
+              {...form.register("email")}
               type="email"
-              id="email"
-              required
+              aria-required
               defaultValue={actionData?.values?.email}
             />
-          </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <Input name="password" type="password" id="password" required />
-          </div>
-          <div>
-            <label
-              htmlFor="password_confirmation"
-              className="block mb-1 text-sm font-medium text-gray-700"
-            >
-              Confirm Password
-            </label>
+          </Field>
+
+          <Field label="Password" error={errors.password?.message}>
             <Input
-              name="password_confirmation"
+              {...form.register("password")}
               type="password"
-              id="password_confirmation"
-              required
+              aria-required
             />
-          </div>
-          <Button
-            variant="primary"
-            className="w-full h-12"
-            loading={navigation.state === "submitting"}
+          </Field>
+
+          <Field
+            label="Confirm Password"
+            error={errors.passwordConfirmation?.message}
           >
+            <Input
+              {...form.register("passwordConfirmation")}
+              type="password"
+              aria-required
+            />
+          </Field>
+
+          <Button variant="primary" className="w-full h-12">
             Register
           </Button>
         </Form>
@@ -96,28 +91,47 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
-  const [error, output] = await registerValidator.tryValidate(body);
-  if (error) {
+  const [errors, input] = await registerValidator.tryValidate(body);
+
+  if (errors || (await getUserByEmail(input.email))) {
     delete body.password;
-    delete body.password_confirmation;
-    return data({ error, values: body }, 422);
+    delete body.passwordConfirmation;
+    return data(
+      {
+        errors: errors || { email: { message: "Email already taken" } },
+        values: body,
+      },
+      422
+    );
   }
 
   const user = await createCredentialAccount(
-    output.name,
-    output.email,
-    output.password
+    input.name,
+    input.email,
+    input.password
   );
+
   await context.get(authContext).login(user.id);
 
   context.get(sessionContext).flash("success", "Signed up successfully!");
   throw redirect("/");
 };
 
-const registerValidator = vine.compile(
-  vine.object({
-    name: vine.string().trim(),
-    email: vine.string().email(),
-    password: vine.string().minLength(6).confirmed(),
-  })
+const registerValidator = validator(
+  z
+    .object({
+      name: z.string().trim().min(1, "Name is required"),
+      email: z.email("Inform a valid email address"),
+      password: z
+        .string()
+        .min(8, "Password must be at least 8 characters long")
+        .max(72, "Password can't be longer than 72 characters"),
+      passwordConfirmation: z
+        .string()
+        .min(1, "Password confirmation is required"),
+    })
+    .refine((data) => data.password === data.passwordConfirmation, {
+      path: ["passwordConfirmation"],
+      message: "Passwords do not match",
+    })
 );

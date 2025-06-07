@@ -1,11 +1,12 @@
-import vine from "@vinejs/vine";
 import { Form, useSearchParams } from "react-router";
+import { z } from "zod/v4";
 
 import { getDiscussions } from "~/core/discussion";
 import { authContext } from "~/web/auth";
 import { Button } from "~/web/ui/shared/button";
 import { Input } from "~/web/ui/shared/input";
 import { Pagination } from "~/web/ui/shared/pagination";
+import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/discussions.route";
 
@@ -15,11 +16,7 @@ export const meta: Route.MetaFunction = () => [{ title: "Top Discussions" }];
 
 export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const user = context.get(authContext).getUser();
-  const {
-    q,
-    page = 1,
-    limit = 20,
-  } = await getDiscussionsValidator.validate(
+  const { q, page, limit } = await getDiscussionsValidator.validate(
     Object.fromEntries(new URL(request.url).searchParams)
   );
 
@@ -77,10 +74,10 @@ export default function Component({
   );
 }
 
-const getDiscussionsValidator = vine.compile(
-  vine.object({
-    page: vine.number().optional(),
-    limit: vine.number().optional(),
-    q: vine.string().optional(),
+const getDiscussionsValidator = validator(
+  z.object({
+    page: z.coerce.number().catch(1),
+    limit: z.coerce.number().catch(20),
+    q: z.string().optional(),
   })
 );

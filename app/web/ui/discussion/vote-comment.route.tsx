@@ -1,10 +1,11 @@
-import vine from "@vinejs/vine";
 import { href, useFetcher } from "react-router";
+import { z } from "zod/v4";
 
 import { unvoteComment, voteComment } from "~/core/comment";
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { VoteButton } from "~/web/ui/shared/vote-button";
+import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/vote-comment.route";
 
@@ -62,8 +63,8 @@ export const action = async ({
   return { ok: true };
 };
 
-const voteCommentValidator = vine.compile(
-  vine.object({
-    voted: vine.boolean(),
+const voteCommentValidator = validator(
+  z.object({
+    voted: z.stringbool(),
   })
 );

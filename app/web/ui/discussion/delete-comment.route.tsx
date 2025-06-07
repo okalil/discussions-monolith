@@ -17,9 +17,7 @@ export function DeleteComment({ commentId }: DeleteCommentProps) {
       method="POST"
       action={href("/comments/:id/delete", { id: commentId.toString() })}
     >
-      <Button variant="danger" loading={fetcher.state !== "idle"}>
-        Delete Comment
-      </Button>
+      <Button variant="danger">Delete Comment</Button>
     </fetcher.Form>
   );
 }
