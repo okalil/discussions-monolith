@@ -1,3 +1,4 @@
+import { convert } from "html-to-text";
 import nodemailer from "nodemailer";
 
 import { env } from "~/config/env.server";
@@ -7,7 +8,6 @@ interface MailMessage {
   to: string;
   subject: string;
   html: string;
-  text: string;
 }
 
 class Mailer {
@@ -20,12 +20,12 @@ class Mailer {
       pass: env.SMTP_PASS,
     },
   });
-  async send({ to, from, subject, html, text }: MailMessage) {
+  async send({ to, from, subject, html }: MailMessage) {
     from ??= "me@mail.com"; // default sender
 
     await new Promise((resolve, reject) => {
       this.transporter.sendMail(
-        { to, from, subject, html, text },
+        { to, from, subject, html, text: convert(html) },
         (err, info) => {
           if (err) reject(err);
           console.log(nodemailer.getTestMessageUrl(info));
@@ -34,6 +34,10 @@ class Mailer {
       );
     });
   }
+}
+
+export interface EmailTemplate<T> {
+  (data: T): Promise<string>;
 }
 
 /**

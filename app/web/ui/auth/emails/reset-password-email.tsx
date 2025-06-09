@@ -11,17 +11,14 @@ import {
   Text,
 } from "@react-email/components";
 
+import type { ForgetPasswordEmailVariables } from "~/core/account";
+
 import { env } from "~/config/env.server";
 
-interface ResetPasswordEmailProps {
-  userFirstname?: string | null;
-  resetPasswordLink?: string;
-}
-
-export const ResetPasswordEmail = ({
-  userFirstname,
-  resetPasswordLink,
-}: ResetPasswordEmailProps) => {
+export function ResetPasswordEmail({
+  name,
+  token,
+}: ForgetPasswordEmailVariables) {
   return (
     <Html>
       <Head />
@@ -35,12 +32,15 @@ export const ResetPasswordEmail = ({
             alt="Discussions"
           />
           <Section>
-            <Text style={text}>Hi {userFirstname},</Text>
+            <Text style={text}>Hi {name},</Text>
             <Text style={text}>
               Someone recently requested a password change for your Discussions
               account. If this was you, you can set a new password here:
             </Text>
-            <Button style={button} href={resetPasswordLink}>
+            <Button
+              style={button}
+              href={`${env.SITE_URL}/reset-password?token=${token}`}
+            >
               Reset password
             </Button>
             <Text style={text}>
@@ -60,12 +60,12 @@ export const ResetPasswordEmail = ({
       </Body>
     </Html>
   );
-};
+}
 
 ResetPasswordEmail.PreviewProps = {
-  userFirstname: "Alan",
-  resetPasswordLink: "https://discussions.com",
-} as ResetPasswordEmailProps;
+  name: "Alan",
+  token: "",
+} as ForgetPasswordEmailVariables;
 
 const main = {
   backgroundColor: "#f6f9fc",

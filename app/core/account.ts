@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import { and, eq, getTableColumns, sql } from "drizzle-orm";
 
+import type { EmailTemplate } from "./services/mailer";
+
 import { db, schema } from "./services/db";
 import { mailer } from "./services/mailer";
 import { github } from "./services/oauth/providers/github";
@@ -47,16 +49,22 @@ export async function getCredentialAccount(email: string) {
   return accounts.at(0);
 }
 
+export interface ForgetPasswordEmailVariables {
+  name: string | null;
+  token: string;
+}
+
 export async function forgetPassword(
   email: string,
-  messageBuilder: (token: string) => Promise<{ html: string; text: string }>
+  name: string | null,
+  template: EmailTemplate<ForgetPasswordEmailVariables>
 ) {
   const token = await createVerificationToken(email);
-  const message = await messageBuilder(token);
+  const html = await template({ name, token });
   await mailer.send({
     to: email,
     subject: "Discussions Password Reset",
-    ...message,
+    html,
   });
 }
 

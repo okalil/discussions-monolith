@@ -4,7 +4,6 @@ import { data, useSubmit } from "react-router";
 import { Form, Link, redirect } from "react-router";
 import { z } from "zod/v4";
 
-import { env } from "~/config/env.server";
 import { forgetPassword } from "~/core/account";
 import { getUserByEmail } from "~/core/user";
 import { bodyParser } from "~/web/body-parser";
@@ -62,19 +61,9 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 
   const user = await getUserByEmail(input.email);
   if (user && user.email) {
-    await forgetPassword(user.email, async (token) => {
-      const body = (
-        <ResetPasswordEmail
-          userFirstname={user.name}
-          resetPasswordLink={`${env.SITE_URL}/reset-password?token=${token}`}
-        />
-      );
-      const [html, text] = await Promise.all([
-        render(body),
-        render(body, { plainText: true }),
-      ]);
-      return { html, text };
-    });
+    await forgetPassword(user.email, user.name, (props) =>
+      render(ResetPasswordEmail(props))
+    );
   }
   context
     .get(sessionContext)
