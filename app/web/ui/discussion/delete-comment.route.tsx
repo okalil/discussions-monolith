@@ -22,7 +22,7 @@ export function DeleteComment({ commentId }: DeleteCommentProps) {
   );
 }
 
-export const action = async ({ context, params }: Route.ActionArgs) => {
+export const action = async ({ params }: Route.ActionArgs) => {
   const user = auth().getUserOrFail();
   await deleteComment(Number(params.id), user.id);
   return { ok: true };

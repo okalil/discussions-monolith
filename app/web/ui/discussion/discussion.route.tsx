@@ -14,7 +14,7 @@ import type { Route } from "./+types/discussion.route";
 import { CreateComment } from "./create-comment.route";
 import { VoteDiscussion } from "./vote-discussion.route";
 
-export const loader = async ({ context, params }: Route.LoaderArgs) => {
+export const loader = async ({ params }: Route.LoaderArgs) => {
   const user = auth().getUser();
   const userId = user?.id;
 
