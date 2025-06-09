@@ -13,7 +13,7 @@ import { Toaster, toast } from "sonner";
 
 import { authMiddleware } from "~/web/auth";
 import { rateLimitMiddleware } from "~/web/rate-limit";
-import { sessionContext, sessionMiddleware } from "~/web/session";
+import { session, sessionMiddleware } from "~/web/session";
 import { NavigationProgress } from "~/web/ui/shared/navigation-progress";
 
 import type { Route } from "./+types/root";
@@ -28,9 +28,11 @@ export const unstable_middleware: Route.unstable_MiddlewareFunction[] = [
 
 export const meta: Route.MetaFunction = () => [{ title: "Discussions" }];
 
-export async function loader({ context }: Route.LoaderArgs) {
-  const session = context.get(sessionContext);
-  return { success: session.get("success"), error: session.get("error") };
+export async function loader() {
+  return {
+    success: session().get("success"),
+    error: session().get("error"),
+  };
 }
 
 export default function App({ loaderData }: Route.ComponentProps) {

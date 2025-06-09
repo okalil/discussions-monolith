@@ -3,7 +3,7 @@ import { data, Form, redirect, useSubmit } from "react-router";
 import { z } from "zod/v4";
 
 import { createDiscussion } from "~/core/discussion";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
@@ -57,8 +57,8 @@ export default function Component({ actionData }: Route.ComponentProps) {
   );
 }
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export const action = async ({ request }: Route.ActionArgs) => {
+  const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const [errors, input] = await createDiscussionValidator.tryValidate(body);
   if (errors) return data({ errors, values: body }, 422);

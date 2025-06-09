@@ -8,7 +8,7 @@ import { env } from "~/config/env.server";
 import { forgetPassword } from "~/core/account";
 import { getUserByEmail } from "~/core/user";
 import { bodyParser } from "~/web/body-parser";
-import { sessionContext } from "~/web/session";
+import { session } from "~/web/session";
 import { Button } from "~/web/ui/shared/button";
 import { Input } from "~/web/ui/shared/input";
 import { validator } from "~/web/validator";
@@ -53,7 +53,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
   );
 }
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   const [errors, input] = await forgetPasswordValidator.tryValidate(body);
   if (errors) {
@@ -76,12 +76,10 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       return { html, text };
     });
   }
-  context
-    .get(sessionContext)
-    .flash(
-      "success",
-      "If your email is in our system, you will receive instructions to reset your password"
-    );
+  session().flash(
+    "success",
+    "If your email is in our system, you will receive instructions to reset your password"
+  );
   throw redirect("/login");
 };
 

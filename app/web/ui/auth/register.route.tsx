@@ -4,9 +4,9 @@ import { z } from "zod/v4";
 
 import { createCredentialAccount } from "~/core/account";
 import { getUserByEmail } from "~/core/user";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
-import { sessionContext } from "~/web/session";
+import { session } from "~/web/session";
 import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
 import { Field } from "~/web/ui/shared/field";
@@ -89,7 +89,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
   );
 }
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
+export const action = async ({ request }: Route.ActionArgs) => {
   const body = await bodyParser.parse(request);
   const [errors, input] = await registerValidator.tryValidate(body);
 
@@ -111,9 +111,9 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     input.password
   );
 
-  await context.get(authContext).login(user.id);
+  await auth().login(user.id);
 
-  context.get(sessionContext).flash("success", "Signed up successfully!");
+  session().flash("success", "Signed up successfully!");
   throw redirect("/");
 };
 

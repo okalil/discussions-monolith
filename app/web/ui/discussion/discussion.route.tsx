@@ -5,7 +5,7 @@ import { Link } from "react-router";
 
 import { getComments } from "~/core/comment";
 import { getDiscussion } from "~/core/discussion";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
 import { CommentsList } from "~/web/ui/discussion/comments-list";
 import { Avatar } from "~/web/ui/shared/avatar";
 
@@ -15,7 +15,7 @@ import { CreateComment } from "./create-comment.route";
 import { VoteDiscussion } from "./vote-discussion.route";
 
 export const loader = async ({ context, params }: Route.LoaderArgs) => {
-  const user = context.get(authContext).getUser();
+  const user = auth().getUser();
   const userId = user?.id;
 
   const comments = getComments(Number(params.id), userId);

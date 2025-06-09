@@ -6,8 +6,8 @@ import {
   createProviderAuthorizationURL,
   linkProviderAccount,
 } from "~/core/account";
-import { authContext } from "~/web/auth";
-import { sessionContext } from "~/web/session";
+import { auth } from "~/web/auth";
+import { session } from "~/web/session";
 
 import type { Route } from "./+types/social.route";
 
@@ -41,8 +41,8 @@ export const loader = async ({
     throw new Response("Invalid State", { status: 400 });
 
   const user = await linkProviderAccount(params.provider, code);
-  await context.get(authContext).login(user.id);
+  await auth().login(user.id);
 
-  context.get(sessionContext).flash("success", "Signed in successfully!");
+  session().flash("success", "Signed in successfully!");
   return redirect("/");
 };

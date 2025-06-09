@@ -2,15 +2,15 @@ import type { ShouldRevalidateFunction } from "react-router";
 
 import { Link, Outlet, Form } from "react-router";
 
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
 import { Avatar } from "~/web/ui/shared/avatar";
 import { Button } from "~/web/ui/shared/button";
 import { cn } from "~/web/ui/shared/utils/cn";
 
 import type { Route } from "./+types/layout.route";
 
-export const loader = ({ context }: Route.LoaderArgs) => {
-  const user = context.get(authContext).getUser();
+export const loader = () => {
+  const user = auth().getUser();
   return { user };
 };
 

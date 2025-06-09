@@ -2,7 +2,7 @@ import { Form, useSearchParams } from "react-router";
 import { z } from "zod/v4";
 
 import { getDiscussions } from "~/core/discussion";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
 import { Button } from "~/web/ui/shared/button";
 import { Input } from "~/web/ui/shared/input";
 import { Pagination } from "~/web/ui/shared/pagination";
@@ -14,8 +14,8 @@ import { DiscussionRow } from "./discussion-row";
 
 export const meta: Route.MetaFunction = () => [{ title: "Top Discussions" }];
 
-export const loader = async ({ request, context }: Route.LoaderArgs) => {
-  const user = context.get(authContext).getUser();
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const user = auth().getUser();
   const { q, page, limit } = await getDiscussionsValidator.validate(
     Object.fromEntries(new URL(request.url).searchParams)
   );

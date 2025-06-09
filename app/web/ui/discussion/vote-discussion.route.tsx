@@ -2,7 +2,7 @@ import { data, useFetcher } from "react-router";
 import { z } from "zod/v4";
 
 import { unvoteDiscussion, voteDiscussion } from "~/core/discussion";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { VoteButton } from "~/web/ui/shared/vote-button";
 import { validator } from "~/web/validator";
@@ -51,7 +51,7 @@ export const action = async ({
   context,
   params,
 }: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+  const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const [errors, input] = await voteDiscussionValidator.tryValidate(body);
   if (errors) {

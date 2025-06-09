@@ -4,9 +4,9 @@ import { data, Form, redirect, useSubmit } from "react-router";
 import { z } from "zod/v4";
 
 import { updateUser, uploadUserImage } from "~/core/user";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
-import { sessionContext } from "~/web/session";
+import { session } from "~/web/session";
 import { Avatar } from "~/web/ui/shared/avatar";
 import { Button } from "~/web/ui/shared/button";
 import { ErrorMessage } from "~/web/ui/shared/error-message";
@@ -18,8 +18,8 @@ import type { Route } from "./+types/profile.route";
 
 export const meta = () => [{ title: "Discussions | Profile" }];
 
-export const loader = ({ context }: Route.LoaderArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export const loader = () => {
+  const user = auth().getUserOrFail();
   return { user };
 };
 
@@ -90,8 +90,8 @@ export default function Component({
   );
 }
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export const action = async ({ request }: Route.ActionArgs) => {
+  const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const [errors, input] = await updateUserValidator.tryValidate(body);
   if (errors) return data({ errors, body }, 422);
@@ -99,7 +99,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   const fileKey = await uploadUserImage(user.id, input.image);
   await updateUser(user.id, input.name, fileKey);
 
-  context.get(sessionContext).flash("success", "Successfully updated!");
+  session().flash("success", "Successfully updated!");
   throw redirect(".");
 };
 

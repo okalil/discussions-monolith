@@ -2,7 +2,7 @@ import { data, href, useFetcher } from "react-router";
 import { z } from "zod/v4";
 
 import { createComment } from "~/core/comment";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { Field } from "~/web/ui/shared/field";
@@ -46,8 +46,8 @@ export function CreateComment({ discussionId }: CreateCommentProps) {
   );
 }
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export const action = async ({ request }: Route.ActionArgs) => {
+  const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const [errors, input] = await createCommentValidator.tryValidate(body);
   if (errors) throw data({ errors }, 422);

@@ -4,7 +4,7 @@ import { z } from "zod/v4";
 import type { CommentsDto } from "~/core/comment";
 
 import { updateComment } from "~/core/comment";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/ui/shared/button";
 import { Field } from "~/web/ui/shared/field";
@@ -59,7 +59,7 @@ export const action = async ({
   context,
   params,
 }: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+  const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const [error, input] = await updateCommentValidator.tryValidate(body);
   if (error) {
