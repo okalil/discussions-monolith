@@ -176,3 +176,29 @@ export const unvoteDiscussion = async (id: number, userId: number) => {
 function formatLargeText(text: string) {
   return text.length > 100 ? text.slice(0, 100) + "..." : text;
 }
+
+export const getParticipants = async (discussionId: number) => {
+  const participants = await db
+    .selectDistinct({
+      id: schema.users.id,
+      name: schema.users.name,
+      image: schema.users.image,
+    })
+    .from(schema.users)
+    .innerJoin(
+      schema.discussions,
+      eq(schema.discussions.id, discussionId)
+    )
+    .leftJoin(
+      schema.comments,
+      eq(schema.comments.discussionId, discussionId)
+    )
+    .where(
+      or(
+        eq(schema.discussions.authorId, schema.users.id),
+        eq(schema.comments.authorId, schema.users.id)
+      )
+    );
+  return participants;
+};
+export type ParticipantsDto = Awaited<ReturnType<typeof getParticipants>>;
