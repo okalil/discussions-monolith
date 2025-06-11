@@ -1,4 +1,3 @@
-import { render } from "@react-email/components";
 import { useForm } from "react-hook-form";
 import { data, useSubmit } from "react-router";
 import { Form, Link, redirect } from "react-router";
@@ -15,7 +14,6 @@ import { validator } from "~/web/validator";
 import type { Route } from "./+types/forgot-password.route";
 
 import { Field } from "../shared/field";
-import { ResetPasswordEmail } from "./emails/reset-password-email";
 
 export default function Component({ actionData }: Route.ComponentProps) {
   const submit = useSubmit();
@@ -60,10 +58,8 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   }
 
   const user = await getUserByEmail(input.email);
-  if (user && user.email) {
-    await forgetPassword(user.email, user.name, (props) =>
-      render(ResetPasswordEmail(props))
-    );
+  if (user && user.email !== null) {
+    await forgetPassword(user.email);
   }
   context
     .get(sessionContext)
