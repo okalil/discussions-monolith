@@ -1,27 +1,26 @@
 import {
   Body,
+  Button,
   Container,
   Head,
   Heading,
   Hr,
   Html,
   Img,
-  Link,
   Preview,
   Section,
   Tailwind,
   Text,
 } from "@react-email/components";
 
-import { env } from "~/config/env.server";
-
 interface Props {
+  baseUrl: string;
   email: string;
   token: string;
 }
 
-export function ResetPasswordLink({ email, token }: Props) {
-  const url = `${env.SITE_URL}/reset-password?token=${token}`;
+export function ResetPasswordLink({ baseUrl, email, token }: Props) {
+  const url = `${baseUrl}/reset-password?token=${token}`;
   return (
     <Html>
       <Head />
@@ -30,30 +29,30 @@ export function ResetPasswordLink({ email, token }: Props) {
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={`${env.SITE_URL}/logo.png`} height="32" alt="Dub" />
+              <Img src={`${baseUrl}/logo.png`} height="32" alt="Discussions" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-xl font-medium text-black">
               Reset password link
             </Heading>
             <Text className="text-sm leading-6 text-black">
               You are receiving this email because we received a password reset
-              request for your account at Dub.
+              request for your account at Discussions.
             </Text>
             <Text className="text-sm leading-6 text-black">
               Please click the button below to reset your password.
             </Text>
             <Section className="my-8 mt-8">
-              <Link
-                className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
+              <Button
+                className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white"
                 href={url}
               >
                 Reset Password
-              </Link>
+              </Button>
             </Section>
             <Text className="text-sm leading-6 text-black">
               or copy and paste this URL into your browser:
             </Text>
-            <Text className="max-w-sm flex-wrap break-words font-medium text-purple-600 no-underline">
+            <Text className="text-sm font-medium text-purple-600 break-all">
               {url.replace(/^https?:\/\//, "")}
             </Text>
 
@@ -73,6 +72,9 @@ export function ResetPasswordLink({ email, token }: Props) {
 }
 
 ResetPasswordLink.PreviewProps = {
+  baseUrl: "http://localhost:5173",
   email: "john@due.com",
-  token: "",
+  token: "1e7ab5ef3e239582fa4f0f4fc31ed6b2d77bf46e32f28d7b343644d1946889ae",
 } as Props;
+
+export default ResetPasswordLink;
