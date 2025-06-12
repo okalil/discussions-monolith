@@ -20,7 +20,7 @@ interface Props {
   token: string;
 }
 
-export function ResetPasswordEmail({ email, token }: Props) {
+export function ResetPasswordLink({ email, token }: Props) {
   const url = `${env.SITE_URL}/reset-password?token=${token}`;
   return (
     <Html>
@@ -72,7 +72,7 @@ export function ResetPasswordEmail({ email, token }: Props) {
   );
 }
 
-ResetPasswordEmail.PreviewProps = {
+ResetPasswordLink.PreviewProps = {
   email: "john@due.com",
   token: "",
 } as Props;

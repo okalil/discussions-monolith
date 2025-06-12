@@ -2,8 +2,8 @@ import bcrypt from "bcrypt";
 import { and, eq, getTableColumns, sql } from "drizzle-orm";
 
 import { db, schema } from "./services/db";
-import { mailer } from "./services/emails/mailer";
-import { ResetPasswordEmail } from "./services/emails/templates/reset-password-email";
+import { mailer } from "./services/email/mailer";
+import { ResetPasswordLink } from "./services/email/templates/reset-password-link";
 import { github } from "./services/oauth/providers/github";
 import {
   createVerificationToken,
@@ -53,7 +53,7 @@ export async function forgetPassword(email: string) {
   await mailer.send({
     to: email,
     subject: "Discussions Password Reset",
-    template: ResetPasswordEmail({ email, token }),
+    template: ResetPasswordLink({ email, token }),
   });
 }
 
