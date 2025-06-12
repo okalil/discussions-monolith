@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import { and, eq, getTableColumns, sql } from "drizzle-orm";
 
+import { env } from "~/config/env.server";
+
 import { db, schema } from "./services/db";
 import { mailer } from "./services/email/mailer";
 import { ResetPasswordLink } from "./services/email/templates/reset-password-link";
@@ -53,7 +55,7 @@ export async function forgetPassword(email: string) {
   await mailer.send({
     to: email,
     subject: "Discussions Password Reset",
-    template: ResetPasswordLink({ email, token }),
+    template: ResetPasswordLink({ baseUrl: env.SITE_URL, email, token }),
   });
 }
 
