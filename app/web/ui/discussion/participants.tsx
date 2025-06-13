@@ -8,22 +8,19 @@ interface ParticipantsProps {
   participants: Promise<ParticipantsDto>;
 }
 
-export function Participants({ participants }: ParticipantsProps) {
-  const resolvedParticipants = use(participants);
-
+export function Participants(props: ParticipantsProps) {
+  const participants = use(props.participants);
   return (
-    <div className="bg-white rounded-lg p-4 shadow-sm">
-      <h2 className="text-lg font-semibold mb-3">Participants</h2>
-      <div className="flex flex-wrap gap-2">
-        {resolvedParticipants.map((participant) => (
-          <Avatar
-            key={participant.id}
-            src={participant.image}
-            alt={participant.name || ""}
-            size={40}
-          />
-        ))}
-      </div>
+    <div className="flex flex-wrap gap-1">
+      {participants.map((participant) => (
+        <Avatar
+          key={participant.id}
+          src={participant.image}
+          alt={`${participant.name}'s avatar`}
+          fallback={participant.name?.at(0)}
+          size={24}
+        />
+      ))}
     </div>
   );
-} 
+}

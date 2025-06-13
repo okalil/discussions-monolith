@@ -91,7 +91,7 @@ export const getDiscussions = async (
 export type DiscussionsDto = Awaited<ReturnType<typeof getDiscussions>>;
 
 export const getDiscussion = async (id: number, userId = 0) => {
-  const discussions = await db
+  const [discussion] = await db
     .select({
       id: schema.discussions.id,
       title: schema.discussions.title,
@@ -101,8 +101,18 @@ export const getDiscussion = async (id: number, userId = 0) => {
         name: schema.users.name,
         image: schema.users.image,
       },
-      commentsCount: countDistinct(schema.comments.id),
       votesCount: countDistinct(schema.discussionVotes.userId),
+      commentsCount: countDistinct(schema.comments.id),
+      participantsCount: sql<number>`
+      (
+        SELECT COUNT(DISTINCT userId) FROM (
+          SELECT ${schema.discussions.authorId} AS userId
+          UNION
+          SELECT ${schema.comments.authorId} FROM ${schema.comments}
+          WHERE ${schema.comments.discussionId} = ${schema.discussions.id}
+        )
+      )
+    `,
       voted:
         sql<number>`COUNT(CASE WHEN ${schema.discussionVotes.userId} = ${userId} THEN 1 END)`.mapWith(
           Boolean
@@ -121,7 +131,7 @@ export const getDiscussion = async (id: number, userId = 0) => {
     .groupBy(schema.discussions.id)
     .where(eq(schema.discussions.id, id))
     .limit(1);
-  return discussions.at(0);
+  return discussion;
 };
 export type DiscussionDto = Awaited<ReturnType<typeof getDiscussion>>;
 
@@ -185,14 +195,8 @@ export const getParticipants = async (discussionId: number) => {
       image: schema.users.image,
     })
     .from(schema.users)
-    .innerJoin(
-      schema.discussions,
-      eq(schema.discussions.id, discussionId)
-    )
-    .leftJoin(
-      schema.comments,
-      eq(schema.comments.discussionId, discussionId)
-    )
+    .innerJoin(schema.discussions, eq(schema.discussions.id, discussionId))
+    .leftJoin(schema.comments, eq(schema.comments.discussionId, discussionId))
     .where(
       or(
         eq(schema.discussions.authorId, schema.users.id),
