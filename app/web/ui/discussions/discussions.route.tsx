@@ -14,13 +14,20 @@ import { DiscussionRow } from "./discussion-row";
 
 export const meta: Route.MetaFunction = () => [{ title: "Top Discussions" }];
 
-export const loader = async ({ request, context }: Route.LoaderArgs) => {
+export const loader = async ({
+  request,
+  context,
+  params,
+}: Route.LoaderArgs) => {
   const user = context.get(authContext).getUser();
   const { q, page, limit } = await getDiscussionsValidator.validate(
     Object.fromEntries(new URL(request.url).searchParams)
   );
 
-  const paginator = await getDiscussions({ page, limit, q }, user?.id);
+  const paginator = await getDiscussions(
+    { category: params.category, page, limit, q },
+    user?.id
+  );
   return paginator;
 };
 

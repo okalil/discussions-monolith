@@ -1,0 +1,84 @@
+/* === Main Select Appearance === */
+select[name="categoryId"] {
+  appearance: base-select;
+  width: 320px;
+  max-width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  &:hover {
+    background: #f7f7f7;
+  }
+}
+
+/* === Popover Panel === */
+::picker(select) {
+  appearance: base-select;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  padding: 0.25rem 0;
+  margin-block: 4px;
+}
+
+/* === Option Style === */
+option {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  align-items: center;
+}
+
+option:checked,
+option:active,
+option:hover {
+  background: #f7f7f7;
+}
+
+/* === Emoji Box === */
+option .emoji,
+selectedcontent .emoji {
+  background: #eee;
+  border-radius: 8px;
+  padding: 0.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === Text Content === */
+option .text,
+selectedcontent .text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+option .title,
+selectedcontent .title {
+  font-weight: 600;
+  color: #222;
+  line-height: 1.2;
+}
+
+option .desc,
+selectedcontent .desc {
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.2;
+}
+
+/* === Selectedcontent (button appearance) === */
+selectedcontent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}

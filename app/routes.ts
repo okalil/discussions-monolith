@@ -1,4 +1,9 @@
-import { layout, route, type RouteConfig } from "@react-router/dev/routes";
+import {
+  index,
+  layout,
+  route,
+  type RouteConfig,
+} from "@react-router/dev/routes";
 
 const routes = [
   layout("web/ui/auth/auth.route.tsx", [
@@ -11,7 +16,10 @@ const routes = [
   route("logout", "web/ui/auth/logout.route.tsx"),
 
   layout("web/ui/layouts/layout.route.tsx", [
-    route(null, "web/ui/discussions/discussions.route.tsx", { index: true }),
+    index("web/ui/discussions/discussions.route.tsx"),
+    route("categories/:category", "web/ui/discussions/discussions.route.tsx", {
+      id: "discussions/category",
+    }),
     route("discussions/new", "web/ui/discussions/new-discussion.route.tsx"),
     route(
       "discussions/:id/hovercard",

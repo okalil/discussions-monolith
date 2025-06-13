@@ -122,21 +122,22 @@ export async function linkProviderAccount(provider: string, code: string) {
   const accessToken = await providerApi.getAccessToken(code);
   const providerUser = await providerApi.getUser(accessToken);
 
-  const user = await db.transaction(async (tx) => {
-    let [user] = await db
-      .select()
-      .from(schema.users)
-      .where(eq(schema.users.email, providerUser.email));
-    let [account] = await db
-      .select()
-      .from(schema.accounts)
-      .where(
-        and(
-          eq(schema.accounts.providerAccountId, providerUser.id),
-          eq(schema.accounts.provider, provider)
-        )
-      );
+  let [user] = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.email, providerUser.email));
+  let [account] = await db
+    .select()
+    .from(schema.accounts)
+    .where(
+      and(
+        eq(schema.accounts.providerAccountId, providerUser.id),
+        eq(schema.accounts.provider, provider)
+      )
+    );
+  if (account && user) return user;
 
+  await db.transaction(async (tx) => {
     // If user is not found, create a new one
     if (!user) {
       [user] = await tx
@@ -161,8 +162,6 @@ export async function linkProviderAccount(provider: string, code: string) {
         })
         .returning();
     }
-
-    return user;
   });
 
   return user;

@@ -67,22 +67,38 @@ export const verificationTokens = sqliteTable(
   ]
 );
 
+export const categories = sqliteTable(
+  "categories",
+  {
+    id: integer("id").primaryKey(),
+    emoji: text("emoji").notNull(),
+    slug: text("slug").notNull().unique(),
+    title: text("title").notNull(),
+    description: text("description"),
+  },
+  () => []
+);
+
 export const discussions = sqliteTable(
   "discussions",
   {
-    id: integer("id" as string).primaryKey(),
-    title: text("title" as string).notNull(),
-    body: text("body" as string).notNull(),
-    authorId: integer("author_id" as string).notNull(),
-    createdAt: text("created_at" as string)
+    id: integer("id").primaryKey(),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    authorId: integer("author_id").notNull(),
+    categoryId: integer("category_id").notNull(),
+    createdAt: text("created_at")
       .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
+      .default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text("updated_at" as string)
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`)
       .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
   },
-  (table) => [index("discussion_author_idx" as string).on(table.authorId)]
+  (table) => [
+    index("discussion_author_idx").on(table.authorId),
+    index("discussion_category_idx").on(table.categoryId),
+  ]
 );
 
 export const discussionVotes = sqliteTable(

@@ -1,7 +1,7 @@
 import type { ShouldRevalidateFunctionArgs } from "react-router";
 
 import { Suspense } from "react";
-import { Link, useSearchParams } from "react-router";
+import { href, Link, useSearchParams } from "react-router";
 
 import { getComments } from "~/core/comment";
 import { getDiscussion, getParticipants } from "~/core/discussion";
@@ -128,15 +128,36 @@ export default function Component({
           </div>
 
           <aside>
-            <div className="sticky top-6 pb-4 mb-4 border-b border-gray-200">
-              <h3 className="text-xs font-semibold text-gray-600 mb-2">
-                {discussion.participantsCount > 1
-                  ? `${discussion.participantsCount} participants`
-                  : "1 participant"}
-              </h3>
-              <Suspense fallback={<div>Loading participants...</div>}>
-                <Participants participants={participants} />
-              </Suspense>
+            <div className="sticky top-6">
+              <div className="pb-4 mb-4 border-b border-gray-200">
+                <h3 className="text-xs font-semibold text-gray-600 mb-2">
+                  Category
+                </h3>
+                <Link
+                  to={href("/categories/:category", {
+                    category: discussion.category.slug,
+                  })}
+                  className="flex items-center gap-2 group w-max"
+                >
+                  <div className="text-base bg-gray-200 rounded-md h-8 w-8 flex items-center justify-center">
+                    {discussion.category.emoji}
+                  </div>
+                  <span className="text-xs font-semibold group-hover:underline">
+                    {discussion.category.title}
+                  </span>
+                </Link>
+              </div>
+
+              <div className="pb-4 mb-4 border-b border-gray-200">
+                <h3 className="text-xs font-semibold text-gray-600 mb-2">
+                  {discussion.participantsCount > 1
+                    ? `${discussion.participantsCount} participants`
+                    : "1 participant"}
+                </h3>
+                <Suspense fallback={<div>Loading participants...</div>}>
+                  <Participants participants={participants} />
+                </Suspense>
+              </div>
             </div>
           </aside>
         </div>
