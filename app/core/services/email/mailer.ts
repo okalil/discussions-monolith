@@ -1,3 +1,4 @@
+import { render } from "@react-email/components";
 import nodemailer from "nodemailer";
 
 import { env } from "~/config/env.server";
@@ -6,8 +7,7 @@ interface MailMessage {
   from?: string;
   to: string;
   subject: string;
-  html: string;
-  text: string;
+  template: React.JSX.Element;
 }
 
 class Mailer {
@@ -20,9 +20,10 @@ class Mailer {
       pass: env.SMTP_PASS,
     },
   });
-  async send({ to, from, subject, html, text }: MailMessage) {
+  async send({ to, from, subject, template }: MailMessage) {
     from ??= "me@mail.com"; // default sender
-
+    const html = await render(template);
+    const text = await render(template, { plainText: true });
     await new Promise((resolve, reject) => {
       this.transporter.sendMail(
         { to, from, subject, html, text },
@@ -34,6 +35,10 @@ class Mailer {
       );
     });
   }
+}
+
+export interface EmailTemplate<T> {
+  (data: T): Promise<string>;
 }
 
 /**

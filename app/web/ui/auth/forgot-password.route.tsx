@@ -1,10 +1,8 @@
-import { render } from "@react-email/components";
 import { useForm } from "react-hook-form";
 import { data, useSubmit } from "react-router";
 import { Form, Link, redirect } from "react-router";
 import { z } from "zod/v4";
 
-import { env } from "~/config/env.server";
 import { forgetPassword } from "~/core/account";
 import { getUserByEmail } from "~/core/user";
 import { bodyParser } from "~/web/body-parser";
@@ -16,7 +14,6 @@ import { validator } from "~/web/validator";
 import type { Route } from "./+types/forgot-password.route";
 
 import { Field } from "../shared/field";
-import { ResetPasswordEmail } from "./emails/reset-password-email";
 
 export default function Component({ actionData }: Route.ComponentProps) {
   const submit = useSubmit();
@@ -61,20 +58,8 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   }
 
   const user = await getUserByEmail(input.email);
-  if (user && user.email) {
-    await forgetPassword(user.email, async (token) => {
-      const body = (
-        <ResetPasswordEmail
-          userFirstname={user.name}
-          resetPasswordLink={`${env.SITE_URL}/reset-password?token=${token}`}
-        />
-      );
-      const [html, text] = await Promise.all([
-        render(body),
-        render(body, { plainText: true }),
-      ]);
-      return { html, text };
-    });
+  if (user && user.email !== null) {
+    await forgetPassword(user.email);
   }
   context
     .get(sessionContext)
