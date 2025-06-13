@@ -16,7 +16,7 @@ interface DiscussionProps {
 
 export function DiscussionRow({ discussion, authenticated }: DiscussionProps) {
   return (
-    <li className="flex gap-5 items-center py-2 px-4 border-b border-gray-300 hover:bg-gray-50">
+    <li className="flex gap-5 items-center py-2 px-4 border-b border-gray-200 hover:bg-gray-50">
       <VoteDiscussion
         discussionId={discussion.id}
         active={discussion.voted}
