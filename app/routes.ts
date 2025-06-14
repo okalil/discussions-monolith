@@ -34,7 +34,11 @@ const routes = [
     route("comments/:id/edit", "web/ui/discussion/edit-comment.route.tsx"),
     route("comments/:id/delete", "web/ui/discussion/delete-comment.route.tsx"),
     route("comments/:id/vote", "web/ui/discussion/vote-comment.route.tsx"),
-    route("profile", "web/ui/profile/profile.route.tsx"),
+    route("profile", "web/ui/profile/sidebar.route.tsx", [
+      index("web/ui/profile/profile.route.tsx"),
+      route("password", "web/ui/profile/password.route.tsx"),
+      route("accounts", "web/ui/profile/accounts.route.tsx"),
+    ]),
   ]),
 
   route("uploads/*", "web/resources/uploads.route.tsx"),

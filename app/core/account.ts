@@ -76,16 +76,9 @@ export async function resetPassword(
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-
-  await updatePassword(verificationToken.identifier, hashedPassword);
-  await deleteVerificationToken(verificationToken.token);
-  return true;
-}
-
-async function updatePassword(email: string, password: string) {
   await db
     .update(schema.accounts)
-    .set({ password })
+    .set({ password: hashedPassword })
     .where(
       and(
         eq(schema.accounts.type, "credential"),
@@ -93,6 +86,36 @@ async function updatePassword(email: string, password: string) {
           schema.accounts.userId,
           sql<number>`(SELECT id FROM ${schema.users} WHERE email = ${email})`
         )
+      )
+    );
+  await deleteVerificationToken(verificationToken.token);
+  return true;
+}
+
+export async function verifyPassword(userId: number, password: string) {
+  const [account] = await db
+    .select({ password: schema.accounts.password })
+    .from(schema.accounts)
+    .where(
+      and(
+        eq(schema.accounts.type, "credential"),
+        eq(schema.accounts.userId, userId)
+      )
+    );
+  if (!account?.password) return false;
+
+  return bcrypt.compare(password, account.password);
+}
+
+export async function updatePassword(userId: number, password: string) {
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await db
+    .update(schema.accounts)
+    .set({ password: hashedPassword })
+    .where(
+      and(
+        eq(schema.accounts.type, "credential"),
+        eq(schema.accounts.userId, userId)
       )
     );
 }
@@ -115,7 +138,61 @@ export function createProviderAuthorizationURL(
   return url;
 }
 
-export async function linkProviderAccount(provider: string, code: string) {
+export async function getProviderAccounts(userId: number) {
+  const accounts = await db
+    .select({ provider: schema.accounts.provider })
+    .from(schema.accounts)
+    .where(
+      and(eq(schema.accounts.type, "oauth"), eq(schema.accounts.userId, userId))
+    );
+  return accounts;
+}
+
+export async function linkProviderAccount(
+  userId: number,
+  provider: string,
+  code: string
+) {
+  const providerApi = providers.get(provider);
+  if (!providerApi) throw new Error("Invalid Provider");
+
+  const accessToken = await providerApi.getAccessToken(code);
+  const providerUser = await providerApi.getUser(accessToken);
+
+  const [existingAccount] = await db
+    .select()
+    .from(schema.accounts)
+    .where(
+      and(
+        eq(schema.accounts.providerAccountId, providerUser.id),
+        eq(schema.accounts.provider, provider)
+      )
+    );
+
+  if (existingAccount) {
+    throw new Error("This account is already linked to another user");
+  }
+
+  await db.insert(schema.accounts).values({
+    type: "oauth",
+    provider: provider,
+    providerAccountId: providerUser.id,
+    userId: userId,
+  });
+}
+
+export async function unlinkProviderAccount(userId: number, provider: string) {
+  await db
+    .delete(schema.accounts)
+    .where(
+      and(
+        eq(schema.accounts.userId, userId),
+        eq(schema.accounts.provider, provider)
+      )
+    );
+}
+
+export async function getProviderAccount(provider: string, code: string) {
   const providerApi = providers.get(provider);
   if (!providerApi) throw new Error("Invalid Provider");
 

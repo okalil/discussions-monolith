@@ -28,6 +28,16 @@ export const authMiddleware: Route.unstable_MiddlewareFunction = async (
   let setCookie: string | undefined;
 
   context.set(authContext, {
+    async login(userId: number, remember?: boolean) {
+      const { id: sessionId, expires } = await createSession(userId);
+      setCookie = await authCookie.serialize(sessionId, {
+        expires: remember ? new Date(expires) : undefined,
+      });
+    },
+    async logout() {
+      await deleteSession(sessionId);
+      setCookie = await authCookie.serialize(null);
+    },
     getUser() {
       return user;
     },
@@ -44,16 +54,7 @@ export const authMiddleware: Route.unstable_MiddlewareFunction = async (
       }
       return user;
     },
-    async login(userId: number, remember?: boolean) {
-      const { id: sessionId, expires } = await createSession(userId);
-      setCookie = await authCookie.serialize(sessionId, {
-        expires: remember ? new Date(expires) : undefined,
-      });
-    },
-    async logout() {
-      await deleteSession(sessionId);
-      setCookie = await authCookie.serialize(null);
-    },
+    sessionId,
   });
 
   const response = await next();
@@ -62,8 +63,9 @@ export const authMiddleware: Route.unstable_MiddlewareFunction = async (
 
 type SessionUser = Awaited<ReturnType<typeof getUserBySession>>;
 type Auth = {
-  getUser: () => SessionUser;
-  getUserOrFail: () => NonNullable<SessionUser>;
   login: (userId: number, remember?: boolean) => Promise<void>;
   logout: () => Promise<void>;
+  getUser(): SessionUser;
+  getUserOrFail(): NonNullable<SessionUser>;
+  sessionId: string;
 };

@@ -4,6 +4,7 @@ import { createCookie, redirect } from "react-router";
 import { env } from "~/config/env.server";
 import {
   createProviderAuthorizationURL,
+  getProviderAccount,
   linkProviderAccount,
 } from "~/core/account";
 import { authContext } from "~/web/auth";
@@ -40,9 +41,19 @@ export const loader = async ({
   if (!state || state !== sessionState)
     throw new Response("Invalid State", { status: 400 });
 
-  const user = await linkProviderAccount(params.provider, code);
-  await context.get(authContext).login(user.id);
+  let user = context.get(authContext).getUser();
+  if (user) {
+    await linkProviderAccount(user.id, params.provider, code);
 
-  context.get(sessionContext).flash("success", "Signed in successfully!");
-  return redirect("/");
+    context
+      .get(sessionContext)
+      .flash("success", "Account linked successfully!");
+    return redirect(request.referrer);
+  } else {
+    user = await getProviderAccount(params.provider, code);
+    await context.get(authContext).login(user.id);
+
+    context.get(sessionContext).flash("success", "Signed in successfully!");
+    return redirect("/");
+  }
 };

@@ -41,7 +41,7 @@ export default function Component({
   const userImage = fileUrl ?? user.image;
 
   return (
-    <main className="max-w-lg mx-auto px-3 py-6">
+    <main className="max-w-lg mx-auto px-3">
       <h1 className="text-xl font-semibold mb-2">Profile</h1>
       <Form
         replace
@@ -86,6 +86,19 @@ export default function Component({
           Save
         </Button>
       </Form>
+
+      <div className="mt-12">
+        <h2 className="text-lg font-semibold mb-4">Security</h2>
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <p className="text-gray-600 mb-4">
+            If you suspect your account has been compromised, you can sign out
+            all other sessions.
+          </p>
+          <Form method="POST" action="?index">
+            <Button variant="danger">Sign out all other sessions</Button>
+          </Form>
+        </div>
+      </div>
     </main>
   );
 }

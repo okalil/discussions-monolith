@@ -1,4 +1,4 @@
-import { and, eq, getTableColumns, gt } from "drizzle-orm";
+import { and, eq, getTableColumns, gt, ne } from "drizzle-orm";
 
 import { db, schema } from "./services/db";
 
@@ -35,4 +35,18 @@ export async function getSession(sessionId: string) {
 
 export async function deleteSession(sessionId: string) {
   await db.delete(schema.sessions).where(eq(schema.sessions.id, sessionId));
+}
+
+export async function deleteOtherSessions(
+  userId: number,
+  currentSessionId: string
+) {
+  await db
+    .delete(schema.sessions)
+    .where(
+      and(
+        eq(schema.sessions.userId, userId),
+        ne(schema.sessions.id, currentSessionId)
+      )
+    );
 }
