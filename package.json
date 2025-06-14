@@ -9,6 +9,7 @@
     "typecheck": "react-router typegen && tsc --build --noEmit",
     "lint": "eslint . --fix",
     "email:dev": "email dev -d app/core/services/email/templates",
+    "db:push": "drizzle-kit push",
     "db:seed": "tsx drizzle/seed.ts"
   },
   "dependencies": {
