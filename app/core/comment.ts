@@ -1,8 +1,20 @@
-import { and, asc, countDistinct, eq, getTableColumns, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  countDistinct,
+  desc,
+  eq,
+  getTableColumns,
+  sql,
+} from "drizzle-orm";
 
 import { db, schema } from "./services/db";
 
-export const getComments = async (discussionId: number, userId = 0) => {
+export const getComments = async (
+  discussionId: number,
+  userId = 0,
+  sort = "oldest"
+) => {
   const comments = await db
     .select({
       ...getTableColumns(schema.comments),
@@ -32,7 +44,13 @@ export const getComments = async (discussionId: number, userId = 0) => {
     )
     .where(eq(schema.comments.discussionId, discussionId))
     .groupBy(schema.comments.id)
-    .orderBy(asc(schema.comments.createdAt));
+    .orderBy(
+      sort === "oldest"
+        ? asc(schema.comments.createdAt)
+        : sort === "newest"
+        ? desc(schema.comments.createdAt)
+        : desc(sql`COUNT(${schema.commentVotes.userId})`)
+    );
   return comments;
 };
 export type CommentsDto = Awaited<ReturnType<typeof getComments>>;

@@ -5,6 +5,7 @@
 html,
 body {
   @apply bg-background;
+  color: #1f2328;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
