@@ -87,6 +87,7 @@ export default function Component({
             </NavLink>
             {categories.map((it) => (
               <NavLink
+                key={it.id}
                 to={href("/categories/:category", { category: it.slug })}
                 className={(state) =>
                   `text-gray-800 rounded-md px-2 py-[6px] flex items-center gap-2 group ${
