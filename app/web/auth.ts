@@ -16,7 +16,7 @@ const authCookie = createCookie("__auth", {
   path: "/",
 });
 
-export const authContext = unstable_createContext<Auth>();
+export const authContext = unstable_createContext<AuthContext>();
 
 export const authMiddleware: unstable_MiddlewareFunction<Response> = async (
   { request, context },
@@ -60,10 +60,11 @@ export const authMiddleware: unstable_MiddlewareFunction<Response> = async (
   if (setCookie) response.headers.append("Set-Cookie", setCookie);
 };
 
-type SessionUser = Awaited<ReturnType<typeof getUserBySession>>;
-type Auth = {
-  getUser: () => SessionUser;
-  getUserOrFail: () => NonNullable<SessionUser>;
-  login: (userId: number, remember?: boolean) => Promise<void>;
-  logout: () => Promise<void>;
+type MaybeSessionUser = Awaited<ReturnType<typeof getUserBySession>>;
+type SessionUser = NonNullable<MaybeSessionUser>;
+type AuthContext = {
+  getUser(): MaybeSessionUser;
+  getUserOrFail(): SessionUser;
+  login(userId: number, remember?: boolean): Promise<void>;
+  logout(): Promise<void>;
 };
