@@ -11,10 +11,10 @@ import { z } from "zod/v4";
 
 import { resetPassword } from "~/core/account";
 import { bodyParser } from "~/web/body-parser";
-import { Button } from "~/web/ui/shared/button";
-import { ErrorMessage } from "~/web/ui/shared/error-message";
-import { Field } from "~/web/ui/shared/field";
-import { Input } from "~/web/ui/shared/input";
+import { Button } from "~/web/shared/button";
+import { ErrorMessage } from "~/web/shared/error-message";
+import { Field } from "~/web/shared/field";
+import { Input } from "~/web/shared/input";
 import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/reset-password.route";

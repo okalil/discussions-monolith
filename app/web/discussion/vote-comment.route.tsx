@@ -1,22 +1,19 @@
-import { data, useFetcher } from "react-router";
+import { href, useFetcher } from "react-router";
 import { z } from "zod/v4";
 
-import { unvoteDiscussion, voteDiscussion } from "~/core/discussion";
+import { unvoteComment, voteComment } from "~/core/comment";
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
-import { VoteButton } from "~/web/ui/shared/vote-button";
+import { VoteButton } from "~/web/shared/vote-button";
 import { validator } from "~/web/validator";
 
-import type { Route } from "./+types/vote-discussion.route";
+import type { Route } from "./+types/vote-comment.route";
 
-interface VoteDiscussionProps extends React.ComponentProps<typeof VoteButton> {
-  discussionId: number;
+interface VoteCommentProps extends React.ComponentProps<typeof VoteButton> {
+  commentId: number;
 }
 
-export function VoteDiscussion({
-  discussionId,
-  ...props
-}: VoteDiscussionProps) {
+export function VoteComment({ commentId, ...props }: VoteCommentProps) {
   const fetcher = useFetcher();
 
   const optimisticVoted =
@@ -37,7 +34,10 @@ export function VoteDiscussion({
       onClick={() =>
         fetcher.submit(
           { voted: !voted },
-          { action: `/discussions/${discussionId}/vote`, method: "POST" }
+          {
+            action: href("/comments/:id/vote", { id: commentId.toString() }),
+            method: "POST",
+          }
         )
       }
       active={voted}
@@ -53,20 +53,17 @@ export const action = async ({
 }: Route.ActionArgs) => {
   const user = context.get(authContext).getUserOrFail();
   const body = await bodyParser.parse(request);
-  const [errors, input] = await voteDiscussionValidator.tryValidate(body);
-  if (errors) {
-    return data({ errors, values: body }, 422);
-  }
+  const { voted } = await voteCommentValidator.validate(body);
 
-  if (input.voted) {
-    await voteDiscussion(Number(params.id), user.id);
+  if (voted) {
+    await voteComment(Number(params.id), user.id);
   } else {
-    await unvoteDiscussion(Number(params.id), user.id);
+    await unvoteComment(Number(params.id), user.id);
   }
   return { ok: true };
 };
 
-const voteDiscussionValidator = validator(
+const voteCommentValidator = validator(
   z.object({
     voted: z.stringbool(),
   })

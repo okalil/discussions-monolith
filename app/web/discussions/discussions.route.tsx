@@ -4,10 +4,10 @@ import { z } from "zod/v4";
 import { getCategories } from "~/core/category";
 import { getDiscussions } from "~/core/discussion";
 import { authContext } from "~/web/auth";
-import { Button } from "~/web/ui/shared/button";
-import { Icon } from "~/web/ui/shared/icon";
-import { Input } from "~/web/ui/shared/input";
-import { Pagination } from "~/web/ui/shared/pagination";
+import { Button } from "~/web/shared/button";
+import { Icon } from "~/web/shared/icon";
+import { Input } from "~/web/shared/input";
+import { Pagination } from "~/web/shared/pagination";
 import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/discussions.route";

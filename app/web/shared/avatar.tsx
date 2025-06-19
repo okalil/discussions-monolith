@@ -1,6 +1,6 @@
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 
-import { cn } from "~/web/ui/shared/utils/cn";
+import { cn } from "~/web/shared/utils/cn";
 
 interface AvatarProps extends React.ComponentProps<"div"> {
   src?: string | null;

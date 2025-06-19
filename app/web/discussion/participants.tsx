@@ -2,7 +2,7 @@ import { use } from "react";
 
 import type { ParticipantsDto } from "~/core/discussion";
 
-import { Avatar } from "~/web/ui/shared/avatar";
+import { Avatar } from "~/web/shared/avatar";
 
 interface ParticipantsProps {
   participants: Promise<ParticipantsDto>;

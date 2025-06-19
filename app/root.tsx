@@ -14,7 +14,7 @@ import { Toaster, toast } from "sonner";
 import { authMiddleware } from "~/web/auth";
 import { rateLimitMiddleware } from "~/web/rate-limit";
 import { sessionContext, sessionMiddleware } from "~/web/session";
-import { NavigationProgress } from "~/web/ui/shared/navigation-progress";
+import { NavigationProgress } from "~/web/shared/navigation-progress";
 
 import type { Route } from "./+types/root";
 

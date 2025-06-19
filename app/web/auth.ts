@@ -1,10 +1,10 @@
+import type { unstable_MiddlewareFunction } from "react-router";
+
 import { createCookie, redirect, unstable_createContext } from "react-router";
 
 import { env } from "~/config/env.server";
 import { createSession, deleteSession } from "~/core/session";
 import { getUserBySession } from "~/core/user";
-
-import type { Route } from "../+types/root";
 
 import { sessionContext } from "./session";
 
@@ -18,7 +18,7 @@ const authCookie = createCookie("__auth", {
 
 export const authContext = unstable_createContext<Auth>();
 
-export const authMiddleware: Route.unstable_MiddlewareFunction = async (
+export const authMiddleware: unstable_MiddlewareFunction<Response> = async (
   { request, context },
   next
 ) => {

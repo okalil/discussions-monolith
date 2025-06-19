@@ -6,9 +6,9 @@ import type { CommentsDto } from "~/core/comment";
 import { updateComment } from "~/core/comment";
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
-import { Button } from "~/web/ui/shared/button";
-import { Field } from "~/web/ui/shared/field";
-import { Textarea } from "~/web/ui/shared/textarea";
+import { Button } from "~/web/shared/button";
+import { Field } from "~/web/shared/field";
+import { Textarea } from "~/web/shared/textarea";
 import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/edit-comment.route";

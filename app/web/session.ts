@@ -1,4 +1,4 @@
-import type { Session } from "react-router";
+import type { Session, unstable_MiddlewareFunction } from "react-router";
 
 import {
   createCookieSessionStorage,
@@ -6,8 +6,6 @@ import {
 } from "react-router";
 
 import { env } from "~/config/env.server";
-
-import type { Route } from "../+types/root";
 
 const sessionStorage = createCookieSessionStorage({
   cookie: {
@@ -22,7 +20,7 @@ const sessionStorage = createCookieSessionStorage({
 
 export const sessionContext = unstable_createContext<Session>();
 
-export const sessionMiddleware: Route.unstable_MiddlewareFunction = async (
+export const sessionMiddleware: unstable_MiddlewareFunction<Response> = async (
   { request, context },
   next
 ) => {

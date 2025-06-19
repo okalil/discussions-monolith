@@ -3,9 +3,9 @@ import type { ShouldRevalidateFunction } from "react-router";
 import { Link, Outlet, Form } from "react-router";
 
 import { authContext } from "~/web/auth";
-import { Avatar } from "~/web/ui/shared/avatar";
-import { Button } from "~/web/ui/shared/button";
-import { cn } from "~/web/ui/shared/utils/cn";
+import { Avatar } from "~/web/shared/avatar";
+import { Button } from "~/web/shared/button";
+import { cn } from "~/web/shared/utils/cn";
 
 import type { Route } from "./+types/layout.route";
 

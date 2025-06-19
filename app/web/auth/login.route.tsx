@@ -15,11 +15,11 @@ import { getUserByCredentials } from "~/core/user";
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
 import { sessionContext } from "~/web/session";
-import { Button } from "~/web/ui/shared/button";
-import { ErrorMessage } from "~/web/ui/shared/error-message";
-import { Field } from "~/web/ui/shared/field";
-import { Icon } from "~/web/ui/shared/icon";
-import { Input } from "~/web/ui/shared/input";
+import { Button } from "~/web/shared/button";
+import { ErrorMessage } from "~/web/shared/error-message";
+import { Field } from "~/web/shared/field";
+import { Icon } from "~/web/shared/icon";
+import { Input } from "~/web/shared/input";
 import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/login.route";

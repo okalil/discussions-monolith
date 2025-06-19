@@ -7,8 +7,8 @@ import { forgetPassword } from "~/core/account";
 import { getUserByEmail } from "~/core/user";
 import { bodyParser } from "~/web/body-parser";
 import { sessionContext } from "~/web/session";
-import { Button } from "~/web/ui/shared/button";
-import { Input } from "~/web/ui/shared/input";
+import { Button } from "~/web/shared/button";
+import { Input } from "~/web/shared/input";
 import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/forgot-password.route";

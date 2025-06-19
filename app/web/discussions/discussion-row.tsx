@@ -2,9 +2,9 @@ import { Form, Link } from "react-router";
 
 import type { DiscussionsDto } from "~/core/discussion";
 
-import { Avatar } from "~/web/ui/shared/avatar";
-import { Icon } from "~/web/ui/shared/icon";
-import { cn } from "~/web/ui/shared/utils/cn";
+import { Avatar } from "~/web/shared/avatar";
+import { Icon } from "~/web/shared/icon";
+import { cn } from "~/web/shared/utils/cn";
 
 import { VoteDiscussion } from "../discussion/vote-discussion.route";
 import { DiscussionHoverCard } from "./discussion-hovercard.route";

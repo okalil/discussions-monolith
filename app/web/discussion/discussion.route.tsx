@@ -6,9 +6,9 @@ import { href, Link, useSearchParams } from "react-router";
 import { getComments } from "~/core/comment";
 import { getDiscussion, getParticipants } from "~/core/discussion";
 import { authContext } from "~/web/auth";
-import { CommentsList } from "~/web/ui/discussion/comments-list";
-import { Participants } from "~/web/ui/discussion/participants";
-import { Avatar } from "~/web/ui/shared/avatar";
+import { CommentsList } from "~/web/discussion/comments-list";
+import { Participants } from "~/web/discussion/participants";
+import { Avatar } from "~/web/shared/avatar";
 
 import type { Route } from "./+types/discussion.route";
 

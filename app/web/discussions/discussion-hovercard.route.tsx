@@ -2,7 +2,7 @@ import * as HoverCard from "@radix-ui/react-hover-card";
 import { Link, useFetcher } from "react-router";
 
 import { getDiscussionWithReply } from "~/core/discussion";
-import { Avatar } from "~/web/ui/shared/avatar";
+import { Avatar } from "~/web/shared/avatar";
 
 import type { Route } from "./+types/discussion-hovercard.route";
 

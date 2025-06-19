@@ -1,6 +1,6 @@
-import net from "node:net";
+import type { unstable_MiddlewareFunction } from "react-router";
 
-import type { Route } from "../+types/root";
+import net from "node:net";
 
 interface RateLimitInfo {
   tokens: number;
@@ -15,7 +15,7 @@ const rateLimitStorage = new Map<string, RateLimitInfo>();
  * For simplicity, a Map object is being used to store the request IP with the corresponding
  * rate info, but we could switch to something like Redis for better scalability.
  */
-export const rateLimitMiddleware: Route.unstable_MiddlewareFunction = ({
+export const rateLimitMiddleware: unstable_MiddlewareFunction<Response> = ({
   request,
 }) => {
   const isAction = !["GET", "HEAD"].includes(request.method);

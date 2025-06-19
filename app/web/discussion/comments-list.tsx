@@ -2,11 +2,11 @@ import { use, useState, useEffect } from "react";
 
 import type { CommentsDto } from "~/core/comment";
 
-import { AlertModal } from "~/web/ui/shared/alert-modal";
-import { Avatar } from "~/web/ui/shared/avatar";
-import { DropdownMenu } from "~/web/ui/shared/dropdown-menu";
-import { Icon } from "~/web/ui/shared/icon";
-import { cn } from "~/web/ui/shared/utils/cn";
+import { AlertModal } from "~/web/shared/alert-modal";
+import { Avatar } from "~/web/shared/avatar";
+import { DropdownMenu } from "~/web/shared/dropdown-menu";
+import { Icon } from "~/web/shared/icon";
+import { cn } from "~/web/shared/utils/cn";
 
 import { DeleteComment } from "./delete-comment.route";
 import { EditComment } from "./edit-comment.route";
