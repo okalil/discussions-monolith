@@ -14,6 +14,7 @@ import { db, schema } from "~/core/services/db";
 export const createDiscussion = async (
   title: string,
   body: string,
+  categoryId: number,
   userId: number
 ) => {
   const [discussion] = await db
@@ -21,30 +22,46 @@ export const createDiscussion = async (
     .values({
       title,
       body,
+      categoryId,
       authorId: userId,
     })
     .returning();
   return discussion;
 };
 
+interface GetDiscussionsInput {
+  category?: string;
+  page: number;
+  limit: number;
+  q?: string;
+}
 export const getDiscussions = async (
-  filters: { page: number; limit: number; q?: string },
+  filters: GetDiscussionsInput,
   userId = 0
 ) => {
-  const { page, limit, q } = filters;
+  const { category, page, limit, q } = filters;
   const offset = (page - 1) * limit;
 
-  const sqlFilters = q
-    ? or(
-        like(schema.discussions.title, `%${q}%`),
-        like(schema.discussions.body, `%${q}%`)
-      )
-    : undefined;
+  const sqlFilters = and(
+    // Category filter
+    category ? eq(schema.categories.slug, category) : undefined,
+    // Search filter
+    q
+      ? or(
+          like(schema.discussions.title, `%${q}%`),
+          like(schema.discussions.body, `%${q}%`)
+        )
+      : undefined
+  );
 
   const [rawTotal, rawDiscussions] = await Promise.all([
     db
       .select({ total: count(schema.discussions.id) })
       .from(schema.discussions)
+      .leftJoin(
+        schema.categories,
+        eq(schema.discussions.categoryId, schema.categories.id)
+      )
       .where(sqlFilters),
     db
       .select({
@@ -64,6 +81,10 @@ export const getDiscussions = async (
       })
       .from(schema.discussions)
       .leftJoin(schema.users, eq(schema.discussions.authorId, schema.users.id))
+      .leftJoin(
+        schema.categories,
+        eq(schema.discussions.categoryId, schema.categories.id)
+      )
       .leftJoin(
         schema.comments,
         eq(schema.comments.discussionId, schema.discussions.id)
@@ -91,7 +112,7 @@ export const getDiscussions = async (
 export type DiscussionsDto = Awaited<ReturnType<typeof getDiscussions>>;
 
 export const getDiscussion = async (id: number, userId = 0) => {
-  const discussions = await db
+  const [discussion] = await db
     .select({
       id: schema.discussions.id,
       title: schema.discussions.title,
@@ -101,8 +122,23 @@ export const getDiscussion = async (id: number, userId = 0) => {
         name: schema.users.name,
         image: schema.users.image,
       },
-      commentsCount: countDistinct(schema.comments.id),
+      category: {
+        emoji: schema.categories.emoji,
+        title: schema.categories.title,
+        slug: schema.categories.slug,
+      },
       votesCount: countDistinct(schema.discussionVotes.userId),
+      commentsCount: countDistinct(schema.comments.id),
+      participantsCount: sql<number>`
+      (
+        SELECT COUNT(DISTINCT userId) FROM (
+          SELECT ${schema.discussions.authorId} AS userId
+          UNION
+          SELECT ${schema.comments.authorId} FROM ${schema.comments}
+          WHERE ${schema.comments.discussionId} = ${schema.discussions.id}
+        )
+      )
+    `,
       voted:
         sql<number>`COUNT(CASE WHEN ${schema.discussionVotes.userId} = ${userId} THEN 1 END)`.mapWith(
           Boolean
@@ -110,6 +146,10 @@ export const getDiscussion = async (id: number, userId = 0) => {
     })
     .from(schema.discussions)
     .leftJoin(schema.users, eq(schema.discussions.authorId, schema.users.id))
+    .leftJoin(
+      schema.categories,
+      eq(schema.discussions.categoryId, schema.categories.id)
+    )
     .leftJoin(
       schema.comments,
       eq(schema.comments.discussionId, schema.discussions.id)
@@ -121,7 +161,11 @@ export const getDiscussion = async (id: number, userId = 0) => {
     .groupBy(schema.discussions.id)
     .where(eq(schema.discussions.id, id))
     .limit(1);
-  return discussions.at(0);
+  return {
+    ...discussion,
+    author: discussion.author!,
+    category: discussion.category!,
+  };
 };
 export type DiscussionDto = Awaited<ReturnType<typeof getDiscussion>>;
 
@@ -176,3 +220,23 @@ export const unvoteDiscussion = async (id: number, userId: number) => {
 function formatLargeText(text: string) {
   return text.length > 100 ? text.slice(0, 100) + "..." : text;
 }
+
+export const getParticipants = async (discussionId: number) => {
+  const participants = await db
+    .selectDistinct({
+      id: schema.users.id,
+      name: schema.users.name,
+      image: schema.users.image,
+    })
+    .from(schema.users)
+    .innerJoin(schema.discussions, eq(schema.discussions.id, discussionId))
+    .leftJoin(schema.comments, eq(schema.comments.discussionId, discussionId))
+    .where(
+      or(
+        eq(schema.discussions.authorId, schema.users.id),
+        eq(schema.comments.authorId, schema.users.id)
+      )
+    );
+  return participants;
+};
+export type ParticipantsDto = Awaited<ReturnType<typeof getParticipants>>;

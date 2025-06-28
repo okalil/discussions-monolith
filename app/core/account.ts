@@ -1,8 +1,11 @@
 import bcrypt from "bcrypt";
 import { and, eq, getTableColumns, sql } from "drizzle-orm";
 
+import { env } from "~/config/env.server";
+
 import { db, schema } from "./services/db";
-import { mailer } from "./services/mailer";
+import { mailer } from "./services/email/mailer";
+import { ResetPasswordLink } from "./services/email/templates/reset-password-link";
 import { github } from "./services/oauth/providers/github";
 import {
   createVerificationToken,
@@ -47,16 +50,12 @@ export async function getCredentialAccount(email: string) {
   return accounts.at(0);
 }
 
-export async function forgetPassword(
-  email: string,
-  messageBuilder: (token: string) => Promise<{ html: string; text: string }>
-) {
+export async function forgetPassword(email: string) {
   const token = await createVerificationToken(email);
-  const message = await messageBuilder(token);
   await mailer.send({
     to: email,
     subject: "Discussions Password Reset",
-    ...message,
+    template: ResetPasswordLink({ baseUrl: env.SITE_URL, email, token }),
   });
 }
 
@@ -123,21 +122,22 @@ export async function linkProviderAccount(provider: string, code: string) {
   const accessToken = await providerApi.getAccessToken(code);
   const providerUser = await providerApi.getUser(accessToken);
 
-  const user = await db.transaction(async (tx) => {
-    let [user] = await db
-      .select()
-      .from(schema.users)
-      .where(eq(schema.users.email, providerUser.email));
-    let [account] = await db
-      .select()
-      .from(schema.accounts)
-      .where(
-        and(
-          eq(schema.accounts.providerAccountId, providerUser.id),
-          eq(schema.accounts.provider, provider)
-        )
-      );
+  let [user] = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.email, providerUser.email));
+  let [account] = await db
+    .select()
+    .from(schema.accounts)
+    .where(
+      and(
+        eq(schema.accounts.providerAccountId, providerUser.id),
+        eq(schema.accounts.provider, provider)
+      )
+    );
+  if (account && user) return user;
 
+  await db.transaction(async (tx) => {
     // If user is not found, create a new one
     if (!user) {
       [user] = await tx
@@ -162,8 +162,6 @@ export async function linkProviderAccount(provider: string, code: string) {
         })
         .returning();
     }
-
-    return user;
   });
 
   return user;

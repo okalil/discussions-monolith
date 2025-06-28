@@ -46,15 +46,15 @@ The `web` directory holds the web-related parts of the application, including co
 
 - Authentication is handled through a separate cookie, which allows for more control over expiration options. There is a user session persisted in the database, and the authentication cookie stores only the ID of that session.
 
-- An [authentication middleware](https://github.com/okalil/discussions-monolith/blob/main/app/web/auth.ts) reads this cookie, retrieves the session and user data, and exposes them via a React Router context.
+- An [authentication middleware](https://github.com/okalil/discussions-monolith/blob/main/app/web/auth.ts) reads this cookie, retrieves the session and user data, and exposes them via an async context.
 
 - Access control is performed in the "controllers" (`loader`/`action`), allowing each route to flexibly define whether or not an authenticated user is required.
 
 When an authenticated user is **required**, we use:
 
 ```ts
-export const loader = async ({ context }: Route.LoaderArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const user = auth().getUserOrFail();
   // User is required here, a redirect will be thrown if the request is not authenticated
 };
 ```
@@ -62,8 +62,8 @@ export const loader = async ({ context }: Route.LoaderArgs) => {
 For an **optional** authenticated user, we have:
 
 ```ts
-export const loader = async ({ context }: Route.LoaderArgs) => {
-  const user = context.get(authContext).getUser();
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const user = auth().getUser();
   // User is nullable here, the loader data will be public but may be slightly different when user is present.
 };
 ```
@@ -112,8 +112,8 @@ export default function Component({ actionData }: Route.ComponentProps) {
   );
 }
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export const action = async ({ request }: Route.ActionArgs) => {
+  const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const [errors, input] = await createDiscussionValidator.tryValidate(body);
   if (errors) return data({ errors, values: body }, 422);
@@ -142,7 +142,21 @@ const createDiscussionValidator = validator(
 Install the dependencies:
 
 ```bash
-npm install
+pnpm install
+```
+
+### Database Setup
+
+Setup the local SQLite database:
+
+```bash
+pnpm db:push
+```
+
+Run the database seed script:
+
+```bash
+pnpm db:seed
 ```
 
 ### Development
@@ -150,67 +164,10 @@ npm install
 Start the development server with HMR:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Your application will be available at `http://localhost:5173`.
-
-## Building for Production
-
-Create a production build:
-
-```bash
-npm run build
-```
-
-## Deployment
-
-### Docker Deployment
-
-This template includes three Dockerfiles optimized for different package managers:
-
-- `Dockerfile` - for npm
-- `Dockerfile.pnpm` - for pnpm
-- `Dockerfile.bun` - for bun
-
-To build and run using Docker:
-
-```bash
-# For npm
-docker build -t my-app .
-
-# For pnpm
-docker build -f Dockerfile.pnpm -t my-app .
-
-# For bun
-docker build -f Dockerfile.bun -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
-```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
 
 ---
 

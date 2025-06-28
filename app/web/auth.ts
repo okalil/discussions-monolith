@@ -1,11 +1,11 @@
+import type { unstable_MiddlewareFunction } from "react-router";
+
 import { AsyncLocalStorage } from "node:async_hooks";
 import { createCookie, redirect } from "react-router";
 
 import { env } from "~/config/env.server";
 import { createSession, deleteSession } from "~/core/session";
 import { getUserBySession } from "~/core/user";
-
-import type { Route } from "../+types/root";
 
 import { session } from "./session";
 
@@ -17,9 +17,9 @@ const authCookie = createCookie("__auth", {
   path: "/",
 });
 
-const als = new AsyncLocalStorage<Auth>();
+const als = new AsyncLocalStorage<AuthContext>();
 
-export const authMiddleware: Route.unstable_MiddlewareFunction = async (
+export const authMiddleware: unstable_MiddlewareFunction<Response> = async (
   { request },
   next
 ) => {
@@ -69,10 +69,11 @@ export function auth() {
   return context;
 }
 
-type SessionUser = Awaited<ReturnType<typeof getUserBySession>>;
-type Auth = {
-  getUser: () => SessionUser;
-  getUserOrFail: () => NonNullable<SessionUser>;
-  login: (userId: number, remember?: boolean) => Promise<void>;
-  logout: () => Promise<void>;
+type MaybeSessionUser = Awaited<ReturnType<typeof getUserBySession>>;
+type SessionUser = NonNullable<MaybeSessionUser>;
+type AuthContext = {
+  getUser(): MaybeSessionUser;
+  getUserOrFail(): SessionUser;
+  login(userId: number, remember?: boolean): Promise<void>;
+  logout(): Promise<void>;
 };
