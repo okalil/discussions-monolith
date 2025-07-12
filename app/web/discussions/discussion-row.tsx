@@ -16,13 +16,15 @@ interface DiscussionProps {
 
 export function DiscussionRow({ discussion, authenticated }: DiscussionProps) {
   return (
-    <li className="flex gap-5 items-center py-2 px-4 border-b border-gray-200 hover:bg-gray-50">
-      <VoteDiscussion
-        discussionId={discussion.id}
-        active={discussion.voted}
-        total={discussion.votesCount}
-        disabled={!authenticated}
-      />
+    <li className="grid grid-cols-[60px_1fr_auto_60px] gap-5 items-center py-2 px-4 border-b border-gray-200 hover:bg-gray-50">
+      <div className="grid place-content-center">
+        <VoteDiscussion
+          discussionId={discussion.id}
+          active={discussion.voted}
+          total={discussion.votesCount}
+          disabled={!authenticated}
+        />
+      </div>
 
       <div className="flex-1">
         <DiscussionHoverCard discussionId={discussion.id}>
@@ -49,7 +51,7 @@ export function DiscussionRow({ discussion, authenticated }: DiscussionProps) {
         fallback={discussion.author?.name?.at(0)}
         size={36}
       />
-      <Form action={`/discussions/${discussion.id}`}>
+      <Form action={`/discussions/${discussion.id}`} className="ml-auto">
         <button
           className={cn(
             "flex items-center gap-2 rounded-xl",
