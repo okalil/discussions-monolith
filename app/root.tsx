@@ -9,12 +9,12 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { Toaster, toast } from "sonner";
 
 import { authMiddleware } from "~/web/auth";
 import { rateLimitMiddleware } from "~/web/rate-limit";
 import { sessionContext, sessionMiddleware } from "~/web/session";
 import { NavigationProgress } from "~/web/shared/navigation-progress";
+import { Toaster } from "~/web/shared/toaster";
 
 import type { Route } from "./+types/root";
 
@@ -34,16 +34,10 @@ export async function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function App({ loaderData }: Route.ComponentProps) {
-  useEffect(() => {
-    const { success, error } = loaderData;
-    if (success) toast.success(success);
-    if (error) toast.error(error, { duration: 5000 });
-  }, [loaderData]);
-
   return (
     <Document>
       <Outlet />
-      <Toaster richColors closeButton position="top-right" />
+      <Toaster session={loaderData} />
     </Document>
   );
 }
