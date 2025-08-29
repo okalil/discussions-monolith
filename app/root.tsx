@@ -1,6 +1,5 @@
 import type { ShouldRevalidateFunctionArgs } from "react-router";
 
-import { useEffect } from "react";
 import {
   isRouteErrorResponse,
   Links,
