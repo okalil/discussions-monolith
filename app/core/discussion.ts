@@ -9,7 +9,9 @@ import {
   sql,
 } from "drizzle-orm";
 
-import { db, schema } from "~/core/services/db";
+import { schema } from "~/core/services/db";
+
+import { getContext } from "./context";
 
 export const createDiscussion = async (
   title: string,
@@ -17,6 +19,7 @@ export const createDiscussion = async (
   categoryId: number,
   userId: number
 ) => {
+  const { db } = getContext();
   const [discussion] = await db
     .insert(schema.discussions)
     .values({
@@ -53,6 +56,8 @@ export const getDiscussions = async (
         )
       : undefined
   );
+
+  const { db } = getContext();
 
   const [rawTotal, rawDiscussions] = await Promise.all([
     db
@@ -112,6 +117,7 @@ export const getDiscussions = async (
 export type DiscussionsDto = Awaited<ReturnType<typeof getDiscussions>>;
 
 export const getDiscussion = async (id: number, userId = 0) => {
+  const { db } = getContext();
   const [discussion] = await db
     .select({
       id: schema.discussions.id,
@@ -170,6 +176,7 @@ export const getDiscussion = async (id: number, userId = 0) => {
 export type DiscussionDto = Awaited<ReturnType<typeof getDiscussion>>;
 
 export const getDiscussionWithReply = async (id: number) => {
+  const { db } = getContext();
   const [discussions, comments] = await Promise.all([
     db
       .select({
@@ -203,10 +210,12 @@ export const getDiscussionWithReply = async (id: number) => {
 };
 
 export const voteDiscussion = async (id: number, userId: number) => {
+  const { db } = getContext();
   await db.insert(schema.discussionVotes).values({ userId, discussionId: id });
 };
 
 export const unvoteDiscussion = async (id: number, userId: number) => {
+  const { db } = getContext();
   await db
     .delete(schema.discussionVotes)
     .where(
@@ -222,6 +231,7 @@ function formatLargeText(text: string) {
 }
 
 export const getParticipants = async (discussionId: number) => {
+  const { db } = getContext();
   const participants = await db
     .selectDistinct({
       id: schema.users.id,

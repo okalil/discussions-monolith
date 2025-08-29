@@ -1,14 +1,16 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { desc, eq } from "drizzle-orm";
 import crypto from "node:crypto";
 
-import { db, schema } from "./services/db";
+import { getContext } from "./context";
+import { schema } from "./services/db";
 
 export async function createVerificationToken(email: string) {
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 1);
   const token = crypto.randomBytes(32).toString("hex");
 
+  const { db } = getContext();
   await db.insert(schema.verificationTokens).values({
     identifier: email,
     expires: expiresAt.toISOString(),
@@ -19,6 +21,7 @@ export async function createVerificationToken(email: string) {
 }
 
 export async function getVerificationToken(email: string) {
+  const { db } = getContext();
   const verifications = await db
     .select()
     .from(schema.verificationTokens)
@@ -29,6 +32,7 @@ export async function getVerificationToken(email: string) {
 }
 
 export async function deleteVerificationToken(token: string) {
+  const { db } = getContext();
   await db
     .delete(schema.verificationTokens)
     .where(eq(schema.verificationTokens.token, token));

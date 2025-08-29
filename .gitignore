@@ -7,3 +7,5 @@ node_modules
 uploads
 *.db
 *.tsbuildinfo
+worker-configuration.d.ts
+.wrangler

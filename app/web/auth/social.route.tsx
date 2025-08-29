@@ -1,7 +1,6 @@
 import * as arctic from "arctic";
 import { createCookie, redirect } from "react-router";
 
-import { env } from "~/config/env.server";
 import {
   createProviderAuthorizationURL,
   linkProviderAccount,
@@ -12,7 +11,7 @@ import { sessionContext } from "~/web/session";
 import type { Route } from "./+types/social.route";
 
 const cookie = createCookie("state", {
-  secure: env.NODE_ENV !== "development",
+  secure: import.meta.env.MODE !== "development",
   path: "/",
   httpOnly: true,
   maxAge: 10 * 60, // 10 min

@@ -1,7 +1,6 @@
 import { render } from "@react-email/components";
-import nodemailer from "nodemailer";
-
-import { env } from "~/config/env.server";
+import { EmailMessage } from "cloudflare:email";
+import { createMimeMessage } from "mimetext";
 
 interface MailMessage {
   from?: string;
@@ -10,42 +9,27 @@ interface MailMessage {
   template: React.JSX.Element;
 }
 
-class Mailer {
-  private transporter = nodemailer.createTransport({
-    host: env.SMTP_HOST,
-    port: env.SMTP_PORT,
-    secure: env.NODE_ENV === "production",
-    auth: {
-      user: env.SMTP_USER,
-      pass: env.SMTP_PASS,
+export function createEmailClient(sender: SendEmail) {
+  return {
+    async send({ to, from, subject, template }: MailMessage) {
+      from ??= "me@mail.com"; // default sender
+      const html = await render(template);
+      const text = await render(template, { plainText: true });
+      console.log({ to, subject, html, text });
+
+      const msg = createMimeMessage();
+      msg.setSender({ name: "Sender", addr: from });
+      msg.setRecipient(to);
+      msg.setSubject(subject);
+      msg.addMessage({
+        contentType: "text/html",
+        data: html,
+      });
+
+      const message = new EmailMessage(from, to, html);
+      await sender.send(message);
     },
-  });
-  async send({ to, from, subject, template }: MailMessage) {
-    from ??= "me@mail.com"; // default sender
-    const html = await render(template);
-    const text = await render(template, { plainText: true });
-    await new Promise((resolve, reject) => {
-      this.transporter.sendMail(
-        { to, from, subject, html, text },
-        (err, info) => {
-          if (err) reject(err);
-          console.log(nodemailer.getTestMessageUrl(info));
-          resolve(info);
-        }
-      );
-    });
-  }
+  };
 }
 
-export interface EmailTemplate<T> {
-  (data: T): Promise<string>;
-}
-
-/**
- * Mailer is the core interface for sending emails.
- *
- * For the sake of simplicity, it is set up with nodemailer and SMTP transport,
- * but for the production environment we can easily replace it by a professional
- * email service like Resend or MailGun.
- */
-export const mailer = new Mailer();
+export type EmailClient = ReturnType<typeof createEmailClient>;

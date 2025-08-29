@@ -1,10 +1,12 @@
 import { and, eq, getTableColumns, gt } from "drizzle-orm";
 
-import { db, schema } from "./services/db";
+import { getContext } from "./context";
+import { schema } from "./services/db";
 
 const expirationTime = 1000 * 60 * 60 * 24 * 30; // 30 days
 
 export async function createSession(userId: number) {
+  const { db } = getContext();
   const [session] = await db
     .insert(schema.sessions)
     .values({
@@ -16,6 +18,7 @@ export async function createSession(userId: number) {
 }
 
 export async function getSession(sessionId: string) {
+  const { db } = getContext();
   const sessions = await db
     .select({
       ...getTableColumns(schema.sessions),
@@ -34,5 +37,6 @@ export async function getSession(sessionId: string) {
 }
 
 export async function deleteSession(sessionId: string) {
+  const { db } = getContext();
   await db.delete(schema.sessions).where(eq(schema.sessions.id, sessionId));
 }

@@ -3,7 +3,7 @@ import "dotenv/config";
 import type { SQLiteTable } from "drizzle-orm/sqlite-core";
 
 import { faker } from "@faker-js/faker";
-import { hash } from "bcrypt";
+import { hash } from "bcryptjs";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 
 import * as schema from "./schema";

@@ -5,18 +5,19 @@ import {
   unstable_createContext,
 } from "react-router";
 
-import { env } from "~/config/env.server";
+import { getContext } from "~/core/context";
 
-const sessionStorage = createCookieSessionStorage({
-  cookie: {
-    name: "__session",
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    secrets: [env.SESSION_SECRET],
-    sameSite: "lax",
-    path: "/",
-  },
-});
+const createSessionStorage = (env: Env) =>
+  createCookieSessionStorage({
+    cookie: {
+      name: "__session",
+      httpOnly: true,
+      secure: import.meta.env.MODE === "production",
+      secrets: [env.SESSION_SECRET],
+      sameSite: "lax",
+      path: "/",
+    },
+  });
 
 export const sessionContext = unstable_createContext<Session>();
 
@@ -24,6 +25,8 @@ export const sessionMiddleware: unstable_MiddlewareFunction<Response> = async (
   { request, context },
   next
 ) => {
+  const { env } = getContext();
+  const sessionStorage = createSessionStorage(env);
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
   );

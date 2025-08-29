@@ -8,13 +8,15 @@ import {
   sql,
 } from "drizzle-orm";
 
-import { db, schema } from "./services/db";
+import { getContext } from "./context";
+import { schema } from "./services/db";
 
 export const getComments = async (
   discussionId: number,
   userId = 0,
   sort = "oldest"
 ) => {
+  const { db } = getContext();
   const comments = await db
     .select({
       ...getTableColumns(schema.comments),
@@ -60,6 +62,7 @@ export const createComment = async (
   body: string,
   userId: number
 ) => {
+  const { db } = getContext();
   const [comment] = await db
     .insert(schema.comments)
     .values({
@@ -76,6 +79,7 @@ export const updateComment = async (
   body: string,
   userId: number
 ) => {
+  const { db } = getContext();
   await db
     .update(schema.comments)
     .set({ body })
@@ -85,6 +89,7 @@ export const updateComment = async (
 };
 
 export const deleteComment = async (id: number, userId: number) => {
+  const { db } = getContext();
   await db
     .delete(schema.comments)
     .where(
@@ -93,10 +98,12 @@ export const deleteComment = async (id: number, userId: number) => {
 };
 
 export const voteComment = async (id: number, userId: number) => {
+  const { db } = getContext();
   await db.insert(schema.commentVotes).values({ userId, commentId: id });
 };
 
 export const unvoteComment = async (id: number, userId: number) => {
+  const { db } = getContext();
   await db
     .delete(schema.commentVotes)
     .where(

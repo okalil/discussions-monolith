@@ -1,8 +1,10 @@
-import { storage } from "~/core/services/storage";
+import { getContext } from "~/core/context";
 
 import type { Route } from "./+types/uploads.route";
 
 export async function loader({ params }: Route.LoaderArgs) {
+  const { storage } = getContext();
+
   const key = params["*"];
   const file = await storage.get(key);
 

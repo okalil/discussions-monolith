@@ -2,27 +2,31 @@ import type { unstable_MiddlewareFunction } from "react-router";
 
 import { createCookie, redirect, unstable_createContext } from "react-router";
 
-import { env } from "~/config/env.server";
+import { getContext } from "~/core/context";
 import { createSession, deleteSession } from "~/core/session";
 import { getUserBySession } from "~/core/user";
 
 import { sessionContext } from "./session";
 
-const authCookie = createCookie("__auth", {
-  httpOnly: true,
-  secure: env.NODE_ENV === "production",
-  secrets: [env.SESSION_SECRET],
-  sameSite: "lax",
-  path: "/",
-});
-
 export const authContext = unstable_createContext<AuthContext>();
+
+const authCookie = (env: Env) =>
+  createCookie("__auth", {
+    httpOnly: true,
+    secure: import.meta.env.MODE === "production",
+    secrets: [env.SESSION_SECRET],
+    sameSite: "lax",
+    path: "/",
+  });
 
 export const authMiddleware: unstable_MiddlewareFunction<Response> = async (
   { request, context },
   next
 ) => {
-  const sessionId = await authCookie.parse(request.headers.get("Cookie"));
+  const { env } = getContext();
+  const cookie = authCookie(env);
+
+  const sessionId = await cookie.parse(request.headers.get("Cookie"));
   const user = sessionId ? await getUserBySession(sessionId) : null;
 
   let setCookie: string | undefined;
@@ -46,13 +50,13 @@ export const authMiddleware: unstable_MiddlewareFunction<Response> = async (
     },
     async login(userId: number, remember?: boolean) {
       const { id: sessionId, expires } = await createSession(userId);
-      setCookie = await authCookie.serialize(sessionId, {
+      setCookie = await cookie.serialize(sessionId, {
         expires: remember ? new Date(expires) : undefined,
       });
     },
     async logout() {
       await deleteSession(sessionId);
-      setCookie = await authCookie.serialize(null);
+      setCookie = await cookie.serialize(null);
     },
   });
 

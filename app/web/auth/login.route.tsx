@@ -10,7 +10,7 @@ import {
 } from "react-router";
 import { z } from "zod/v4";
 
-import { env } from "~/config/env.server";
+import { getContext } from "~/core/context";
 import { getUserByCredentials } from "~/core/user";
 import { authContext } from "~/web/auth";
 import { bodyParser } from "~/web/body-parser";
@@ -166,7 +166,7 @@ const loginValidator = validator(
 function safeUrl(value?: string) {
   try {
     if (!value) return;
-    const url = new URL(value, env.SITE_URL);
+    const url = new URL(value, getContext().env.SITE_URL);
     return url.href.replace(url.origin, "");
   } catch {
     return;

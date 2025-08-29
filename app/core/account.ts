@@ -1,12 +1,11 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { and, eq, getTableColumns, sql } from "drizzle-orm";
 
-import { env } from "~/config/env.server";
-
-import { db, schema } from "./services/db";
+import { getContext } from "./context";
+import { schema } from "./services/db";
 import { mailer } from "./services/email/mailer";
 import { ResetPasswordLink } from "./services/email/templates/reset-password-link";
-import { github } from "./services/oauth/providers/github";
+import { createGithubClient } from "./services/oauth/providers/github";
 import {
   createVerificationToken,
   deleteVerificationToken,
@@ -21,6 +20,8 @@ export async function createCredentialAccount(
   password: string
 ) {
   const hashedPassword = await bcrypt.hash(password, 10);
+
+  const { db } = getContext();
   const user = await db.transaction(async (tx) => {
     const [user] = await tx
       .insert(schema.users)
@@ -37,6 +38,7 @@ export async function createCredentialAccount(
 }
 
 export async function getCredentialAccount(email: string) {
+  const { db } = getContext();
   const accounts = await db
     .select({
       password: schema.accounts.password,
@@ -51,11 +53,17 @@ export async function getCredentialAccount(email: string) {
 }
 
 export async function forgetPassword(email: string) {
+  const { env } = getContext();
+
   const token = await createVerificationToken(email);
   await mailer.send({
     to: email,
     subject: "Discussions Password Reset",
-    template: ResetPasswordLink({ baseUrl: env.SITE_URL, email, token }),
+    template: ResetPasswordLink({
+      baseUrl: env.SITE_URL,
+      email,
+      token,
+    }),
   });
 }
 
@@ -83,6 +91,7 @@ export async function resetPassword(
 }
 
 async function updatePassword(email: string, password: string) {
+  const { db } = getContext();
   await db
     .update(schema.accounts)
     .set({ password })
@@ -100,7 +109,7 @@ async function updatePassword(email: string, password: string) {
 /* PROVIDERS ACCOUNTS */
 
 const providers = new Map([
-  ["github", github],
+  ["github", () => createGithubClient(getContext().env)],
   // add more providers as needed
 ]);
 
@@ -108,7 +117,7 @@ export function createProviderAuthorizationURL(
   provider: string,
   state: string
 ) {
-  const providerApi = providers.get(provider);
+  const providerApi = providers.get(provider)?.();
   if (!providerApi) throw new Error("Invalid Provider");
 
   const url = providerApi.createAuthorizationURL(state);
@@ -116,12 +125,13 @@ export function createProviderAuthorizationURL(
 }
 
 export async function linkProviderAccount(provider: string, code: string) {
-  const providerApi = providers.get(provider);
+  const providerApi = providers.get(provider)?.();
   if (!providerApi) throw new Error("Invalid Provider");
 
   const accessToken = await providerApi.getAccessToken(code);
   const providerUser = await providerApi.getUser(accessToken);
 
+  const { db } = getContext();
   let [user] = await db
     .select()
     .from(schema.users)
