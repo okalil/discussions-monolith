@@ -1,23 +1,25 @@
 import * as HoverCard from "@radix-ui/react-hover-card";
 import { Link, useFetcher } from "react-router";
 
-import { getDiscussionWithReply } from "~/core/discussion";
+import { discussionService } from "~/web/bindings";
 import { Avatar } from "~/web/shared/avatar";
 
 import type { Route } from "./+types/discussion-hovercard.route";
 
-export const loader = async ({ params }: Route.LoaderArgs) => {
-  const discussion = await getDiscussionWithReply(+params.id);
+export async function loader({ params }: Route.LoaderArgs) {
+  const discussion = await discussionService().getDiscussionWithReply(
+    +params.id
+  );
   return { discussion };
-};
+}
 
-export const clientLoader = async (_: Route.ClientLoaderArgs) => {
+export async function clientLoader(_: Route.ClientLoaderArgs) {
   try {
     return await _.serverLoader();
   } catch {
     return; // prevents throwing error for unexpected/network issues
   }
-};
+}
 
 export const shouldRevalidate = () => false;
 
@@ -32,14 +34,14 @@ export function DiscussionHoverCard({
   const fetcher = useFetcher<typeof loader>();
   const discussion = fetcher.data?.discussion;
 
-  const onOpen = () => {
+  const onOpenChange = () => {
     if (!discussion && fetcher.state === "idle") {
       fetcher.load(`/discussions/${discussionId}/hovercard`);
     }
   };
 
   return (
-    <HoverCard.Root openDelay={500} onOpenChange={() => onOpen()}>
+    <HoverCard.Root openDelay={500} onOpenChange={onOpenChange}>
       <HoverCard.Trigger asChild>{props.children}</HoverCard.Trigger>
       <HoverCard.Portal>
         {discussion && (

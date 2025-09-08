@@ -1,12 +1,10 @@
 import { useForm } from "react-hook-form";
-import { data, useSubmit } from "react-router";
-import { Form, Link, redirect } from "react-router";
-import { z } from "zod/v4";
+import { data, Form, Link, redirect, useSubmit } from "react-router";
+import * as z from "zod";
 
-import { forgetPassword } from "~/core/account";
-import { getUserByEmail } from "~/core/user";
+import { accountService, userService } from "~/web/bindings";
 import { bodyParser } from "~/web/body-parser";
-import { sessionContext } from "~/web/session";
+import { session } from "~/web/session";
 import { Button } from "~/web/shared/button";
 import { Input } from "~/web/shared/input";
 import { validator } from "~/web/validator";
@@ -50,25 +48,24 @@ export default function Component({ actionData }: Route.ComponentProps) {
   );
 }
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
+export async function action({ request }: Route.ActionArgs) {
   const body = await bodyParser.parse(request);
   const [errors, input] = await forgetPasswordValidator.tryValidate(body);
   if (errors) {
     return data({ errors, values: body }, 422);
   }
 
-  const user = await getUserByEmail(input.email);
+  const user = await userService().getUserByEmail(input.email);
   if (user && user.email !== null) {
-    await forgetPassword(user.email);
+    await accountService().forgetPassword(user.email);
   }
-  context
-    .get(sessionContext)
-    .flash(
-      "success",
-      "If your email is in our system, you will receive instructions to reset your password"
-    );
+
+  session().flash(
+    "success",
+    "If your email is in our system, you will receive instructions to reset your password"
+  );
   throw redirect("/login");
-};
+}
 
 const forgetPasswordValidator = validator(
   z.object({

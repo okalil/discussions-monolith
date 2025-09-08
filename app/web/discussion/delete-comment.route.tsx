@@ -1,7 +1,7 @@
 import { href, useFetcher } from "react-router";
 
-import { deleteComment } from "~/core/comment";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
+import { commentService } from "~/web/bindings";
 import { Button } from "~/web/shared/button";
 
 import type { Route } from "./+types/delete-comment.route";
@@ -22,8 +22,8 @@ export function DeleteComment({ commentId }: DeleteCommentProps) {
   );
 }
 
-export const action = async ({ context, params }: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
-  await deleteComment(Number(params.id), user.id);
+export async function action({ params }: Route.ActionArgs) {
+  const user = auth().getUserOrFail();
+  await commentService().deleteComment(Number(params.id), user.id);
   return { ok: true };
-};
+}

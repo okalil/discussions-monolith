@@ -3,9 +3,8 @@ import type { ShouldRevalidateFunctionArgs } from "react-router";
 import { Suspense } from "react";
 import { href, Link, useSearchParams } from "react-router";
 
-import { getComments } from "~/core/comment";
-import { getDiscussion, getParticipants } from "~/core/discussion";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
+import { discussionService, commentService } from "~/web/bindings";
 import { CommentsList } from "~/web/discussion/comments-list";
 import { Participants } from "~/web/discussion/participants";
 import { Avatar } from "~/web/shared/avatar";
@@ -15,25 +14,24 @@ import type { Route } from "./+types/discussion.route";
 import { CreateComment } from "./create-comment.route";
 import { VoteDiscussion } from "./vote-discussion.route";
 
-export const loader = async ({
-  context,
-  params,
-  request,
-}: Route.LoaderArgs) => {
-  const user = context.get(authContext).getUser();
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const user = auth().getUser();
   const sort = new URL(request.url).searchParams.get("sort")?.toString();
 
-  const comments = getComments(+params.id, user?.id, sort);
-  const participants = getParticipants(+params.id);
-  const discussion = await getDiscussion(+params.id, user?.id);
+  const comments = commentService().getComments(+params.id, user?.id, sort);
+  const participants = discussionService().getParticipants(+params.id);
+  const discussion = await discussionService().getDiscussion(
+    +params.id,
+    user?.id
+  );
 
   if (!discussion) throw new Response("Not Found Discussion", { status: 404 });
 
   return { discussion, comments, participants };
-};
+}
 
-export const meta: Route.MetaFunction = ({ data }) => [
-  { title: data?.discussion.title },
+export const meta: Route.MetaFunction = ({ loaderData }) => [
+  { title: loaderData?.discussion.title },
 ];
 
 export default function Component({

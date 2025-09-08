@@ -6,7 +6,7 @@ import {
 } from "@react-router/dev/routes";
 
 const routes = [
-  layout("web/auth/auth.route.tsx", [
+  layout("web/auth/anonymous.route.tsx", [
     route("login", "web/auth/login.route.tsx"),
     route("register", "web/auth/register.route.tsx"),
     route("forgot-password", "web/auth/forgot-password.route.tsx"),

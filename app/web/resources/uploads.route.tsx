@@ -1,10 +1,10 @@
-import { storage } from "~/core/services/storage";
+import { storage } from "~/web/bindings";
 
 import type { Route } from "./+types/uploads.route";
 
 export async function loader({ params }: Route.LoaderArgs) {
   const key = params["*"];
-  const file = await storage.get(key);
+  const file = await storage().get(key);
 
   if (!file) {
     throw new Response("File not found", { status: 404 });

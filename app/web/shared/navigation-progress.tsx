@@ -29,7 +29,7 @@ export function NavigationProgress() {
   return (
     <div className="h-1 fixed z-30 top-0 left-0 right-0">
       <div
-        className="bg-blue-500 h-full transition-all"
+        className="bg-blue-700 h-full transition-all"
         style={{ width: `${progress * 100}%` }}
       />
     </div>

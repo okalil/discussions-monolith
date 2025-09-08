@@ -1,3 +1,4 @@
+import { cloudflare } from "@cloudflare/vite-plugin";
 import { reactRouter } from "@react-router/dev/vite";
 import autoprefixer from "autoprefixer";
 import tailwindcss from "tailwindcss";
@@ -10,9 +11,12 @@ export default defineConfig({
       plugins: [tailwindcss, autoprefixer],
     },
   },
-  plugins: [reactRouter(), tsconfigPaths()],
-  optimizeDeps: {
-    exclude: ["@mapbox"],
+  plugins: [
+    cloudflare({ viteEnvironment: { name: "ssr" } }),
+    reactRouter(),
+    tsconfigPaths(),
+  ],
+  build: {
+    target: "esnext",
   },
-  build: { target: "esnext" },
 });

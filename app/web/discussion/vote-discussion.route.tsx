@@ -1,8 +1,8 @@
 import { data, useFetcher } from "react-router";
-import { z } from "zod/v4";
+import * as z from "zod";
 
-import { unvoteDiscussion, voteDiscussion } from "~/core/discussion";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
+import { discussionService } from "~/web/bindings";
 import { bodyParser } from "~/web/body-parser";
 import { VoteButton } from "~/web/shared/vote-button";
 import { validator } from "~/web/validator";
@@ -46,12 +46,8 @@ export function VoteDiscussion({
   );
 }
 
-export const action = async ({
-  request,
-  context,
-  params,
-}: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export async function action({ request, params }: Route.ActionArgs) {
+  const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const [errors, input] = await voteDiscussionValidator.tryValidate(body);
   if (errors) {
@@ -59,12 +55,12 @@ export const action = async ({
   }
 
   if (input.voted) {
-    await voteDiscussion(Number(params.id), user.id);
+    await discussionService().voteDiscussion(+params.id, user.id);
   } else {
-    await unvoteDiscussion(Number(params.id), user.id);
+    await discussionService().unvoteDiscussion(+params.id, user.id);
   }
   return { ok: true };
-};
+}
 
 const voteDiscussionValidator = validator(
   z.object({

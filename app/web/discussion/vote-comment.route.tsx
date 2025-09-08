@@ -1,8 +1,8 @@
 import { href, useFetcher } from "react-router";
-import { z } from "zod/v4";
+import * as z from "zod";
 
-import { unvoteComment, voteComment } from "~/core/comment";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
+import { commentService } from "~/web/bindings";
 import { bodyParser } from "~/web/body-parser";
 import { VoteButton } from "~/web/shared/vote-button";
 import { validator } from "~/web/validator";
@@ -46,22 +46,18 @@ export function VoteComment({ commentId, ...props }: VoteCommentProps) {
   );
 }
 
-export const action = async ({
-  request,
-  context,
-  params,
-}: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export async function action({ request, params }: Route.ActionArgs) {
+  const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const { voted } = await voteCommentValidator.validate(body);
 
   if (voted) {
-    await voteComment(Number(params.id), user.id);
+    await commentService().voteComment(+params.id, user.id);
   } else {
-    await unvoteComment(Number(params.id), user.id);
+    await commentService().unvoteComment(+params.id, user.id);
   }
   return { ok: true };
-};
+}
 
 const voteCommentValidator = validator(
   z.object({

@@ -1,12 +1,11 @@
 import { useForm } from "react-hook-form";
 import { data, Form, Link, redirect, useSubmit } from "react-router";
-import { z } from "zod/v4";
+import * as z from "zod";
 
-import { createCredentialAccount } from "~/core/account";
-import { getUserByEmail } from "~/core/user";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
+import { accountService, userService } from "~/web/bindings";
 import { bodyParser } from "~/web/body-parser";
-import { sessionContext } from "~/web/session";
+import { session } from "~/web/session";
 import { Button } from "~/web/shared/button";
 import { ErrorMessage } from "~/web/shared/error-message";
 import { Field } from "~/web/shared/field";
@@ -89,11 +88,11 @@ export default function Component({ actionData }: Route.ComponentProps) {
   );
 }
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
+export async function action({ request }: Route.ActionArgs) {
   const body = await bodyParser.parse(request);
   const [errors, input] = await registerValidator.tryValidate(body);
 
-  if (errors || (await getUserByEmail(input.email))) {
+  if (errors || (await userService().getUserByEmail(input.email))) {
     delete body.password;
     delete body.passwordConfirmation;
     return data(
@@ -105,17 +104,17 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     );
   }
 
-  const user = await createCredentialAccount(
+  const user = await accountService().createCredentialAccount(
     input.name,
     input.email,
     input.password
   );
 
-  await context.get(authContext).login(user.id);
+  await auth().login(user.id);
 
-  context.get(sessionContext).flash("success", "Signed up successfully!");
+  session().flash("success", "Signed up successfully!");
   throw redirect("/");
-};
+}
 
 const registerValidator = validator(
   z

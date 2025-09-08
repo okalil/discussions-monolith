@@ -1,48 +1,60 @@
-import bcrypt from "bcrypt";
-import { eq } from "drizzle-orm";
+import bcrypt from "bcryptjs";
+import { and, eq, getTableColumns } from "drizzle-orm";
 
-import { getCredentialAccount } from "./account";
-import { db, schema } from "./services/db";
-import { storage } from "./services/storage";
-import { getSession } from "./session";
+import type { DatabaseClient } from "./integrations/db";
+import type { StorageClient } from "./integrations/storage";
 
-export async function getUserBySession(sessionId: string) {
-  const session = await getSession(sessionId);
-  if (!session) return null;
-  return session.user;
-}
+import { schema } from "./integrations/db/schema";
 
-export async function getUserByEmail(email: string) {
-  const users = await db
-    .select()
-    .from(schema.users)
-    .where(eq(schema.users.email, email))
-    .limit(1);
-  return users.at(0) ?? null;
-}
+export class UserService {
+  constructor(private db: DatabaseClient, private storage: StorageClient) {}
 
-export async function getUserByCredentials(email: string, password: string) {
-  const account = await getCredentialAccount(email);
+  async getUserByEmail(email: string) {
+    const users = await this.db
+      .select()
+      .from(schema.users)
+      .where(eq(schema.users.email, email))
+      .limit(1);
+    return users.at(0) ?? null;
+  }
 
-  if (!account?.user || !account.password) return null;
+  async getUserByCredentials(email: string, password: string) {
+    const accounts = await this.db
+      .select({
+        password: schema.accounts.password,
+        user: getTableColumns(schema.users),
+      })
+      .from(schema.accounts)
+      .leftJoin(schema.users, eq(schema.users.id, schema.accounts.userId))
+      .where(
+        and(
+          eq(schema.accounts.type, "credential"),
+          eq(schema.users.email, email)
+        )
+      );
+    const account = accounts.at(0);
 
-  const isValid = await bcrypt.compare(password, account.password);
-  if (!isValid) return null;
+    if (!account?.user || !account.password) return null;
 
-  return account.user;
-}
+    const isValid = await bcrypt.compare(password, account.password);
+    if (!isValid) return null;
 
-export async function updateUser(userId: number, name: string, image?: string) {
-  await db
-    .update(schema.users)
-    .set({ name, image })
-    .where(eq(schema.users.id, userId));
-}
+    return account.user;
+  }
 
-export async function uploadUserImage(userId: number, file?: unknown) {
-  if (!file || !(file instanceof File)) return;
-  if (!file.name) return;
-  const key = `avatars/${userId}_${Date.now()}`;
-  await storage.set(key, file);
-  return key;
+  async updateUser(userId: number, name: string, image?: string) {
+    await this.db
+      .update(schema.users)
+      .set({ name, image })
+      .where(eq(schema.users.id, userId));
+  }
+
+  async uploadUserImage(userId: number, file?: unknown) {
+    if (!file || !(file instanceof File)) return;
+    if (!file.name) return;
+
+    const key = `avatars/${userId}_${Date.now()}`;
+    await this.storage.set(key, file);
+    return key;
+  }
 }

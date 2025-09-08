@@ -1,40 +1,42 @@
 import type { unstable_MiddlewareFunction } from "react-router";
 
-import { createCookie, redirect, unstable_createContext } from "react-router";
+import { AsyncLocalStorage } from "node:async_hooks";
+import { createCookie, redirect } from "react-router";
 
-import { env } from "~/config/env.server";
-import { createSession, deleteSession } from "~/core/session";
-import { getUserBySession } from "~/core/user";
+import type { SessionDto } from "~/core/session";
 
-import { sessionContext } from "./session";
+import { env, sessionService } from "./bindings";
+import { session } from "./session";
 
-const authCookie = createCookie("__auth", {
-  httpOnly: true,
-  secure: env.NODE_ENV === "production",
-  secrets: [env.SESSION_SECRET],
-  sameSite: "lax",
-  path: "/",
-});
-
-export const authContext = unstable_createContext<AuthContext>();
+const als = new AsyncLocalStorage<Auth>();
 
 export const authMiddleware: unstable_MiddlewareFunction<Response> = async (
-  { request, context },
+  { request },
   next
 ) => {
-  const sessionId = await authCookie.parse(request.headers.get("Cookie"));
-  const user = sessionId ? await getUserBySession(sessionId) : null;
+  const cookie = createCookie("__auth", {
+    httpOnly: true,
+    secure: import.meta.env.MODE === "production",
+    secrets: [env().SESSION_SECRET],
+    sameSite: "lax",
+    path: "/",
+  });
+
+  const userSessionId = await cookie.parse(request.headers.get("Cookie"));
+  const userSession = userSessionId
+    ? await sessionService().getSession(userSessionId)
+    : null;
+  const user = userSession?.user ?? null;
 
   let setCookie: string | undefined;
 
-  context.set(authContext, {
+  const auth = {
     getUser() {
       return user;
     },
     getUserOrFail() {
       if (!user) {
-        const session = context.get(sessionContext);
-        session.flash("error", "Hold up! You need to log in first");
+        session().flash("error", "Hold up! You need to log in first");
 
         const url = new URL(request.url);
         const searchParams = new URLSearchParams([
@@ -45,24 +47,33 @@ export const authMiddleware: unstable_MiddlewareFunction<Response> = async (
       return user;
     },
     async login(userId: number, remember?: boolean) {
-      const { id: sessionId, expires } = await createSession(userId);
-      setCookie = await authCookie.serialize(sessionId, {
+      const { id: sessionId, expires } = await sessionService().createSession(
+        userId
+      );
+      setCookie = await cookie.serialize(sessionId, {
         expires: remember ? new Date(expires) : undefined,
       });
     },
     async logout() {
-      await deleteSession(sessionId);
-      setCookie = await authCookie.serialize(null);
+      await sessionService().deleteSession(userSessionId);
+      setCookie = await cookie.serialize(null);
     },
-  });
+  };
 
-  const response = await next();
+  const response = await als.run(auth, next);
   if (setCookie) response.headers.append("Set-Cookie", setCookie);
 };
 
-type MaybeSessionUser = Awaited<ReturnType<typeof getUserBySession>>;
-type SessionUser = NonNullable<MaybeSessionUser>;
-type AuthContext = {
+export function auth() {
+  const store = als.getStore();
+  if (!store) throw new Error("Auth context not provided");
+
+  return store;
+}
+
+type SessionUser = NonNullable<SessionDto>["user"];
+type MaybeSessionUser = SessionUser | null;
+type Auth = {
   getUser(): MaybeSessionUser;
   getUserOrFail(): SessionUser;
   login(userId: number, remember?: boolean): Promise<void>;

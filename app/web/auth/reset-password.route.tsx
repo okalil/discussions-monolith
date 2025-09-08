@@ -7,10 +7,11 @@ import {
   useSearchParams,
   useSubmit,
 } from "react-router";
-import { z } from "zod/v4";
+import * as z from "zod";
 
-import { resetPassword } from "~/core/account";
+import { accountService } from "~/web/bindings";
 import { bodyParser } from "~/web/body-parser";
+import { session } from "~/web/session";
 import { Button } from "~/web/shared/button";
 import { ErrorMessage } from "~/web/shared/error-message";
 import { Field } from "~/web/shared/field";
@@ -83,17 +84,25 @@ export default function Component({ actionData }: Route.ComponentProps) {
   );
 }
 
-export const action = async ({ request }: Route.ActionArgs) => {
+export async function action({ request }: Route.ActionArgs) {
   const body = await bodyParser.parse(request);
   const [errors, input] = await resetPasswordValidator.tryValidate(body);
   if (errors) return data({ errors }, 422);
 
-  const reset = await resetPassword(input.email, input.password, input.token);
+  const reset = await accountService().resetPassword(
+    input.email,
+    input.password,
+    input.token
+  );
   if (!reset)
     return data({ errors: { root: { message: "Invalid credentials" } } }, 400);
 
+  session().flash(
+    "success",
+    "Password succesfully reset! Login to access your account."
+  );
   throw redirect("/login");
-};
+}
 
 const resetPasswordValidator = validator(
   z

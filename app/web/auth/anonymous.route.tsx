@@ -1,12 +1,12 @@
 import { Outlet, redirect } from "react-router";
 
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
 
-import type { Route } from "./+types/auth.route";
+import type { Route } from "./+types/anonymous.route";
 
 export const unstable_middleware: Route.unstable_MiddlewareFunction[] = [
-  function anonymousMiddleware({ context }) {
-    const user = context.get(authContext).getUser();
+  function anonymousMiddleware() {
+    const user = auth().getUser();
     if (user) throw redirect("/");
   },
 ];

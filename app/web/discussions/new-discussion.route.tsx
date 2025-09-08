@@ -1,10 +1,9 @@
 import { useForm } from "react-hook-form";
 import { data, Form, redirect, useSubmit } from "react-router";
-import { z } from "zod/v4";
+import * as z from "zod";
 
-import { getCategories } from "~/core/category";
-import { createDiscussion } from "~/core/discussion";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
+import { categoryService, discussionService } from "~/web/bindings";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/shared/button";
 import { ErrorMessage } from "~/web/shared/error-message";
@@ -17,10 +16,10 @@ import type { Route } from "./+types/new-discussion.route";
 
 import "./new-discussion.css";
 
-export const loader = async () => {
-  const categories = await getCategories();
+export async function loader() {
+  const categories = await categoryService().getCategories();
   return { categories };
-};
+}
 
 export default function Component({
   actionData,
@@ -85,20 +84,20 @@ export default function Component({
   );
 }
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export async function action({ request }: Route.ActionArgs) {
+  const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const [errors, input] = await createDiscussionValidator.tryValidate(body);
   if (errors) return data({ errors, values: body }, 422);
 
-  const discussion = await createDiscussion(
+  const discussion = await discussionService().createDiscussion(
     input.title,
     input.body,
     input.categoryId,
     user.id
   );
   throw redirect(`/discussions/${discussion.id}`);
-};
+}
 
 const createDiscussionValidator = validator(
   z.object({

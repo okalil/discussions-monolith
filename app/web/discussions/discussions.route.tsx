@@ -1,9 +1,8 @@
 import { Form, href, NavLink, useSearchParams } from "react-router";
-import { z } from "zod/v4";
+import * as z from "zod";
 
-import { getCategories } from "~/core/category";
-import { getDiscussions } from "~/core/discussion";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
+import { categoryService, discussionService } from "~/web/bindings";
 import { Button } from "~/web/shared/button";
 import { Icon } from "~/web/shared/icon";
 import { Input } from "~/web/shared/input";
@@ -16,23 +15,19 @@ import { DiscussionRow } from "./discussion-row";
 
 export const meta: Route.MetaFunction = () => [{ title: "Top Discussions" }];
 
-export const loader = async ({
-  request,
-  context,
-  params,
-}: Route.LoaderArgs) => {
-  const user = context.get(authContext).getUser();
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const user = auth().getUser();
   const { q, page, limit } = await getDiscussionsValidator.validate(
     Object.fromEntries(new URL(request.url).searchParams)
   );
 
-  const categories = await getCategories();
-  const paginator = await getDiscussions(
+  const categories = await categoryService().getCategories();
+  const paginator = await discussionService().getDiscussions(
     { category: params.category, page, limit, q },
     user?.id
   );
   return { ...paginator, categories };
-};
+}
 
 export default function Component({
   loaderData,
@@ -40,7 +35,7 @@ export default function Component({
   params,
 }: Route.ComponentProps) {
   const { categories, discussions, total, limit } = loaderData;
-  const { user } = matches[1].data;
+  const { user } = matches[1].loaderData;
 
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Number(searchParams.get("page") ?? 1);

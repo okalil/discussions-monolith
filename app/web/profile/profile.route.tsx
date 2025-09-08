@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { data, Form, redirect, useSubmit } from "react-router";
-import { z } from "zod/v4";
+import * as z from "zod";
 
-import { updateUser, uploadUserImage } from "~/core/user";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
+import { userService } from "~/web/bindings";
 import { bodyParser } from "~/web/body-parser";
-import { sessionContext } from "~/web/session";
+import { session } from "~/web/session";
 import { Avatar } from "~/web/shared/avatar";
 import { Button } from "~/web/shared/button";
 import { ErrorMessage } from "~/web/shared/error-message";
@@ -16,12 +16,14 @@ import { validator } from "~/web/validator";
 
 import type { Route } from "./+types/profile.route";
 
-export const meta = () => [{ title: "Discussions | Profile" }];
+export const meta: Route.MetaFunction = () => [
+  { title: "Discussions | Profile" },
+];
 
-export const loader = ({ context }: Route.LoaderArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export async function loader() {
+  const user = auth().getUserOrFail();
   return { user };
-};
+}
 
 export default function Component({
   loaderData,
@@ -90,18 +92,18 @@ export default function Component({
   );
 }
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export async function action({ request }: Route.ActionArgs) {
+  const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const [errors, input] = await updateUserValidator.tryValidate(body);
   if (errors) return data({ errors, body }, 422);
 
-  const fileKey = await uploadUserImage(user.id, input.image);
-  await updateUser(user.id, input.name, fileKey);
+  const fileKey = await userService().uploadUserImage(user.id, input.image);
+  await userService().updateUser(user.id, input.name, fileKey);
 
-  context.get(sessionContext).flash("success", "Successfully updated!");
+  session().flash("success", "Successfully updated!");
   throw redirect(".");
-};
+}
 
 const updateUserValidator = validator(
   z.object({

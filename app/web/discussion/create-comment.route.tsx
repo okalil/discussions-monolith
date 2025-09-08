@@ -1,8 +1,8 @@
 import { data, href, useFetcher } from "react-router";
-import { z } from "zod/v4";
+import * as z from "zod";
 
-import { createComment } from "~/core/comment";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
+import { commentService } from "~/web/bindings";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/shared/button";
 import { Field } from "~/web/shared/field";
@@ -46,15 +46,19 @@ export function CreateComment({ discussionId }: CreateCommentProps) {
   );
 }
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export async function action({ request }: Route.ActionArgs) {
+  const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const [errors, input] = await createCommentValidator.tryValidate(body);
   if (errors) throw data({ errors }, 422);
 
-  const comment = await createComment(input.discussionId, input.body, user.id);
+  const comment = await commentService().createComment(
+    input.discussionId,
+    input.body,
+    user.id
+  );
   return { comment };
-};
+}
 
 const createCommentValidator = validator(
   z.object({

@@ -9,6 +9,7 @@ The purpose is to provide a reference implementation for monolithic applications
 - [Architecture](#architecture)
 - [Directory Structure](#directory-structure)
 - [Patterns and Conventions](#patterns-and-conventions)
+- [Running](#running)
 
 ## Design Principles
 
@@ -46,15 +47,15 @@ The `web` directory holds the web-related parts of the application, including co
 
 - Authentication is handled through a separate cookie, which allows for more control over expiration options. There is a user session persisted in the database, and the authentication cookie stores only the ID of that session.
 
-- An [authentication middleware](https://github.com/okalil/discussions-monolith/blob/main/app/web/auth.ts) reads this cookie, retrieves the session and user data, and exposes them via a React Router context.
+- An [authentication middleware](https://github.com/okalil/discussions-monolith/blob/main/app/web/auth.ts) reads this cookie, retrieves the session and user data, and exposes them via an async context.
 
 - Access control is performed in the "controllers" (`loader`/`action`), allowing each route to flexibly define whether or not an authenticated user is required.
 
 When an authenticated user is **required**, we use:
 
 ```ts
-export const loader = async ({ context }: Route.LoaderArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export async function loader(_: Route.LoaderArgs) {
+  const user = auth().getUserOrFail();
   // User is required here, a redirect will be thrown if the request is not authenticated
 };
 ```
@@ -62,8 +63,8 @@ export const loader = async ({ context }: Route.LoaderArgs) => {
 For an **optional** authenticated user, we have:
 
 ```ts
-export const loader = async ({ context }: Route.LoaderArgs) => {
-  const user = context.get(authContext).getUser();
+export async function loader(_: Route.LoaderArgs) {
+  const user = auth().getUser();
   // User is nullable here, the loader data will be public but may be slightly different when user is present.
 };
 ```
@@ -112,13 +113,13 @@ export default function Component({ actionData }: Route.ComponentProps) {
   );
 }
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export async function action ({ request }: Route.ActionArgs) {
+  const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const [errors, input] = await createDiscussionValidator.tryValidate(body);
   if (errors) return data({ errors, values: body }, 422);
 
-  const discussion = await createDiscussion(input.title, input.body, user.id);
+  const discussion = await discussionService().createDiscussion(input.title, input.body, user.id);
   throw redirect(`/discussions/${discussion.id}`);
 };
 
@@ -135,9 +136,79 @@ const createDiscussionValidator = validator(
 - Instead of handling loading state for a submit button every time, we can take advantage of React Router's `useFetchers` and `useNavigation` hooks to access the state of any inflight form submissions.
 - Then, we can check whether the button's form's action matches any of them to know if [it should be disabled or showing a spinner](https://github.com/okalil/discussions-monolith/blob/main/app/web/ui/shared/button.tsx).
 
-## Getting Started
+### Fullstack Component Pattern
 
-### Installation
+- A "fullstack component" is a file that colocates UI, loader/action logic, validation, and data fetching for a specific feature or route.
+- **These components always use `useFetcher` because they are implemented as React Router resource routes (not UI routes).** This allows them to be embedded in other UI and invoked programmatically, rather than being tied to navigation.
+- Typical structure includes:
+  - UI component (React function)
+  - Route loader and/or action (for data fetching and mutations)
+  - Validation schema (using the shared validator utility)
+  - Data fetching or mutation functions from the core/domain layer
+- Example: `edit-comment.route.tsx`
+
+  ```tsx
+  export function EditComment({ comment, onCancel }) {
+    const fetcher = useFetcher();
+    return (
+      <fetcher.Form
+        method="POST"
+        action={href("/comments/:id/edit", { id: comment.id })}
+      >
+        {/* ...fields... */}
+      </fetcher.Form>
+    );
+  }
+
+  export async function action({ request, params }) {
+    const user = auth().getUserOrFail();
+    const body = await bodyParser.parse(request);
+    const [error, input] = await updateCommentValidator.tryValidate(body);
+    if (error) return data({ error, body }, 422);
+    await commentService().updateComment(+params.id, input.body, user.id);
+    return { ok: true };
+  }
+  const updateCommentValidator = validator(
+    z.object({ body: z.string().trim().min(1) })
+  );
+  ```
+
+- Example: `discussion-hovercard.route.tsx`
+
+  ```tsx
+  export async function loader({ params }) {
+    const discussion = await discussionService().getDiscussionWithReply(
+      +params.id
+    );
+    return { discussion };
+  }
+
+  export function DiscussionHoverCard({ discussionId, children }) {
+    const fetcher = useFetcher();
+    const discussion = fetcher.data?.discussion;
+    const onOpen = () => {
+      if (!discussion && fetcher.state === "idle") {
+        fetcher.load(`/discussions/${discussionId}/hovercard`);
+      }
+    };
+    return (
+      <HoverCard.Root openDelay={500} onOpenChange={onOpen}>
+        <HoverCard.Trigger asChild>{children}</HoverCard.Trigger>
+        {/* ...hovercard content... */}
+      </HoverCard.Root>
+    );
+  }
+  ```
+
+- This pattern makes easy to reason about a feature's full stack in one place.
+
+## Running
+
+### Environment variables
+
+Create a `.env` file following `.env.example`
+
+### Project dependencies
 
 Install the dependencies:
 
@@ -147,16 +218,10 @@ pnpm install
 
 ### Database Setup
 
-Setup the local SQLite database:
+Apply migrations to the database:
 
 ```bash
-pnpm db:push
-```
-
-Run the database seed script:
-
-```bash
-pnpm db:seed
+pnpm db:migrate
 ```
 
 ### Development

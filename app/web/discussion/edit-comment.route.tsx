@@ -1,10 +1,10 @@
 import { data, href, useFetcher } from "react-router";
-import { z } from "zod/v4";
+import * as z from "zod";
 
 import type { CommentsDto } from "~/core/comment";
 
-import { updateComment } from "~/core/comment";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
+import { commentService } from "~/web/bindings";
 import { bodyParser } from "~/web/body-parser";
 import { Button } from "~/web/shared/button";
 import { Field } from "~/web/shared/field";
@@ -54,21 +54,17 @@ export function EditComment({ comment, onCancel }: EditCommentProps) {
   );
 }
 
-export const action = async ({
-  request,
-  context,
-  params,
-}: Route.ActionArgs) => {
-  const user = context.get(authContext).getUserOrFail();
+export async function action({ request, params }: Route.ActionArgs) {
+  const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const [error, input] = await updateCommentValidator.tryValidate(body);
   if (error) {
     return data({ error, body }, 422);
   }
 
-  await updateComment(Number(params.id), input.body, user.id);
+  await commentService().updateComment(+params.id, input.body, user.id);
   return { ok: true };
-};
+}
 
 const updateCommentValidator = validator(
   z.object({ body: z.string().trim().min(1) })

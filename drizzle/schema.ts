@@ -14,7 +14,7 @@ export const users = sqliteTable(
     id: integer("id" as string).primaryKey(),
     name: text("name" as string),
     email: text("email" as string).unique(),
-    emailVerified: text("email_verified" as string),
+    emailVerified: integer("email_verified" as string, { mode: "boolean" }),
     image: text("image" as string),
     createdAt: text("created_at" as string)
       .notNull()

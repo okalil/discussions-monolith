@@ -8,13 +8,12 @@ import {
   useSearchParams,
   useSubmit,
 } from "react-router";
-import { z } from "zod/v4";
+import * as z from "zod";
 
-import { env } from "~/config/env.server";
-import { getUserByCredentials } from "~/core/user";
-import { authContext } from "~/web/auth";
+import { auth } from "~/web/auth";
+import { env, userService } from "~/web/bindings";
 import { bodyParser } from "~/web/body-parser";
-import { sessionContext } from "~/web/session";
+import { session } from "~/web/session";
 import { Button } from "~/web/shared/button";
 import { ErrorMessage } from "~/web/shared/error-message";
 import { Field } from "~/web/shared/field";
@@ -130,14 +129,17 @@ export default function Component({ actionData }: Route.ComponentProps) {
   );
 }
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
+export async function action({ request }: Route.ActionArgs) {
   const body = await bodyParser.parse(request);
   const [errors, input] = await loginValidator.tryValidate(body);
   if (errors) {
     return data({ errors, email: body.email }, 422);
   }
 
-  const user = await getUserByCredentials(input.email, input.password);
+  const user = await userService().getUserByCredentials(
+    input.email,
+    input.password
+  );
   if (!user) {
     return data(
       {
@@ -148,11 +150,11 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     );
   }
 
-  await context.get(authContext).login(user.id, input.remember);
+  await auth().login(user.id, input.remember);
 
-  context.get(sessionContext).flash("success", "Signed in successfully!");
+  session().flash("success", "Signed in successfully!");
   throw redirect(safeUrl(input.to) || "/");
-};
+}
 
 const loginValidator = validator(
   z.object({
@@ -166,7 +168,7 @@ const loginValidator = validator(
 function safeUrl(value?: string) {
   try {
     if (!value) return;
-    const url = new URL(value, env.SITE_URL);
+    const url = new URL(value, env().SITE_URL);
     return url.href.replace(url.origin, "");
   } catch {
     return;

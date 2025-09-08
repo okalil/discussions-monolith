@@ -1,22 +1,19 @@
 import * as arctic from "arctic";
 
-import { env } from "~/config/env.server";
+import type { AuthProvider } from "../provider";
 
-import type { OAuthProvider } from "../provider";
+export class GithubAuthProvider implements AuthProvider {
+  private authClient: arctic.GitHub;
+  constructor(clientId: string, clientSecret: string) {
+    this.authClient = new arctic.GitHub(clientId, clientSecret, null);
+  }
 
-const arcticGithubApi = new arctic.GitHub(
-  env.GITHUB_CLIENT_ID,
-  env.GITHUB_CLIENT_SECRET,
-  null
-);
-
-class GithubOAuthProvider implements OAuthProvider {
   createAuthorizationURL(state: string) {
-    const url = arcticGithubApi.createAuthorizationURL(state, ["read:user"]);
+    const url = this.authClient.createAuthorizationURL(state, ["read:user"]);
     return url.toString();
   }
   async getAccessToken(code: string) {
-    const tokens = await arcticGithubApi.validateAuthorizationCode(code);
+    const tokens = await this.authClient.validateAuthorizationCode(code);
     return tokens.accessToken();
   }
   async getUser(token: string) {
@@ -29,20 +26,19 @@ class GithubOAuthProvider implements OAuthProvider {
       headers: { Authorization: `Bearer ${token}` },
     });
     const emails: GithubEmail[] = await emailsResponse.json();
-    const email = emails.find((email) => email.primary)?.email;
+    const primaryEmailInfo = emails.find((email) => email.primary);
 
-    if (!email) throw new Error("Email not found");
+    if (!primaryEmailInfo) throw new Error("Email not found");
 
     return {
       id: user.id.toString(),
       name: user.name,
       image: user.avatar_url,
-      email,
+      email: primaryEmailInfo.email,
+      emailVerified: primaryEmailInfo.verified,
     };
   }
 }
-
-export const github = new GithubOAuthProvider();
 
 interface GithubUser {
   id: number;
@@ -52,4 +48,5 @@ interface GithubUser {
 interface GithubEmail {
   email: string;
   primary: boolean;
+  verified: boolean;
 }
