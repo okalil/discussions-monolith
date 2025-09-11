@@ -10,7 +10,7 @@ import {
 
 import type { DatabaseClient } from "./integrations/db";
 
-import { schema } from "./integrations/db/schema";
+import { schema } from "./integrations/db";
 
 export type CommentsDto = Awaited<
   ReturnType<CommentService["getComments"]>

@@ -2,7 +2,7 @@ import { and, eq, getTableColumns, gt } from "drizzle-orm";
 
 import type { DatabaseClient } from "./integrations/db";
 
-import { schema } from "./integrations/db/schema";
+import { schema } from "./integrations/db";
 
 const expirationTime = 1000 * 60 * 60 * 24 * 30; // 30 days
 

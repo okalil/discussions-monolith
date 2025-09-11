@@ -7,9 +7,9 @@ import type { DatabaseClient } from "./integrations/db";
 import type { EmailClient } from "./integrations/email";
 
 import { GithubAuthProvider } from "./integrations/auth/providers/github";
-import { schema } from "./integrations/db/schema";
-import { ResetPasswordLink } from "./integrations/emails/reset-password-link";
-import { ResetPasswordSuccess } from "./integrations/emails/reset-password-success";
+import { schema } from "./integrations/db";
+import { ResetPasswordLink } from "./integrations/email/templates/reset-password-link";
+import { ResetPasswordSuccess } from "./integrations/email/templates/reset-password-success";
 
 export class AccountService {
   private providers: Map<string, AuthProvider> = new Map();

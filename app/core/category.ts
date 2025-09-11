@@ -1,6 +1,6 @@
 import type { DatabaseClient } from "./integrations/db";
 
-import { schema } from "./integrations/db/schema";
+import { schema } from "./integrations/db";
 
 export class CategoryService {
   constructor(private db: DatabaseClient) {}

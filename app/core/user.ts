@@ -4,7 +4,7 @@ import { and, eq, getTableColumns } from "drizzle-orm";
 import type { DatabaseClient } from "./integrations/db";
 import type { StorageClient } from "./integrations/storage";
 
-import { schema } from "./integrations/db/schema";
+import { schema } from "./integrations/db";
 
 export class UserService {
   constructor(private db: DatabaseClient, private storage: StorageClient) {}
