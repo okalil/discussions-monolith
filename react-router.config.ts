@@ -6,7 +6,7 @@ export default {
     mode: "initial",
   },
   future: {
-    unstable_middleware: true,
+    v8_middleware: true,
     unstable_optimizeDeps: true,
     unstable_viteEnvironmentApi: true,
   },

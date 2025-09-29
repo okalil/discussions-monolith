@@ -1,4 +1,4 @@
-import type { unstable_MiddlewareFunction } from "react-router";
+import type { MiddlewareFunction } from "react-router";
 
 import { AsyncLocalStorage } from "node:async_hooks";
 import { createCookie, redirect } from "react-router";
@@ -10,7 +10,7 @@ import { session } from "./session";
 
 const als = new AsyncLocalStorage<Auth>();
 
-export const authMiddleware: unstable_MiddlewareFunction<Response> = async (
+export const authMiddleware: MiddlewareFunction<Response> = async (
   { request },
   next
 ) => {
@@ -36,7 +36,7 @@ export const authMiddleware: unstable_MiddlewareFunction<Response> = async (
     },
     getUserOrFail() {
       if (!user) {
-        session().flash("error", "Hold up! You need to log in first");
+        session().flash("error", "Hold on! You need to log in first");
 
         const url = new URL(request.url);
         const searchParams = new URLSearchParams([

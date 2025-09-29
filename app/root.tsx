@@ -20,7 +20,7 @@ import stylesheet from "./root.css?url";
 
 import "@fontsource-variable/inter";
 
-export const unstable_middleware: Route.unstable_MiddlewareFunction[] = [
+export const middleware: Route.MiddlewareFunction[] = [
   sessionMiddleware,
   authMiddleware,
 ];

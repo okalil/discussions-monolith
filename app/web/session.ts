@@ -1,4 +1,4 @@
-import type { Session, unstable_MiddlewareFunction } from "react-router";
+import type { Session, MiddlewareFunction } from "react-router";
 
 import { AsyncLocalStorage } from "node:async_hooks";
 import { createCookieSessionStorage } from "react-router";
@@ -7,7 +7,7 @@ import { env } from "./bindings";
 
 const als = new AsyncLocalStorage<Session>();
 
-export const sessionMiddleware: unstable_MiddlewareFunction<Response> = async (
+export const sessionMiddleware: MiddlewareFunction<Response> = async (
   { request },
   next
 ) => {

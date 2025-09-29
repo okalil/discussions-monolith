@@ -4,7 +4,7 @@ import { auth } from "~/web/auth";
 
 import type { Route } from "./+types/anonymous.route";
 
-export const unstable_middleware: Route.unstable_MiddlewareFunction[] = [
+export const middleware: Route.MiddlewareFunction[] = [
   function anonymousMiddleware() {
     const user = auth().getUser();
     if (user) throw redirect("/");

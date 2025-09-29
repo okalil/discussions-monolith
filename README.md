@@ -19,17 +19,13 @@ The purpose is to provide a reference implementation for monolithic applications
 
 ## Architecture
 
-The project architecture is composed of two main layers: a _domain_ layer, containing all business logic and data access code, and a _presentation_ layer, containing routes, UI and orchestration logic code.
+The project architecture is composed of two main layers: a _core_ layer, containing all business logic and data handling code, and a _presentation_ layer, containing routes, UI and orchestration logic code.
 
-This _domain layer_ is responsible for domain and application logic, and is designed to be agnostic to framework-specific concerns. Ideally, it should be "copy-pasteable" in a way that would work with any JavaScript framework. For the sake of simplicity, there is no strict separation between core logic and infrastructure services.
+This _core layer_ is responsible for domain and application logic, and is designed to be agnostic to framework-specific concerns. Ideally, it should be "copy-pasteable" in a way that would work with any JavaScript framework.
 
 The _presentation layer_ includes our React components and React Router route modules. It depends on the domain layer to perform business operations and access data. This layer should remain as lean as possible, delegating complex logic to the domain layer whenever appropriate.
 
 ## Directory Structure
-
-### The app/config directory
-
-The `config` directory keeps configuration files for the project, including environment variables and library-specific global configurations.
 
 ### The app/core directory
 
@@ -37,7 +33,7 @@ The `core` directory hosts the core application logic, where we define domain fu
 
 ### The app/web directory
 
-The `web` directory holds the web-related parts of the application, including cookies, middlewares, route modules and UI components.
+The `web` directory holds the web-related parts of the application, including cookies, request middlewares, route modules and UI components.
 
 ## Patterns and Conventions
 
@@ -51,32 +47,32 @@ The `web` directory holds the web-related parts of the application, including co
 
 - Access control is performed in the "controllers" (`loader`/`action`), allowing each route to flexibly define whether or not an authenticated user is required.
 
-When an authenticated user is **required**, we use:
+When an authenticated user is **required**:
 
 ```ts
 export async function loader(_: Route.LoaderArgs) {
   const user = auth().getUserOrFail();
   // User is required here, a redirect will be thrown if the request is not authenticated
-};
+}
 ```
 
-For an **optional** authenticated user, we have:
+For an **optional** authenticated user:
 
 ```ts
 export async function loader(_: Route.LoaderArgs) {
   const user = auth().getUser();
-  // User is nullable here, the loader data will be public but may be slightly different when user is present.
-};
+  // User is nullable here, the loader data will be public but can be slightly different when user is present.
+}
 ```
 
 ### Form validation
 
-- To share validation logic between client and server, a utility called [`validator`](https://github.com/okalil/discussions-monolith/blob/main/app/web/validator.ts) is used. It encapsulates a `resolver` (for client-side validation) and a `tryValidate` method (for server-side validation).
-- Although the React Router's form API _does not require_ an external library, using `react-hook-form` enhances the user experience by providing real-time validation and automatic focusing on invalid fields.
-- The `handleSubmit` function is used to perform validation and apply focus. Once the data is validated, the submission is delegated back to React Router using `useSubmit`. This is important to keep _consistency_ between document/fetch submissions.
-- Errors returned by the `action` are automatically synchronized with the form state, allowing `formState.errors` to be used as the _single source of truth_ for form errors.
+- Although the React Router's form API _does not require_ an external library, using `react-hook-form` enhances the user experience by providing **real-time validation** and **automatic focusing on invalid fields**.
+- A utility called [`validator`](https://github.com/okalil/discussions-monolith/blob/main/app/web/validator.ts) is used to share validation logic between client and server. It encapsulates a `resolver` (for client-side validation) and a `tryValidate` method (for server-side validation).
+- The `handleSubmit` function is used to perform validation and apply focus. Once the data is validated, the submission is delegated back to React Router using `useSubmit`. This is important to keep **consistency** between document/fetch submissions.
+- Errors returned by the `action` are automatically synchronized with the form state, allowing `formState.errors` to be used as the **single source of truth** for form errors.
 
-See a simplified example of a form following this pattern ([or check full code](https://github.com/okalil/discussions-monolith/blob/main/app/web/ui/discussions/new-discussion.route.tsx)):
+See a simplified example of a form following this pattern ([or check full code](https://github.com/okalil/discussions-monolith/blob/main/app/web/discussions/new-discussion.route.tsx)):
 
 ```tsx
 export default function Component({ actionData }: Route.ComponentProps) {
@@ -106,22 +102,24 @@ export default function Component({ actionData }: Route.ComponentProps) {
           defaultValue={actionData?.values?.body}
         />
       </Field>
-      <Button className="ml-auto" variant="primary">
-        Start Discussion
-      </Button>
+      <Button variant="primary">Start Discussion</Button>
     </Form>
   );
 }
 
-export async function action ({ request }: Route.ActionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const user = auth().getUserOrFail();
   const body = await bodyParser.parse(request);
   const [errors, input] = await createDiscussionValidator.tryValidate(body);
   if (errors) return data({ errors, values: body }, 422);
 
-  const discussion = await discussionService().createDiscussion(input.title, input.body, user.id);
+  const discussion = await discussionService().createDiscussion(
+    input.title,
+    input.body,
+    user.id
+  );
   throw redirect(`/discussions/${discussion.id}`);
-};
+}
 
 const createDiscussionValidator = validator(
   z.object({
@@ -134,18 +132,19 @@ const createDiscussionValidator = validator(
 ### Pending submit button
 
 - Instead of handling loading state for a submit button every time, we can take advantage of React Router's `useFetchers` and `useNavigation` hooks to access the state of any inflight form submissions.
-- Then, we can check whether the button's form's action matches any of them to know if [it should be disabled or showing a spinner](https://github.com/okalil/discussions-monolith/blob/main/app/web/ui/shared/button.tsx).
+- Then, we can check whether the button's form's action matches any of them to know if [it should be disabled or showing a spinner](https://github.com/okalil/discussions-monolith/blob/main/app/web/shared/button.tsx).
 
 ### Fullstack Component Pattern
 
-- A "fullstack component" is a file that colocates UI, loader/action logic, validation, and data fetching for a specific feature or route.
+- A "fullstack component" is a single component file that colocates UI, server-side logic and data handling for a specific feature or route.
 - **These components always use `useFetcher` because they are implemented as React Router resource routes (not UI routes).** This allows them to be embedded in other UI and invoked programmatically, rather than being tied to navigation.
 - Typical structure includes:
+
   - UI component (React function)
   - Route loader and/or action (for data fetching and mutations)
   - Validation schema (using the shared validator utility)
-  - Data fetching or mutation functions from the core/domain layer
-- Example: `edit-comment.route.tsx`
+
+- Data mutation example: `web/discussion/edit-comment.route.tsx`
 
   ```tsx
   export function EditComment({ comment, onCancel }) {
@@ -165,15 +164,17 @@ const createDiscussionValidator = validator(
     const body = await bodyParser.parse(request);
     const [error, input] = await updateCommentValidator.tryValidate(body);
     if (error) return data({ error, body }, 422);
+
     await commentService().updateComment(+params.id, input.body, user.id);
     return { ok: true };
   }
+
   const updateCommentValidator = validator(
     z.object({ body: z.string().trim().min(1) })
   );
   ```
 
-- Example: `discussion-hovercard.route.tsx`
+- Data fetching example: `web/discussions/discussion-hovercard.route.tsx`
 
   ```tsx
   export async function loader({ params }) {
@@ -199,8 +200,6 @@ const createDiscussionValidator = validator(
     );
   }
   ```
-
-- This pattern makes easy to reason about a feature's full stack in one place.
 
 ## Running
 
