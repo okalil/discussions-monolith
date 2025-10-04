@@ -10,6 +10,7 @@ The purpose is to provide a reference implementation for monolithic applications
 - [Directory Structure](#directory-structure)
 - [Patterns and Conventions](#patterns-and-conventions)
 - [Running](#running)
+- [Infrastructure](#infrastructure)
 
 ## Design Principles
 
@@ -223,6 +224,12 @@ Apply migrations to the database:
 pnpm db:migrate
 ```
 
+If you need to seed the database, use the following command:
+
+```bash
+pnpm db:seed
+```
+
 ### Development
 
 Start the development server with HMR:
@@ -232,6 +239,115 @@ pnpm dev
 ```
 
 Your application will be available at `http://localhost:5173`.
+
+## Infrastructure
+
+This section describes the infrastructure components used in the application, including the database, mailer, file storage, and hosting setup.
+
+### Database
+
+The application uses **Cloudflare D1**, a serverless SQLite database, with **Drizzle ORM** for migrations and schema management.
+
+#### Configuration
+The database is configured in the `wrangler.jsonc` file. Example:
+
+```jsonc
+"d1_databases": [
+  {
+    "binding": "DB",
+    "database_name": "discussions",
+    "migrations_dir": "drizzle/migrations"
+  }
+]
+```
+
+#### Applying Migrations
+Run the following command to apply database migrations:
+
+```bash
+pnpm db:migrate
+```
+
+#### Seeding the Database
+If you need to seed the database, use the following command:
+
+```bash
+pnpm db:seed
+```
+
+---
+
+### Mailer
+
+The application uses **Resend** for sending transactional emails.
+
+#### Configuration
+Set the `RESEND_API_KEY` environment variable in the `.env` file to configure the mailer. Example:
+
+```env
+RESEND_API_KEY=your-resend-api-key
+```
+
+#### Example Usage
+Emails are sent using the `EmailClient` interface. For example:
+
+```ts
+await mailer.send({
+  to: "user@example.com",
+  subject: "Welcome to Discussions",
+  template: WelcomeEmailTemplate({ name: "User" }),
+});
+```
+
+---
+
+### Storage
+
+The application uses **Cloudflare R2** for file storage.
+
+#### Configuration
+Set the following environment variables in the `.env` file:
+
+```env
+STORAGE_BUCKET=your-bucket-name
+STORAGE_REGION=your-region
+```
+
+#### Example Usage
+Files can be uploaded and retrieved using the `StorageClient` interface.
+
+---
+
+### Hosting
+
+The application is hosted on **Cloudflare Workers**.
+
+#### Configuration
+Set up the `wrangler.jsonc` file with the necessary configuration. Example:
+
+```jsonc
+{
+  "name": "discussions",
+  "main": "./app/entry.worker.ts",
+  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_date": "2025-04-04",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "discussions",
+      "migrations_dir": "drizzle/migrations"
+    }
+  ],
+  "r2_buckets": [{ "binding": "R2", "bucket_name": "discussions-uploads" }]
+}
+```
+
+#### Deployment
+Run the following command to deploy the app:
+
+```bash
+pnpm wrangler publish
+```
 
 ---
 
