@@ -1,16 +1,15 @@
 import { Form, href, NavLink, useSearchParams } from "react-router";
 import * as z from "zod";
 
-import { auth } from "~/web/auth";
-import { categoryService, discussionService } from "~/web/bindings";
-import { Button } from "~/web/shared/button";
-import { Icon } from "~/web/shared/icon";
-import { Input } from "~/web/shared/input";
-import { Pagination } from "~/web/shared/pagination";
-import { validator } from "~/web/validator";
-
 import type { Route } from "./+types/discussions.route";
 
+import { auth } from "../auth";
+import { categoryService, discussionService } from "../bindings";
+import { Button } from "../shared/button";
+import { Icon } from "../shared/icon";
+import { Input } from "../shared/input";
+import { Pagination } from "../shared/pagination";
+import { validator } from "../validator";
 import { DiscussionRow } from "./discussion-row";
 
 export const meta: Route.MetaFunction = () => [{ title: "Top Discussions" }];

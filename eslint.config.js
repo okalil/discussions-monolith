@@ -5,7 +5,7 @@ import tseslint from "typescript-eslint";
 import perfectionist from "eslint-plugin-perfectionist";
 
 export default tseslint.config(
-  { ignores: ["dist", ".react-router"] },
+  { ignores: ["build", ".react-router"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
@@ -28,6 +28,7 @@ export default tseslint.config(
         },
       ],
       "perfectionist/sort-imports": ["error"],
+      quotes: ["error", "double"],
     },
   }
 );

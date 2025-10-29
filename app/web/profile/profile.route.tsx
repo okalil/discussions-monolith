@@ -3,18 +3,18 @@ import { useForm } from "react-hook-form";
 import { data, Form, redirect, useSubmit } from "react-router";
 import * as z from "zod";
 
-import { auth } from "~/web/auth";
-import { userService } from "~/web/bindings";
-import { bodyParser } from "~/web/body-parser";
-import { session } from "~/web/session";
-import { Avatar } from "~/web/shared/avatar";
-import { Button } from "~/web/shared/button";
-import { ErrorMessage } from "~/web/shared/error-message";
-import { Field } from "~/web/shared/field";
-import { Input } from "~/web/shared/input";
-import { validator } from "~/web/validator";
-
 import type { Route } from "./+types/profile.route";
+
+import { auth } from "../auth";
+import { userService } from "../bindings";
+import { bodyParser } from "../body-parser";
+import { session } from "../session";
+import { Avatar } from "../shared/avatar";
+import { Button } from "../shared/button";
+import { ErrorMessage } from "../shared/error-message";
+import { Field } from "../shared/field";
+import { Input } from "../shared/input";
+import { validator } from "../validator";
 
 export const meta: Route.MetaFunction = () => [
   { title: "Discussions | Profile" },

@@ -2,18 +2,17 @@ import { useForm } from "react-hook-form";
 import { data, Form, redirect, useSubmit } from "react-router";
 import * as z from "zod";
 
-import { auth } from "~/web/auth";
-import { categoryService, discussionService } from "~/web/bindings";
-import { bodyParser } from "~/web/body-parser";
-import { Button } from "~/web/shared/button";
-import { ErrorMessage } from "~/web/shared/error-message";
-import { Field } from "~/web/shared/field";
-import { Input } from "~/web/shared/input";
-import { Textarea } from "~/web/shared/textarea";
-import { validator } from "~/web/validator";
-
 import type { Route } from "./+types/new-discussion.route";
 
+import { auth } from "../auth";
+import { categoryService, discussionService } from "../bindings";
+import { bodyParser } from "../body-parser";
+import { Button } from "../shared/button";
+import { ErrorMessage } from "../shared/error-message";
+import { Field } from "../shared/field";
+import { Input } from "../shared/input";
+import { Textarea } from "../shared/textarea";
+import { validator } from "../validator";
 import "./new-discussion.css";
 
 export async function loader() {

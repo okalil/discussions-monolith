@@ -1,15 +1,15 @@
 import { data, href, useFetcher } from "react-router";
 import * as z from "zod";
 
-import { auth } from "~/web/auth";
-import { commentService } from "~/web/bindings";
-import { bodyParser } from "~/web/body-parser";
-import { Button } from "~/web/shared/button";
-import { Field } from "~/web/shared/field";
-import { Textarea } from "~/web/shared/textarea";
-import { validator } from "~/web/validator";
-
 import type { Route } from "./+types/create-comment.route";
+
+import { auth } from "../auth";
+import { commentService } from "../bindings";
+import { bodyParser } from "../body-parser";
+import { Button } from "../shared/button";
+import { Field } from "../shared/field";
+import { Textarea } from "../shared/textarea";
+import { validator } from "../validator";
 
 interface CreateCommentProps {
   discussionId: number;

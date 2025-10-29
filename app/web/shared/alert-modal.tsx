@@ -1,8 +1,7 @@
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 
-import { cn } from "~/web/shared/utils/cn";
-
 import { Button } from "./button";
+import { cn } from "./utils/cn";
 
 interface AlertModalProps extends AlertDialog.AlertDialogProps {
   className?: string;

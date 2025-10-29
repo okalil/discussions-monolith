@@ -1,8 +1,8 @@
 import { Outlet, redirect } from "react-router";
 
-import { auth } from "~/web/auth";
-
 import type { Route } from "./+types/anonymous.route";
+
+import { auth } from "../auth";
 
 export const middleware: Route.MiddlewareFunction[] = [
   function anonymousMiddleware() {

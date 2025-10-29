@@ -1,8 +1,8 @@
 import { use } from "react";
 
-import type { ParticipantsDto } from "~/core/discussion";
+import type { ParticipantsDto } from "../../core/discussion";
 
-import { Avatar } from "~/web/shared/avatar";
+import { Avatar } from "../shared/avatar";
 
 interface ParticipantsProps {
   participants: Promise<ParticipantsDto>;

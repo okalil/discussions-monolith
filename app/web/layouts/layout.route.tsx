@@ -2,12 +2,12 @@ import type { ShouldRevalidateFunction } from "react-router";
 
 import { Link, Outlet, Form } from "react-router";
 
-import { auth } from "~/web/auth";
-import { Avatar } from "~/web/shared/avatar";
-import { Button } from "~/web/shared/button";
-import { cn } from "~/web/shared/utils/cn";
-
 import type { Route } from "./+types/layout.route";
+
+import { auth } from "../auth";
+import { Avatar } from "../shared/avatar";
+import { Button } from "../shared/button";
+import { cn } from "../shared/utils/cn";
 
 export async function loader() {
   const user = auth().getUser();

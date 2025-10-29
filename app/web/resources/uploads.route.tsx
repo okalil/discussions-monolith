@@ -1,6 +1,6 @@
-import { storage } from "~/web/bindings";
-
 import type { Route } from "./+types/uploads.route";
+
+import { storage } from "../bindings";
 
 export async function loader({ params }: Route.LoaderArgs) {
   const key = params["*"];

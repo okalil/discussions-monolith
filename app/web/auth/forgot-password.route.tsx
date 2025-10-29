@@ -2,16 +2,15 @@ import { useForm } from "react-hook-form";
 import { data, Form, Link, redirect, useSubmit } from "react-router";
 import * as z from "zod";
 
-import { accountService, userService } from "~/web/bindings";
-import { bodyParser } from "~/web/body-parser";
-import { session } from "~/web/session";
-import { Button } from "~/web/shared/button";
-import { Input } from "~/web/shared/input";
-import { validator } from "~/web/validator";
-
 import type { Route } from "./+types/forgot-password.route";
 
+import { accountService, userService } from "../bindings";
+import { bodyParser } from "../body-parser";
+import { session } from "../session";
+import { Button } from "../shared/button";
 import { Field } from "../shared/field";
+import { Input } from "../shared/input";
+import { validator } from "../validator";
 
 export default function Component({ actionData }: Route.ComponentProps) {
   const submit = useSubmit();

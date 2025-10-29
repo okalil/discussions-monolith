@@ -1,6 +1,6 @@
 import { redirect } from "react-router";
 
-import { auth } from "~/web/auth";
+import { auth } from "../auth";
 
 export async function action() {
   await auth().logout();

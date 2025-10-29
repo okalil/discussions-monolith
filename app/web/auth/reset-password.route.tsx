@@ -9,16 +9,16 @@ import {
 } from "react-router";
 import * as z from "zod";
 
-import { accountService } from "~/web/bindings";
-import { bodyParser } from "~/web/body-parser";
-import { session } from "~/web/session";
-import { Button } from "~/web/shared/button";
-import { ErrorMessage } from "~/web/shared/error-message";
-import { Field } from "~/web/shared/field";
-import { Input } from "~/web/shared/input";
-import { validator } from "~/web/validator";
-
 import type { Route } from "./+types/reset-password.route";
+
+import { accountService } from "../bindings";
+import { bodyParser } from "../body-parser";
+import { session } from "../session";
+import { Button } from "../shared/button";
+import { ErrorMessage } from "../shared/error-message";
+import { Field } from "../shared/field";
+import { Input } from "../shared/input";
+import { validator } from "../validator";
 
 export default function Component({ actionData }: Route.ComponentProps) {
   const submit = useSubmit();

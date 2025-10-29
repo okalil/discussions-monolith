@@ -9,14 +9,13 @@ import {
   ScrollRestoration,
 } from "react-router";
 
-import { authMiddleware } from "~/web/auth";
-import { session, sessionMiddleware } from "~/web/session";
-import { NavigationProgress } from "~/web/shared/navigation-progress";
-import { Toaster } from "~/web/shared/toaster";
-
 import type { Route } from "./+types/root";
 
 import stylesheet from "./root.css?url";
+import { authMiddleware } from "./web/auth";
+import { session, sessionMiddleware } from "./web/session";
+import { NavigationProgress } from "./web/shared/navigation-progress";
+import { Toaster } from "./web/shared/toaster";
 
 import "@fontsource-variable/inter";
 

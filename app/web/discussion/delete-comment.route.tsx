@@ -1,10 +1,10 @@
 import { href, useFetcher } from "react-router";
 
-import { auth } from "~/web/auth";
-import { commentService } from "~/web/bindings";
-import { Button } from "~/web/shared/button";
-
 import type { Route } from "./+types/delete-comment.route";
+
+import { auth } from "../auth";
+import { commentService } from "../bindings";
+import { Button } from "../shared/button";
 
 interface DeleteCommentProps {
   commentId: number;

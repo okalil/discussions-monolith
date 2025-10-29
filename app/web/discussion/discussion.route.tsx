@@ -3,15 +3,14 @@ import type { ShouldRevalidateFunctionArgs } from "react-router";
 import { Suspense } from "react";
 import { href, Link, useSearchParams } from "react-router";
 
-import { auth } from "~/web/auth";
-import { discussionService, commentService } from "~/web/bindings";
-import { CommentsList } from "~/web/discussion/comments-list";
-import { Participants } from "~/web/discussion/participants";
-import { Avatar } from "~/web/shared/avatar";
-
 import type { Route } from "./+types/discussion.route";
 
+import { auth } from "../auth";
+import { discussionService, commentService } from "../bindings";
+import { Avatar } from "../shared/avatar";
+import { CommentsList } from "./comments-list";
 import { CreateComment } from "./create-comment.route";
+import { Participants } from "./participants";
 import { VoteDiscussion } from "./vote-discussion.route";
 
 export async function loader({ request, params }: Route.LoaderArgs) {

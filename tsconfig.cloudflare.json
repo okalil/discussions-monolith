@@ -20,9 +20,6 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "rootDirs": [".", "./.react-router/types"],
-    "paths": {
-      "~/*": ["./app/*"]
-    },
     "esModuleInterop": true,
     "resolveJsonModule": true
   }

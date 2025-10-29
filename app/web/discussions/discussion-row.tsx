@@ -1,12 +1,11 @@
 import { Form, Link } from "react-router";
 
-import type { DiscussionsDto } from "~/core/discussion";
-
-import { Avatar } from "~/web/shared/avatar";
-import { Icon } from "~/web/shared/icon";
-import { cn } from "~/web/shared/utils/cn";
+import type { DiscussionsDto } from "../../core/discussion";
 
 import { VoteDiscussion } from "../discussion/vote-discussion.route";
+import { Avatar } from "../shared/avatar";
+import { Icon } from "../shared/icon";
+import { cn } from "../shared/utils/cn";
 import { DiscussionHoverCard } from "./discussion-hovercard.route";
 
 interface DiscussionProps {

@@ -1,11 +1,11 @@
 import * as arctic from "arctic";
 import { createCookie, redirect } from "react-router";
 
-import { auth } from "~/web/auth";
-import { accountService } from "~/web/bindings";
-import { session } from "~/web/session";
-
 import type { Route } from "./+types/social.route";
+
+import { auth } from "../auth";
+import { accountService } from "../bindings";
+import { session } from "../session";
 
 const cookie = createCookie("state", {
   secure: import.meta.env.MODE !== "development",

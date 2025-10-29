@@ -3,7 +3,7 @@ import type { MiddlewareFunction } from "react-router";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { createCookie, redirect } from "react-router";
 
-import type { SessionDto } from "~/core/session";
+import type { SessionDto } from "../core/session";
 
 import { env, sessionService } from "./bindings";
 import { session } from "./session";

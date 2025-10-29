@@ -1,13 +1,13 @@
 import { data, useFetcher } from "react-router";
 import * as z from "zod";
 
-import { auth } from "~/web/auth";
-import { discussionService } from "~/web/bindings";
-import { bodyParser } from "~/web/body-parser";
-import { VoteButton } from "~/web/shared/vote-button";
-import { validator } from "~/web/validator";
-
 import type { Route } from "./+types/vote-discussion.route";
+
+import { auth } from "../auth";
+import { discussionService } from "../bindings";
+import { bodyParser } from "../body-parser";
+import { VoteButton } from "../shared/vote-button";
+import { validator } from "../validator";
 
 interface VoteDiscussionProps extends React.ComponentProps<typeof VoteButton> {
   discussionId: number;

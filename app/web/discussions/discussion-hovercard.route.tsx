@@ -1,10 +1,10 @@
 import * as HoverCard from "@radix-ui/react-hover-card";
 import { Link, useFetcher } from "react-router";
 
-import { discussionService } from "~/web/bindings";
-import { Avatar } from "~/web/shared/avatar";
-
 import type { Route } from "./+types/discussion-hovercard.route";
+
+import { discussionService } from "../bindings";
+import { Avatar } from "../shared/avatar";
 
 export async function loader({ params }: Route.LoaderArgs) {
   const discussion = await discussionService().getDiscussionWithReply(

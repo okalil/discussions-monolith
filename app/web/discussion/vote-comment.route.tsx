@@ -1,13 +1,13 @@
 import { href, useFetcher } from "react-router";
 import * as z from "zod";
 
-import { auth } from "~/web/auth";
-import { commentService } from "~/web/bindings";
-import { bodyParser } from "~/web/body-parser";
-import { VoteButton } from "~/web/shared/vote-button";
-import { validator } from "~/web/validator";
-
 import type { Route } from "./+types/vote-comment.route";
+
+import { auth } from "../auth";
+import { commentService } from "../bindings";
+import { bodyParser } from "../body-parser";
+import { VoteButton } from "../shared/vote-button";
+import { validator } from "../validator";
 
 interface VoteCommentProps extends React.ComponentProps<typeof VoteButton> {
   commentId: number;

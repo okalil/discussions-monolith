@@ -1,12 +1,12 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 
-import type { AccountService } from "~/core/account";
-import type { CategoryService } from "~/core/category";
-import type { CommentService } from "~/core/comment";
-import type { DiscussionService } from "~/core/discussion";
-import type { StorageClient } from "~/core/integrations/storage";
-import type { SessionService } from "~/core/session";
-import type { UserService } from "~/core/user";
+import type { AccountService } from "../core/account";
+import type { CategoryService } from "../core/category";
+import type { CommentService } from "../core/comment";
+import type { DiscussionService } from "../core/discussion";
+import type { StorageClient } from "../core/integrations/storage";
+import type { SessionService } from "../core/session";
+import type { UserService } from "../core/user";
 
 interface BindingsContext {
   env: Env;
