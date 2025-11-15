@@ -157,8 +157,6 @@ export class AccountService {
   }
 
   private hashPassword(password: string): string {
-    console.log("Using scrypt password hashing");
-
     const salt = crypto.randomBytes(16);
     const hash = crypto.scryptSync(password, salt, 64);
 
@@ -166,8 +164,6 @@ export class AccountService {
   }
 
   private verifyPassword(password: string, hashedPassword: string): boolean {
-    console.log("Using scrypt password verification");
-
     const [saltHex, hashHex] = hashedPassword.split(":");
 
     const salt = Buffer.from(saltHex, "hex");
