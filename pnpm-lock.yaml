@@ -14,9 +14,6 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.2.1
         version: 5.2.1(react-hook-form@7.62.0(react@19.1.1))
-      '@mjackson/file-storage':
-        specifier: ^0.6.1
-        version: 0.6.1
       '@radix-ui/react-alert-dialog':
         specifier: ^1.1.15
         version: 1.1.15(@types/react-dom@19.1.9(@types/react@19.1.12))(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -32,12 +29,12 @@ importers:
       '@react-email/components':
         specifier: ^0.0.31
         version: 0.0.31(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@remix-run/file-storage':
+        specifier: ^0.10.0
+        version: 0.10.0
       arctic:
         specifier: ^3.7.0
         version: 3.7.0
-      bcryptjs:
-        specifier: ^3.0.2
-        version: 3.0.2
       drizzle-orm:
         specifier: ^0.38.4
         version: 0.38.4(@libsql/client@0.15.14)(@types/better-sqlite3@7.6.13)(@types/react@19.1.12)(better-sqlite3@11.10.0)(react@19.1.1)
@@ -54,8 +51,8 @@ importers:
         specifier: ^7.62.0
         version: 7.62.0(react@19.1.1)
       react-router:
-        specifier: 7.9.3
-        version: 7.9.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+        specifier: 7.9.6
+        version: 7.9.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       resend:
         specifier: ^6.0.2
         version: 6.0.2
@@ -68,7 +65,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.12.1
-        version: 1.12.1(vite@7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))(workerd@1.20250823.0)(wrangler@4.33.1)
+        version: 1.12.1(vite@7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))(workerd@1.20250823.0)(wrangler@4.33.1)
       '@eslint/js':
         specifier: ^9.34.0
         version: 9.34.0
@@ -76,8 +73,8 @@ importers:
         specifier: ^9.9.0
         version: 9.9.0
       '@react-router/dev':
-        specifier: 7.9.3
-        version: 7.9.3(@types/node@20.19.11)(@vitejs/plugin-rsc@0.4.11(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)))(jiti@2.4.2)(react-router@7.9.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(tsx@4.20.5)(typescript@5.9.2)(vite@7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))(wrangler@4.33.1)(yaml@2.8.1)
+        specifier: 7.9.6
+        version: 7.9.6(@types/node@20.19.11)(@vitejs/plugin-rsc@0.4.11(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)))(jiti@2.4.2)(react-router@7.9.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(tsx@4.20.5)(typescript@5.9.2)(vite@7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))(wrangler@4.33.1)(yaml@2.8.1)
       '@types/node':
         specifier: ^20.19.11
         version: 20.19.11
@@ -127,11 +124,11 @@ importers:
         specifier: ^8.41.0
         version: 8.41.0(eslint@9.34.0(jiti@2.4.2))(typescript@5.9.2)
       vite:
-        specifier: ^7.1.9
-        version: 7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
+        specifier: ^7.2.2
+        version: 7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
       vite-plugin-devtools-json:
         specifier: ^1.0.0
-        version: 1.0.0(vite@7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))
+        version: 1.0.0(vite@7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))
       wrangler:
         specifier: ^4.33.1
         version: 4.33.1
@@ -1197,12 +1194,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@mjackson/file-storage@0.6.1':
-    resolution: {integrity: sha512-H3GEVpmfmNryNoYloddIOba5OAwckfVGMvutPeI94Shbv/R+NVh89gIYa8SK3Vfa+ky9PitclP+5XQ6/zlSdQQ==}
-
-  '@mjackson/lazy-file@3.4.0':
-    resolution: {integrity: sha512-zQ/b3hEpHI7YQJjPeEKo1U9DVmLV7bNKFFYJbG20TM4bCug2u1CoBZ5IHlaIrI6oq6HuYs1FpqdtKSQyjWAN7g==}
-
   '@mjackson/node-fetch-server@0.2.0':
     resolution: {integrity: sha512-EMlH1e30yzmTpGLQjlFmaDAjyOeZhng1/XCd7DExR8PNAnG/G1tyruZxEoUe11ClnwGhGrtsdnyyUx1frSzjng==}
 
@@ -1722,14 +1713,14 @@ packages:
     peerDependencies:
       react: ^18.0 || ^19.0 || ^19.0.0-rc
 
-  '@react-router/dev@7.9.3':
-    resolution: {integrity: sha512-oPaO+OpvCo/rNTJrRipHSp31/K4It19PE5A24x21FlYlemPTe3fbGX/kyC2+8au/abXbvzNHfRbuIBD/rfojmA==}
+  '@react-router/dev@7.9.6':
+    resolution: {integrity: sha512-pBkbczGwI+NcZPcK8JPvWGWdjUpT/+okXYp6IXvt7zI3WLxr5hQLLRox5FkLiVxkykbqARO1hk9NRp9KFwJ2sA==}
     engines: {node: '>=20.0.0'}
     hasBin: true
     peerDependencies:
-      '@react-router/serve': ^7.9.3
+      '@react-router/serve': ^7.9.6
       '@vitejs/plugin-rsc': '*'
-      react-router: ^7.9.3
+      react-router: ^7.9.6
       typescript: ^5.1.0
       vite: ^5.1.0 || ^6.0.0 || ^7.0.0
       wrangler: ^3.28.2 || ^4.0.0
@@ -1743,15 +1734,21 @@ packages:
       wrangler:
         optional: true
 
-  '@react-router/node@7.9.3':
-    resolution: {integrity: sha512-+OvWxPPUgouOshw85QlG0J6yFJM0GMCCpXqPj38IcveeFLlP7ppOAEkOi7RBFrDvg7vSUtCEBDnsbuDCvxUPJg==}
+  '@react-router/node@7.9.6':
+    resolution: {integrity: sha512-XzU8gPHwSl2Qh8/bOV30npbpH2fWOO3sFg+SwhX3+IddD1a/0C2KQzRiW/qAngkvZTJVdbca5Qp+FJjCCE7sNw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      react-router: 7.9.3
+      react-router: 7.9.6
       typescript: ^5.1.0
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  '@remix-run/file-storage@0.10.0':
+    resolution: {integrity: sha512-s+xNp1Tu0HQJcbuN3ASD3ri+6GET+HAU3IIpenUmazXnRAeXe2qBpOp3+nyUZrZXp1kr3wBUnvl0DS8OyFQW/Q==}
+
+  '@remix-run/lazy-file@3.6.0':
+    resolution: {integrity: sha512-z+Ze2SinJoko3D0AGWCFGPKLmszC3mxn5/Fcqn/aR+xva8JC/lJVNY/xl45tZmGhsW2cu9hiAPHkC+DHuVdl2w==}
 
   '@remix-run/node-fetch-server@0.8.0':
     resolution: {integrity: sha512-8/sKegb4HrM6IdcQeU0KPhj9VOHm5SUqswJDHuMCS3mwbr/NRx078QDbySmn0xslahvvZoOENd7EnK40kWKxkg==}
@@ -2048,10 +2045,6 @@ packages:
   base64id@2.0.0:
     resolution: {integrity: sha512-lGe34o6EHj9y3Kts9R4ZYs/Gr+6N7MCaMlIFA3F1R2O5/m7K06AxfSeO5530PEERE6/WyEg3lsuyw4GHlPZHog==}
     engines: {node: ^4.5.0 || >= 5.9}
-
-  bcryptjs@3.0.2:
-    resolution: {integrity: sha512-k38b3XOZKv60C4E2hVsXTolJWfkGRMbILBIe2IBITXciy5bOsTKot5kDrf3ZfufQtQOUN5mXceUEpU1rTl9Uog==}
-    hasBin: true
 
   better-sqlite3@11.10.0:
     resolution: {integrity: sha512-EwhOpyXiOEL/lKzHz9AW1msWFNzGc/z+LzeB3/jnFJpxu+th2yqvzsSWas1v9jgs9+xiXJcD5A8CJxAG2TaghQ==}
@@ -3049,6 +3042,10 @@ packages:
     resolution: {integrity: sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==}
     engines: {node: '>=10'}
 
+  p-map@7.0.4:
+    resolution: {integrity: sha512-tkAQEw8ysMzmkhgw8k+1U/iPhWNhykKnSk4Rd5zLoPJCuJaGRPo6YposrZgaxHKzDHdDWWZvE/Sk7hsL2X/CpQ==}
+    engines: {node: '>=18'}
+
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
@@ -3259,8 +3256,8 @@ packages:
       '@types/react':
         optional: true
 
-  react-router@7.9.3:
-    resolution: {integrity: sha512-4o2iWCFIwhI/eYAIL43+cjORXYn/aRQPgtFRRZb3VzoyQ5Uej0Bmqj7437L97N9NJW4wnicSwLOLS+yCXfAPgg==}
+  react-router@7.9.6:
+    resolution: {integrity: sha512-Y1tUp8clYRXpfPITyuifmSoE2vncSME18uVLgaqyxh9H35JWpIfzHo+9y3Fzh5odk/jxPW29IgLgzcdwxGqyNA==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
@@ -3623,8 +3620,8 @@ packages:
     resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
     hasBin: true
 
-  valibot@0.41.0:
-    resolution: {integrity: sha512-igDBb8CTYr8YTQlOKgaN9nSS0Be7z+WRuaeYqGf3Cjz3aKmSnqEmYnkfVjzIuumGqfHpa3fLIvMEAfhrpqN8ng==}
+  valibot@1.1.0:
+    resolution: {integrity: sha512-Nk8lX30Qhu+9txPYTwM0cFlWLdPFsFr6LblzqIySfbZph9+BFsAHsNvHOymEviUepeIW6KFHzpX8TKhbptBXXw==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -3652,48 +3649,8 @@ packages:
     peerDependencies:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0
 
-  vite@6.3.5:
-    resolution: {integrity: sha512-cZn6NDFE7wdTpINgs++ZJ4N49W2vRp8LCKrn3Ob1kYNtOo21vfDoaV5GzBfLU4MovSAB8uNRm4jgzVQZ+mBzPQ==}
-    engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': ^18.0.0 || ^20.0.0 || >=22.0.0
-      jiti: '>=1.21.0'
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      sass-embedded: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.16.0
-      tsx: ^4.8.1
-      yaml: ^2.4.2
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      jiti:
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      sass-embedded:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-      tsx:
-        optional: true
-      yaml:
-        optional: true
-
-  vite@7.1.9:
-    resolution: {integrity: sha512-4nVGliEpxmhCL8DslSAUdxlB6+SMrhB0a1v5ijlh1xB1nEPuy1mxaHxysVucLHuWryAxLWg6a5ei+U4TLn/rFg==}
+  vite@7.2.2:
+    resolution: {integrity: sha512-BxAKBWmIbrDgrokdGZH1IgkIk/5mMHDreLDmCJ0qpyJaAteP8NvMhkwr/ZCQNqNH97bw/dANTE9PDzqwJghfMQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -4049,7 +4006,7 @@ snapshots:
     optionalDependencies:
       workerd: 1.20250823.0
 
-  '@cloudflare/vite-plugin@1.12.1(vite@7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))(workerd@1.20250823.0)(wrangler@4.33.1)':
+  '@cloudflare/vite-plugin@1.12.1(vite@7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))(workerd@1.20250823.0)(wrangler@4.33.1)':
     dependencies:
       '@cloudflare/unenv-preset': 2.7.0(unenv@2.0.0-rc.19)(workerd@1.20250823.0)
       '@remix-run/node-fetch-server': 0.8.0
@@ -4058,7 +4015,7 @@ snapshots:
       picocolors: 1.1.1
       tinyglobby: 0.2.14
       unenv: 2.0.0-rc.19
-      vite: 7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
+      vite: 7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
       wrangler: 4.33.1
       ws: 8.18.0
     transitivePeerDependencies:
@@ -4649,14 +4606,6 @@ snapshots:
   '@libsql/win32-x64-msvc@0.5.20':
     optional: true
 
-  '@mjackson/file-storage@0.6.1':
-    dependencies:
-      '@mjackson/lazy-file': 3.4.0
-
-  '@mjackson/lazy-file@3.4.0':
-    dependencies:
-      mrmime: 2.0.1
-
   '@mjackson/node-fetch-server@0.2.0': {}
 
   '@mjackson/node-fetch-server@0.7.0':
@@ -5167,7 +5116,7 @@ snapshots:
     dependencies:
       react: 19.1.1
 
-  '@react-router/dev@7.9.3(@types/node@20.19.11)(@vitejs/plugin-rsc@0.4.11(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)))(jiti@2.4.2)(react-router@7.9.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(tsx@4.20.5)(typescript@5.9.2)(vite@7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))(wrangler@4.33.1)(yaml@2.8.1)':
+  '@react-router/dev@7.9.6(@types/node@20.19.11)(@vitejs/plugin-rsc@0.4.11(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)))(jiti@2.4.2)(react-router@7.9.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(tsx@4.20.5)(typescript@5.9.2)(vite@7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))(wrangler@4.33.1)(yaml@2.8.1)':
     dependencies:
       '@babel/core': 7.28.3
       '@babel/generator': 7.28.3
@@ -5177,7 +5126,7 @@ snapshots:
       '@babel/traverse': 7.28.3
       '@babel/types': 7.28.2
       '@npmcli/package-json': 4.0.1
-      '@react-router/node': 7.9.3(react-router@7.9.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
+      '@react-router/node': 7.9.6(react-router@7.9.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)
       '@remix-run/node-fetch-server': 0.9.0
       arg: 5.0.2
       babel-dead-code-elimination: 1.0.10
@@ -5188,18 +5137,19 @@ snapshots:
       isbot: 5.1.30
       jsesc: 3.0.2
       lodash: 4.17.21
+      p-map: 7.0.4
       pathe: 1.1.2
       picocolors: 1.1.1
       prettier: 3.6.2
       react-refresh: 0.14.2
-      react-router: 7.9.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      react-router: 7.9.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       semver: 7.7.2
-      tinyglobby: 0.2.14
-      valibot: 0.41.0(typescript@5.9.2)
-      vite: 7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
+      tinyglobby: 0.2.15
+      valibot: 1.1.0(typescript@5.9.2)
+      vite: 7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
       vite-node: 3.2.4(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
     optionalDependencies:
-      '@vitejs/plugin-rsc': 0.4.11(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))
+      '@vitejs/plugin-rsc': 0.4.11(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))
       typescript: 5.9.2
       wrangler: 4.33.1
     transitivePeerDependencies:
@@ -5218,12 +5168,20 @@ snapshots:
       - tsx
       - yaml
 
-  '@react-router/node@7.9.3(react-router@7.9.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)':
+  '@react-router/node@7.9.6(react-router@7.9.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.9.2)':
     dependencies:
       '@mjackson/node-fetch-server': 0.2.0
-      react-router: 7.9.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      react-router: 7.9.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
     optionalDependencies:
       typescript: 5.9.2
+
+  '@remix-run/file-storage@0.10.0':
+    dependencies:
+      '@remix-run/lazy-file': 3.6.0
+
+  '@remix-run/lazy-file@3.6.0':
+    dependencies:
+      mrmime: 2.0.1
 
   '@remix-run/node-fetch-server@0.8.0': {}
 
@@ -5425,7 +5383,7 @@ snapshots:
       '@typescript-eslint/types': 8.41.0
       eslint-visitor-keys: 4.2.1
 
-  '@vitejs/plugin-rsc@0.4.11(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))':
+  '@vitejs/plugin-rsc@0.4.11(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(vite@7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))':
     dependencies:
       '@mjackson/node-fetch-server': 0.7.0
       es-module-lexer: 1.7.0
@@ -5435,8 +5393,8 @@ snapshots:
       react: 19.1.1
       react-dom: 19.1.1(react@19.1.1)
       turbo-stream: 3.1.0
-      vite: 7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
-      vitefu: 1.1.1(vite@7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))
+      vite: 7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
+      vitefu: 1.1.1(vite@7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1))
     optional: true
 
   accepts@1.3.8:
@@ -5517,8 +5475,6 @@ snapshots:
     optional: true
 
   base64id@2.0.0: {}
-
-  bcryptjs@3.0.2: {}
 
   better-sqlite3@11.10.0:
     dependencies:
@@ -6505,6 +6461,8 @@ snapshots:
     dependencies:
       p-limit: 3.1.0
 
+  p-map@7.0.4: {}
+
   package-json-from-dist@1.0.1: {}
 
   parent-module@1.0.1:
@@ -6717,7 +6675,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.1.12
 
-  react-router@7.9.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
+  react-router@7.9.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
     dependencies:
       cookie: 1.0.2
       react: 19.1.1
@@ -7149,7 +7107,7 @@ snapshots:
 
   uuid@11.1.0: {}
 
-  valibot@0.41.0(typescript@5.9.2):
+  valibot@1.1.0(typescript@5.9.2):
     optionalDependencies:
       typescript: 5.9.2
 
@@ -7168,7 +7126,7 @@ snapshots:
       debug: 4.4.1
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 6.3.5(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
+      vite: 7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -7183,27 +7141,12 @@ snapshots:
       - tsx
       - yaml
 
-  vite-plugin-devtools-json@1.0.0(vite@7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)):
+  vite-plugin-devtools-json@1.0.0(vite@7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)):
     dependencies:
       uuid: 11.1.0
-      vite: 7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
+      vite: 7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
 
-  vite@6.3.5(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1):
-    dependencies:
-      esbuild: 0.25.9
-      fdir: 6.5.0(picomatch@4.0.3)
-      picomatch: 4.0.3
-      postcss: 8.5.6
-      rollup: 4.49.0
-      tinyglobby: 0.2.14
-    optionalDependencies:
-      '@types/node': 20.19.11
-      fsevents: 2.3.3
-      jiti: 2.4.2
-      tsx: 4.20.5
-      yaml: 2.8.1
-
-  vite@7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1):
+  vite@7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.9
       fdir: 6.5.0(picomatch@4.0.3)
@@ -7218,9 +7161,9 @@ snapshots:
       tsx: 4.20.5
       yaml: 2.8.1
 
-  vitefu@1.1.1(vite@7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)):
+  vitefu@1.1.1(vite@7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)):
     optionalDependencies:
-      vite: 7.1.9(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
+      vite: 7.2.2(@types/node@20.19.11)(jiti@2.4.2)(tsx@4.20.5)(yaml@2.8.1)
     optional: true
 
   web-streams-polyfill@3.3.3:

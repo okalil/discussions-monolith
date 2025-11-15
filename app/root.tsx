@@ -28,8 +28,10 @@ export const meta: Route.MetaFunction = () => [{ title: "Discussions" }];
 
 export async function loader() {
   return {
-    success: session().get("success"),
-    error: session().get("error"),
+    toasts: {
+      success: session().get("success"),
+      error: session().get("error"),
+    },
   };
 }
 
@@ -37,7 +39,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
   return (
     <Document>
       <Outlet />
-      <Toaster serverToasts={loaderData} />
+      <Toaster sessionToasts={loaderData.toasts} />
     </Document>
   );
 }
@@ -74,7 +76,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 }
 
 // the root loader is only being used to fetch toasts added in server actions
-// so it only needs to revalidate when it's a non-GET form submission
+// so it only needs to revalidate for non-GET form submissions
 export function shouldRevalidate(args: ShouldRevalidateFunctionArgs) {
   return Boolean(args.formMethod && args.formMethod !== "GET");
 }

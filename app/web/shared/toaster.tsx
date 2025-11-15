@@ -1,21 +1,21 @@
 import { useEffect } from "react";
 import { toast, Toaster as SonnerToaster } from "sonner";
 
-interface ServerToasts {
+interface SessionToasts {
   success?: string;
   error?: string;
 }
 
 interface ToasterProps {
-  serverToasts?: ServerToasts;
+  sessionToasts?: SessionToasts;
 }
 
-export function Toaster({ serverToasts = {} }: ToasterProps) {
+export function Toaster({ sessionToasts = {} }: ToasterProps) {
   useEffect(() => {
-    const { success, error } = serverToasts;
+    const { success, error } = sessionToasts;
     if (success) toast.success(success);
     if (error) toast.error(error, { duration: 5000 });
-  }, [serverToasts]);
+  }, [sessionToasts]);
 
   return <SonnerToaster richColors closeButton position="top-right" />;
 }

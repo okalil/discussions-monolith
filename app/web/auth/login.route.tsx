@@ -13,7 +13,7 @@ import * as z from "zod";
 import type { Route } from "./+types/login.route";
 
 import { auth } from "../auth";
-import { env, userService } from "../bindings";
+import { accountService, env } from "../bindings";
 import { bodyParser } from "../body-parser";
 import { session } from "../session";
 import { Button } from "../shared/button";
@@ -136,7 +136,7 @@ export async function action({ request }: Route.ActionArgs) {
     return data({ errors, email: body.email }, 422);
   }
 
-  const user = await userService().getUserByCredentials(
+  const user = await accountService().getUserByCredentials(
     input.email,
     input.password
   );

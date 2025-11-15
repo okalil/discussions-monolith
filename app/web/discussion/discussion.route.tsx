@@ -1,5 +1,3 @@
-import type { ShouldRevalidateFunctionArgs } from "react-router";
-
 import { Suspense } from "react";
 import { href, Link, useSearchParams } from "react-router";
 
@@ -38,7 +36,7 @@ export default function Component({
   matches,
 }: Route.ComponentProps) {
   const { discussion, comments, participants } = loaderData;
-  const { user } = matches[1].data;
+  const { user } = matches[1].loaderData;
   const authenticated = !!user;
 
   return (
@@ -185,12 +183,4 @@ function CommentSort({ sort, children }: CommentSortProps) {
       {children}
     </Link>
   );
-}
-
-// This shouldRevalidate shouldn't be necessary since the default behavior
-// is to skip revalidation after a non-200 status action result
-// Open issue: https://github.com/remix-run/react-router/issues/13062
-export function shouldRevalidate(args: ShouldRevalidateFunctionArgs) {
-  if (args.actionStatus && args.actionStatus !== 200) return false;
-  return args.defaultShouldRevalidate;
 }

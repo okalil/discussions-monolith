@@ -8,7 +8,7 @@ class BodyParser {
     return this.parseForm(formData);
   }
 
-  // Example with @mjackson/form-data-parser
+  // Example with @remix-run/form-data-parser
   // async parse(
   //   request: Request,
   //   fileUploads?: Record<string, FileUploadHandler>,

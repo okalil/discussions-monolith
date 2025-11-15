@@ -1,5 +1,4 @@
-import bcrypt from "bcryptjs";
-import { and, eq, desc, sql } from "drizzle-orm";
+import { and, eq, desc, sql, getTableColumns } from "drizzle-orm";
 import crypto from "node:crypto";
 
 import type { AuthProvider } from "./integrations/auth/provider";
@@ -27,8 +26,33 @@ export class AccountService {
 
   /* CREDENTIAL ACCOUNT */
 
+  async getUserByCredentials(email: string, password: string) {
+    const accounts = await this.db
+      .select({
+        password: schema.accounts.password,
+        user: getTableColumns(schema.users),
+      })
+      .from(schema.accounts)
+      .leftJoin(schema.users, eq(schema.users.id, schema.accounts.userId))
+      .where(
+        and(
+          eq(schema.accounts.type, "credential"),
+          eq(schema.users.email, email)
+        )
+      );
+    const account = accounts.at(0);
+
+    if (!account?.user || !account.password) return null;
+
+    const isValid = this.verifyPassword(password, account.password);
+    if (!isValid) return null;
+
+    return account.user;
+  }
+
   async createCredentialAccount(name: string, email: string, password: string) {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = this.hashPassword(password);
+
     const [user] = await this.db
       .insert(schema.users)
       .values({ email, name })
@@ -65,16 +89,16 @@ export class AccountService {
       return false;
     }
 
-    const isValid = await bcrypt.compare(token, verificationToken.token);
+    const isValid = this.verifyPassword(token, verificationToken.token);
     if (!isValid) {
       return false;
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = this.hashPassword(password);
 
     await this.updatePassword(verificationToken.identifier, hashedPassword);
     await this.deleteVerificationToken(verificationToken.token);
-    
+
     await this.mailer.send({
       to: email,
       subject: "Discussions, Password Successfully Reset",
@@ -83,7 +107,7 @@ export class AccountService {
         email,
       }),
     });
-    
+
     return true;
   }
 
@@ -110,7 +134,7 @@ export class AccountService {
     await this.db.insert(schema.verificationTokens).values({
       identifier: email,
       expires: expiresAt.toISOString(),
-      token: await bcrypt.hash(token, 10),
+      token: this.hashPassword(token),
     });
 
     return token;
@@ -130,6 +154,28 @@ export class AccountService {
     await this.db
       .delete(schema.verificationTokens)
       .where(eq(schema.verificationTokens.token, token));
+  }
+
+  private hashPassword(password: string): string {
+    console.log("Using scrypt password hashing");
+
+    const salt = crypto.randomBytes(16);
+    const hash = crypto.scryptSync(password, salt, 64);
+
+    return `${salt.toString("hex")}:${hash.toString("hex")}`;
+  }
+
+  private verifyPassword(password: string, hashedPassword: string): boolean {
+    console.log("Using scrypt password verification");
+
+    const [saltHex, hashHex] = hashedPassword.split(":");
+
+    const salt = Buffer.from(saltHex, "hex");
+    const storedHash = Buffer.from(hashHex, "hex");
+
+    const hash = crypto.scryptSync(password, salt, 64);
+
+    return crypto.timingSafeEqual(hash, storedHash);
   }
 
   /* PROVIDERS ACCOUNTS */

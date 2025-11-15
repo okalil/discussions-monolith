@@ -1,5 +1,4 @@
-import bcrypt from "bcryptjs";
-import { and, eq, getTableColumns } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import type { DatabaseClient } from "./integrations/db";
 import type { StorageClient } from "./integrations/storage";
@@ -16,30 +15,6 @@ export class UserService {
       .where(eq(schema.users.email, email))
       .limit(1);
     return users.at(0) ?? null;
-  }
-
-  async getUserByCredentials(email: string, password: string) {
-    const accounts = await this.db
-      .select({
-        password: schema.accounts.password,
-        user: getTableColumns(schema.users),
-      })
-      .from(schema.accounts)
-      .leftJoin(schema.users, eq(schema.users.id, schema.accounts.userId))
-      .where(
-        and(
-          eq(schema.accounts.type, "credential"),
-          eq(schema.users.email, email)
-        )
-      );
-    const account = accounts.at(0);
-
-    if (!account?.user || !account.password) return null;
-
-    const isValid = await bcrypt.compare(password, account.password);
-    if (!isValid) return null;
-
-    return account.user;
   }
 
   async updateUser(userId: number, name: string, image?: string) {

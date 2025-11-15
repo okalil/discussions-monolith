@@ -67,7 +67,7 @@ export async function loader(_: Route.LoaderArgs) {
 
 ### Form validation
 
-- Although the React Router's form API _does not require_ an external library, using `react-hook-form` enhances the user experience by providing **real-time validation** and **automatic focusing on invalid fields**.
+- Although the React Router's Form API _does not require_ an external library, using `react-hook-form` enhances the user experience by providing **real-time validation** and **automatic focusing on invalid fields**.
 - A utility called [`validator`](https://github.com/okalil/discussions-monolith/blob/main/app/web/validator.ts) is used to share validation logic between client and server. It encapsulates a `resolver` (for client-side validation) and a `tryValidate` method (for server-side validation).
 - The `handleSubmit` function is used to perform validation and apply focus. Once the data is validated, the submission is delegated back to React Router using `useSubmit`. This is important to keep **consistency** between document/fetch submissions.
 - Errors returned by the `action` are automatically synchronized with the form state, allowing `formState.errors` to be used as the **single source of truth** for form errors.
@@ -136,13 +136,8 @@ const createDiscussionValidator = validator(
 
 ### Fullstack Component Pattern
 
-- A "fullstack component" is a single component file that colocates UI, server-side logic and data handling for a specific feature or route.
+- A "fullstack component" is a single component file that colocates UI and server handling for a feature that is not tied to a specific UI route.
 - **These components always use `useFetcher` because they are implemented as React Router resource routes (not UI routes).** This allows them to be embedded in other UI and invoked programmatically, rather than being tied to navigation.
-- Typical structure includes:
-
-  - UI component (React function)
-  - Route loader and/or action (for data fetching and mutations)
-  - Validation schema (using the shared validator utility)
 
 - Data mutation example: `web/discussion/edit-comment.route.tsx`
 

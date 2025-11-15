@@ -3,7 +3,7 @@ import type {
   ListOptions,
   ListResult,
   FileKey,
-} from "@mjackson/file-storage";
+} from "@remix-run/file-storage";
 
 export type StorageClient = FileStorage;
 
