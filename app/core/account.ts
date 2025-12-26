@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import { and, eq, desc, sql, getTableColumns } from "drizzle-orm";
 import crypto from "node:crypto";
 
@@ -44,14 +45,14 @@ export class AccountService {
 
     if (!account?.user || !account.password) return null;
 
-    const isValid = this.verifyPassword(password, account.password);
+    const isValid = await this.verifyPassword(password, account.password);
     if (!isValid) return null;
 
     return account.user;
   }
 
   async createCredentialAccount(name: string, email: string, password: string) {
-    const hashedPassword = this.hashPassword(password);
+    const hashedPassword = await this.hashPassword(password);
 
     const [user] = await this.db
       .insert(schema.users)
@@ -89,12 +90,12 @@ export class AccountService {
       return false;
     }
 
-    const isValid = this.verifyPassword(token, verificationToken.token);
+    const isValid = await this.verifyPassword(token, verificationToken.token);
     if (!isValid) {
       return false;
     }
 
-    const hashedPassword = this.hashPassword(password);
+    const hashedPassword = await this.hashPassword(password);
 
     await this.updatePassword(verificationToken.identifier, hashedPassword);
     await this.deleteVerificationToken(verificationToken.token);
@@ -134,7 +135,7 @@ export class AccountService {
     await this.db.insert(schema.verificationTokens).values({
       identifier: email,
       expires: expiresAt.toISOString(),
-      token: this.hashPassword(token),
+      token: await this.hashPassword(token),
     });
 
     return token;
@@ -156,22 +157,19 @@ export class AccountService {
       .where(eq(schema.verificationTokens.token, token));
   }
 
-  private hashPassword(password: string): string {
-    const salt = crypto.randomBytes(16);
-    const hash = crypto.scryptSync(password, salt, 64);
-
-    return `${salt.toString("hex")}:${hash.toString("hex")}`;
+  private async hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 12);
   }
 
-  private verifyPassword(password: string, hashedPassword: string): boolean {
-    const [saltHex, hashHex] = hashedPassword.split(":");
-
-    const salt = Buffer.from(saltHex, "hex");
-    const storedHash = Buffer.from(hashHex, "hex");
-
-    const hash = crypto.scryptSync(password, salt, 64);
-
-    return crypto.timingSafeEqual(hash, storedHash);
+  private async verifyPassword(
+    password: string,
+    hashedPassword: string
+  ): Promise<boolean> {
+    try {
+      return await bcrypt.compare(password, hashedPassword);
+    } catch {
+      return false;
+    }
   }
 
   /* PROVIDERS ACCOUNTS */
