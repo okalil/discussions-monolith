@@ -3,6 +3,7 @@ import * as z from "zod";
 
 import type { Route } from "./+types/create-comment.route";
 
+import { m } from "../../paraglide/messages";
 import { auth } from "../auth";
 import { commentService } from "../bindings";
 import { bodyParser } from "../body-parser";
@@ -29,17 +30,17 @@ export function CreateComment({ discussionId }: CreateCommentProps) {
       }}
     >
       <input name="discussionId" value={discussionId} type="hidden" />
-      <Field label="Write">
+      <Field label={m.comment_write()}>
         <Textarea
           name="body"
-          placeholder="Write your comment here..."
+          placeholder={m.comment_placeholder()}
           rows={4}
           required
         />
       </Field>
       <div>
         <Button variant="primary" className="h-10 w-24 ml-auto">
-          Comment
+          {m.comment_button()}
         </Button>
       </div>
     </fetcher.Form>
@@ -62,7 +63,7 @@ export async function action({ request }: Route.ActionArgs) {
 
 const createCommentValidator = validator(
   z.object({
-    body: z.string().trim().min(1, "Comment body is required"),
+    body: z.string().trim().min(1, m.validation_comment_body_required()),
     discussionId: z.coerce.number(),
   })
 );

@@ -4,6 +4,7 @@ import * as z from "zod";
 
 import type { Route } from "./+types/forgot-password.route";
 
+import { m } from "../../paraglide/messages";
 import { accountService, userService } from "../bindings";
 import { bodyParser } from "../body-parser";
 import { session } from "../session";
@@ -23,23 +24,23 @@ export default function Component({ actionData }: Route.ComponentProps) {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-        <h2 className="text-2xl font-bold text-center">Forgot Password</h2>
+        <h2 className="text-2xl font-bold text-center">{m.forgot_password_title()}</h2>
         <Form
           method="POST"
           className="space-y-4"
           onSubmit={form.handleSubmit((_, e) => submit(e?.target))}
         >
-          <Field label="Email" error={errors.email?.message}>
+          <Field label={m.forgot_password_field_email()} error={errors.email?.message}>
             <Input {...form.register("email")} type="email" aria-required />
           </Field>
           <Button variant="primary" className="w-full h-12">
-            Submit
+            {m.forgot_password_submit()}
           </Button>
         </Form>
         <p className="text-center text-sm text-gray-600">
-          Remember your password?{" "}
+          {m.forgot_password_remember()}{" "}
           <Link to="/login" className="text-indigo-600 hover:text-indigo-500">
-            Login
+            {m.forgot_password_login()}
           </Link>
         </p>
       </div>
@@ -59,15 +60,12 @@ export async function action({ request }: Route.ActionArgs) {
     await accountService().forgetPassword(user.email);
   }
 
-  session().flash(
-    "success",
-    "If your email is in our system, you will receive instructions to reset your password"
-  );
+  session().flash("success", m.toast_forgot_password_success());
   throw redirect("/login");
 }
 
 const forgetPasswordValidator = validator(
   z.object({
-    email: z.email("Inform a valid email address"),
+    email: z.email(m.validation_email_invalid()),
   })
 );

@@ -3,6 +3,7 @@ import * as z from "zod";
 
 import type { Route } from "./+types/discussions.route";
 
+import { m } from "../../paraglide/messages";
 import { auth } from "../auth";
 import { categoryService, discussionService } from "../bindings";
 import { Button } from "../shared/button";
@@ -12,7 +13,9 @@ import { Pagination } from "../shared/pagination";
 import { validator } from "../validator";
 import { DiscussionRow } from "./discussion-row";
 
-export const meta: Route.MetaFunction = () => [{ title: "Top Discussions" }];
+export const meta: Route.MetaFunction = ({ loaderData }) => [
+  { title: m.discussions_title({ total: loaderData.total }) },
+];
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const user = auth().getUser();
@@ -50,13 +53,13 @@ export default function Component({
     <div className="px-3 py-6 max-w-5xl mx-auto">
       <div className="flex justify-between items-center gap-5 h-10 mb-4">
         <Form className="flex-1">
-          <Input type="search" name="q" placeholder="Search all discussions" />
+          <Input type="search" name="q" placeholder={m.discussions_search_placeholder()} />
         </Form>
 
         {!!user && (
           <Form action="/discussions/new">
             <Button variant="primary" className="h-full">
-              New Discussion
+              {m.discussions_new_discussion()}
             </Button>
           </Form>
         )}
@@ -64,7 +67,7 @@ export default function Component({
 
       <div className="grid gap-4 md:grid-cols-[256px_1fr]">
         <section className="px-2 row-start-2 md:row-auto">
-          <h2 className="font-semibold mb-4">Categories</h2>
+          <h2 className="font-semibold mb-4">{m.discussions_categories()}</h2>
           <nav>
             <NavLink
               to={href("/")}
@@ -76,7 +79,7 @@ export default function Component({
             >
               <Icon name="discussion" size={16} />
               <span className="text-sm group-[.active]:font-semibold ">
-                View all discussions
+                {m.discussions_view_all()}
               </span>
             </NavLink>
             {categories.map((it) => (
@@ -111,7 +114,9 @@ export default function Component({
                 </p>
               </>
             ) : (
-              <h2 className="font-semibold">Discussions ({total})</h2>
+              <h2 className="font-semibold">
+                {m.discussions_title({ total })}
+              </h2>
             )}
           </div>
 

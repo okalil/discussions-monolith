@@ -4,6 +4,7 @@ import * as z from "zod";
 
 import type { Route } from "./+types/new-discussion.route";
 
+import { m } from "../../paraglide/messages";
 import { auth } from "../auth";
 import { categoryService, discussionService } from "../bindings";
 import { bodyParser } from "../body-parser";
@@ -33,7 +34,7 @@ export default function Component({
 
   return (
     <main className="max-w-4xl mx-auto px-3 py-6">
-      <h1 className="text-xl font-semibold mb-4">Start a new discussion</h1>
+      <h1 className="text-xl font-semibold mb-4">{m.new_discussion_title()}</h1>
       <Form
         method="POST"
         className="space-y-3"
@@ -41,24 +42,24 @@ export default function Component({
       >
         {errors.root?.message && <ErrorMessage error={errors.root?.message} />}
 
-        <Field label="Title" error={errors.title?.message}>
+        <Field label={m.new_discussion_field_title()} error={errors.title?.message}>
           <Input
             {...form.register("title")}
-            placeholder="Title"
+            placeholder={m.new_discussion_field_title_placeholder()}
             aria-required
             defaultValue={actionData?.values?.title}
           />
         </Field>
-        <Field label="Body" error={errors.body?.message}>
+        <Field label={m.new_discussion_field_body()} error={errors.body?.message}>
           <Textarea
             {...form.register("body")}
-            placeholder="Body"
+            placeholder={m.new_discussion_field_body_placeholder()}
             aria-required
             rows={16}
             defaultValue={actionData?.values?.body}
           />
         </Field>
-        <Field label="Category" error={errors.categoryId?.message}>
+        <Field label={m.new_discussion_field_category()} error={errors.categoryId?.message}>
           <select {...form.register("categoryId")}>
             <button>
               {/* @ts-expect-error <selectedcontent> is experimental */}
@@ -76,7 +77,7 @@ export default function Component({
           </select>
         </Field>
         <Button className="ml-auto" variant="primary">
-          Start Discussion
+          {m.new_discussion_button_start()}
         </Button>
       </Form>
     </main>
@@ -100,8 +101,8 @@ export async function action({ request }: Route.ActionArgs) {
 
 const createDiscussionValidator = validator(
   z.object({
-    title: z.string().trim().min(1, "Title is required"),
-    body: z.string().trim().min(1, "Body is required"),
+    title: z.string().trim().min(1, m.validation_title_required()),
+    body: z.string().trim().min(1, m.validation_body_required()),
     categoryId: z.coerce.number(),
   })
 );

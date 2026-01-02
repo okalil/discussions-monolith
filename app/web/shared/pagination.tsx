@@ -1,5 +1,7 @@
 import React from "react";
 
+import { m } from "../../paraglide/messages";
+
 interface PaginationProps {
   page: number;
   onPageChange: (page: number) => void;
@@ -40,7 +42,7 @@ export const Pagination = ({
         disabled={page === 1}
         className="px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 border rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        &laquo; Prev
+        {m.pagination_prev()}
       </button>
 
       {pages.map((pageItem, index) => (
@@ -67,7 +69,7 @@ export const Pagination = ({
         disabled={page === totalPages}
         className="px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 border rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Next &raquo;
+        {m.pagination_next()}
       </button>
     </div>
   );

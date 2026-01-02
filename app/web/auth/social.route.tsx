@@ -3,6 +3,7 @@ import { createCookie, redirect } from "react-router";
 
 import type { Route } from "./+types/social.route";
 
+import { m } from "../../paraglide/messages";
 import { auth } from "../auth";
 import { accountService } from "../bindings";
 import { session } from "../session";
@@ -41,6 +42,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   );
   await auth().login(user.id);
 
-  session().flash("success", "Signed in successfully!");
+  session().flash("success", m.toast_signed_in_success());
   return redirect("/");
 }

@@ -4,6 +4,7 @@ import * as z from "zod";
 import type { CommentsDto } from "../../core/comment";
 import type { Route } from "./+types/edit-comment.route";
 
+import { m } from "../../paraglide/messages";
 import { auth } from "../auth";
 import { commentService } from "../bindings";
 import { bodyParser } from "../body-parser";
@@ -26,10 +27,10 @@ export function EditComment({ comment, onCancel }: EditCommentProps) {
       className="px-3 py-3 border border-gray-300 rounded-md"
     >
       <input type="hidden" name="id" value={comment.id} />
-      <Field label="Write">
+      <Field label={m.comment_write()}>
         <Textarea
           name="body"
-          placeholder="Write your comment here..."
+          placeholder={m.comment_placeholder()}
           rows={4}
           required
           defaultValue={comment.body}
@@ -43,10 +44,10 @@ export function EditComment({ comment, onCancel }: EditCommentProps) {
           type="button"
           onClick={onCancel}
         >
-          Cancel
+          {m.comment_cancel()}
         </Button>
         <Button variant="primary" className="h-10 w-48">
-          Update comment
+          {m.comment_update()}
         </Button>
       </div>
     </fetcher.Form>

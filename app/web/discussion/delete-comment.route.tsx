@@ -2,6 +2,7 @@ import { href, useFetcher } from "react-router";
 
 import type { Route } from "./+types/delete-comment.route";
 
+import { m } from "../../paraglide/messages";
 import { auth } from "../auth";
 import { commentService } from "../bindings";
 import { Button } from "../shared/button";
@@ -17,7 +18,7 @@ export function DeleteComment({ commentId }: DeleteCommentProps) {
       method="POST"
       action={href("/comments/:id/delete", { id: commentId.toString() })}
     >
-      <Button variant="danger">Delete Comment</Button>
+      <Button variant="danger">{m.comment_delete_button()}</Button>
     </fetcher.Form>
   );
 }

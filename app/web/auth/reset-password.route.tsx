@@ -11,6 +11,7 @@ import * as z from "zod";
 
 import type { Route } from "./+types/reset-password.route";
 
+import { m } from "../../paraglide/messages";
 import { accountService } from "../bindings";
 import { bodyParser } from "../body-parser";
 import { session } from "../session";
@@ -34,7 +35,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-        <h2 className="text-2xl font-bold text-center">Reset Password</h2>
+        <h2 className="text-2xl font-bold text-center">{m.reset_password_title()}</h2>
         <Form
           method="POST"
           className="space-y-4"
@@ -46,11 +47,11 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
           <input {...form.register("token")} value={token} type="hidden" />
 
-          <Field label="Email" error={errors.email?.message}>
+          <Field label={m.reset_password_field_email()} error={errors.email?.message}>
             <Input {...form.register("email")} type="email" aria-required />
           </Field>
 
-          <Field label="New Password" error={errors.password?.message}>
+          <Field label={m.reset_password_field_new_password()} error={errors.password?.message}>
             <Input
               {...form.register("password")}
               type="password"
@@ -59,7 +60,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
           </Field>
 
           <Field
-            label="Confirm Password"
+            label={m.reset_password_field_confirm_password()}
             error={errors.passwordConfirmation?.message}
           >
             <Input
@@ -70,13 +71,13 @@ export default function Component({ actionData }: Route.ComponentProps) {
           </Field>
 
           <Button variant="primary" className="w-full h-12">
-            Submit
+            {m.reset_password_submit()}
           </Button>
         </Form>
         <p className="text-center text-sm text-gray-600">
-          Remember your password?{" "}
+          {m.reset_password_remember()}{" "}
           <Link to="/login" className="text-indigo-600 hover:text-indigo-500">
-            Login
+            {m.reset_password_login()}
           </Link>
         </p>
       </div>
@@ -95,30 +96,27 @@ export async function action({ request }: Route.ActionArgs) {
     input.token
   );
   if (!reset)
-    return data({ errors: { root: { message: "Invalid credentials" } } }, 400);
+    return data({ errors: { root: { message: m.validation_invalid_credentials() } } }, 400);
 
-  session().flash(
-    "success",
-    "Password succesfully reset! Login to access your account."
-  );
+  session().flash("success", m.toast_reset_password_success());
   throw redirect("/login");
 }
 
 const resetPasswordValidator = validator(
   z
     .object({
-      email: z.email("Inform a valid email address"),
+      email: z.email(m.validation_email_invalid()),
       password: z
         .string()
-        .min(8, "Password must be at least 8 characters long")
-        .max(72, "Password can't be longer than 72 characters"),
+        .min(8, m.validation_password_min())
+        .max(72, m.validation_password_max()),
       passwordConfirmation: z
         .string()
-        .min(8, "Password confirmation must be at least 8 characters long"),
+        .min(8, m.validation_password_confirmation_min()),
       token: z.string(),
     })
     .refine((data) => data.password === data.passwordConfirmation, {
       path: ["passwordConfirmation"],
-      message: "Passwords do not match",
+      message: m.validation_passwords_no_match(),
     })
 );

@@ -3,6 +3,8 @@ import { href, Link, useSearchParams } from "react-router";
 
 import type { Route } from "./+types/discussion.route";
 
+import { m } from "../../paraglide/messages";
+import { getLocale } from "../../paraglide/runtime";
 import { auth } from "../auth";
 import { discussionService, commentService } from "../bindings";
 import { Avatar } from "../shared/avatar";
@@ -65,9 +67,11 @@ export default function Component({
                   <span className="text-gray-900 font-medium">
                     {discussion.author?.name}
                   </span>{" "}
-                  on{" "}
-                  {new Date(discussion.createdAt).toLocaleDateString("en", {
-                    dateStyle: "medium",
+                  {m.discussion_created_at({
+                    date: new Date(discussion.createdAt).toLocaleDateString(
+                      getLocale(),
+                      { dateStyle: "medium" }
+                    ),
                   })}
                 </p>
               </div>
@@ -83,19 +87,28 @@ export default function Component({
             <section className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-base font-medium">
-                  {discussion.commentsCount > 1
-                    ? `${discussion.commentsCount} comments`
-                    : discussion.commentsCount
-                    ? "1 comment"
-                    : "No comments"}
+                  {discussion.commentsCount
+                    ? m.discussion_comments({
+                      count: discussion.commentsCount,
+                    })
+                    : m.discussion_comments_empty()}
                 </h2>
-                <nav className="flex gap-2" aria-label="Sort comments">
-                  <CommentSort sort="oldest">Oldest</CommentSort>
-                  <CommentSort sort="newest">Newest</CommentSort>
-                  <CommentSort sort="top">Top</CommentSort>
+                <nav
+                  className="flex gap-2"
+                  aria-label={m.discussion_sort_aria()}
+                >
+                  <CommentSort sort="oldest">
+                    {m.discussion_sort_oldest()}
+                  </CommentSort>
+                  <CommentSort sort="newest">
+                    {m.discussion_sort_newest()}
+                  </CommentSort>
+                  <CommentSort sort="top">
+                    {m.discussion_sort_top()}
+                  </CommentSort>
                 </nav>
               </div>
-              <Suspense fallback={<div>Loading comments...</div>}>
+              <Suspense fallback={<div>{m.discussion_loading_comments()}</div>}>
                 <CommentsList
                   comments={comments}
                   authenticated={authenticated}
@@ -106,17 +119,19 @@ export default function Component({
 
             {authenticated ? (
               <section>
-                <h3 className="text-lg font-medium mb-4">Add a comment</h3>
+                <h3 className="text-lg font-medium mb-4">
+                  {m.discussion_add_comment()}
+                </h3>
                 <CreateComment discussionId={discussion.id} />
               </section>
             ) : (
               <div className="rounded-md border border-gray-300 px-3 py-3">
                 <Link to="/register" className="underline">
-                  Sign up
+                  {m.discussion_sign_up_to_comment()}
                 </Link>{" "}
-                now to comment on this discussion. Already have an account?{" "}
+                {m.discussion_sign_up_to_comment_text()}{" "}
                 <Link to="/login" className="underline">
-                  Sign in
+                  {m.discussion_sign_in()}
                 </Link>
               </div>
             )}
@@ -126,7 +141,7 @@ export default function Component({
             <div className="sticky top-6">
               <div className="pb-4 mb-4 border-b border-gray-200">
                 <h3 className="text-xs font-semibold text-gray-600 mb-2">
-                  Category
+                  {m.discussion_category_label()}
                 </h3>
                 <Link
                   to={href("/categories/:category", {
@@ -145,11 +160,13 @@ export default function Component({
 
               <div className="pb-4 mb-4 border-b border-gray-200">
                 <h3 className="text-xs font-semibold text-gray-600 mb-2">
-                  {discussion.participantsCount > 1
-                    ? `${discussion.participantsCount} participants`
-                    : "1 participant"}
+                  {m.discussion_participants({
+                    count: discussion.participantsCount,
+                  })}
                 </h3>
-                <Suspense fallback={<div>Loading participants...</div>}>
+                <Suspense
+                  fallback={<div>{m.discussion_loading_participants()}</div>}
+                >
                   <Participants participants={participants} />
                 </Suspense>
               </div>
@@ -173,11 +190,10 @@ function CommentSort({ sort, children }: CommentSortProps) {
   return (
     <Link
       to={`?sort=${sort}`}
-      className={`px-3 py-1 text-sm rounded-md ${
-        currentSort === sort
+      className={`px-3 py-1 text-sm rounded-md ${currentSort === sort
           ? "bg-gray-100 text-gray-900"
           : "text-gray-600 hover:bg-gray-50"
-      }`}
+        }`}
       preventScrollReset
     >
       {children}

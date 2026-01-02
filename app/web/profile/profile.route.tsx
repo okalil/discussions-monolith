@@ -5,6 +5,7 @@ import * as z from "zod";
 
 import type { Route } from "./+types/profile.route";
 
+import { m } from "../../paraglide/messages";
 import { auth } from "../auth";
 import { userService } from "../bindings";
 import { bodyParser } from "../body-parser";
@@ -17,7 +18,7 @@ import { Input } from "../shared/input";
 import { validator } from "../validator";
 
 export const meta: Route.MetaFunction = () => [
-  { title: "Discussions | Profile" },
+  { title: m.profile_meta_title() },
 ];
 
 export async function loader() {
@@ -44,7 +45,7 @@ export default function Component({
 
   return (
     <main className="max-w-lg mx-auto px-3 py-6">
-      <h1 className="text-xl font-semibold mb-2">Profile</h1>
+      <h1 className="text-xl font-semibold mb-2">{m.profile_title()}</h1>
       <Form
         replace
         method="POST"
@@ -75,7 +76,7 @@ export default function Component({
             </span>
           )}
         </label>
-        <Field label="Name" error={errors.name?.message}>
+        <Field label={m.profile_field_name()} error={errors.name?.message}>
           <Input
             {...form.register("name")}
             defaultValue={user?.name ?? ""}
@@ -85,7 +86,7 @@ export default function Component({
         </Field>
 
         <Button variant="primary" className="h-12 mt-5 w-40 ml-auto">
-          Save
+          {m.profile_save()}
         </Button>
       </Form>
     </main>
@@ -101,16 +102,16 @@ export async function action({ request }: Route.ActionArgs) {
   const fileKey = await userService().uploadUserImage(user.id, input.image);
   await userService().updateUser(user.id, input.name, fileKey);
 
-  session().flash("success", "Successfully updated!");
+  session().flash("success", m.toast_profile_updated());
   throw redirect(".");
 }
 
 const updateUserValidator = validator(
   z.object({
-    name: z.string().min(1, "Name is required"),
+    name: z.string().min(1, m.validation_name_required()),
     image: z
-      .file("Image must be a file")
-      .max(5 * 1024 * 1024, "Image must be less than 5MB")
+      .file(m.validation_image_file())
+      .max(5 * 1024 * 1024, m.validation_image_size())
       .transform((file) => {
         if (!file.size || !file.name) return undefined; // Ignore empty files
         return file;

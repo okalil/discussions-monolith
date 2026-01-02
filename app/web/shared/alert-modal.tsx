@@ -1,5 +1,6 @@
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 
+import { m } from "../../paraglide/messages";
 import { Button } from "./button";
 import { cn } from "./utils/cn";
 
@@ -44,7 +45,7 @@ export const AlertModal = ({
 
         <div className="flex justify-end gap-3">
           <AlertDialog.Cancel asChild>
-            <Button variant="default">Cancelar</Button>
+            <Button variant="default">{m.alert_modal_cancel()}</Button>
           </AlertDialog.Cancel>
 
           {action}

@@ -11,8 +11,10 @@ import {
 
 import type { Route } from "./+types/root";
 
+import { getLocale } from "./paraglide/runtime";
 import stylesheet from "./root.css?url";
 import { authMiddleware } from "./web/auth";
+import { localeMiddleware } from "./web/locale";
 import { session, sessionMiddleware } from "./web/session";
 import { NavigationProgress } from "./web/shared/navigation-progress";
 import { Toaster } from "./web/shared/toaster";
@@ -20,6 +22,7 @@ import { Toaster } from "./web/shared/toaster";
 import "@fontsource-variable/inter";
 
 export const middleware: Route.MiddlewareFunction[] = [
+  localeMiddleware,
   sessionMiddleware,
   authMiddleware,
 ];
@@ -83,7 +86,7 @@ export function shouldRevalidate(args: ShouldRevalidateFunctionArgs) {
 
 function Document(props: React.PropsWithChildren) {
   return (
-    <html lang="en" className="h-full">
+    <html lang={getLocale()} className="h-full">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />

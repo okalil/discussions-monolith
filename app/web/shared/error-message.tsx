@@ -1,3 +1,4 @@
+import { m } from "../../paraglide/messages";
 import { cn } from "./utils/cn";
 
 interface Props extends React.ComponentProps<"p"> {
@@ -15,7 +16,7 @@ export function ErrorMessage({ error, ...props }: Props) {
       )}
       role="alert"
     >
-      <span className="font-medium">Error:</span> {errorMessage}
+      <span className="font-medium">{m.error_label()}:</span> {errorMessage}
     </div>
   );
 }

@@ -2,6 +2,8 @@ import { use, useState, useEffect } from "react";
 
 import type { CommentsDto } from "../../core/comment";
 
+import { m } from "../../paraglide/messages";
+import { getLocale } from "../../paraglide/runtime";
 import { AlertModal } from "../shared/alert-modal";
 import { Avatar } from "../shared/avatar";
 import { DropdownMenu } from "../shared/dropdown-menu";
@@ -75,9 +77,10 @@ function CommentRow({ comment, authenticated }: CommentRowProps) {
             <span className="text-gray-900 font-medium">
               {comment.author?.name}
             </span>{" "}
-            on{" "}
-            {new Date(comment.createdAt).toLocaleDateString("en", {
-              dateStyle: "medium",
+            {m.discussion_created_at({
+              date: new Date(comment.createdAt).toLocaleDateString(getLocale(), {
+                dateStyle: "medium",
+              }),
             })}
           </p>
 
@@ -87,7 +90,7 @@ function CommentRow({ comment, authenticated }: CommentRowProps) {
                 "px-2 py-px rounded-xl border border-gray-300 text-xs ml-2"
               )}
             >
-              Author
+              {m.comment_author()}
             </span>
           )}
         </div>
@@ -97,8 +100,8 @@ function CommentRow({ comment, authenticated }: CommentRowProps) {
               trigger={
                 <button
                   type="button"
-                  aria-label="Comment options"
-                  title="Comment options"
+                  aria-label={m.comment_options_aria()}
+                  title={m.comment_options_aria()}
                   className="grid place-items-center p-2 rounded-md hover:bg-gray-100"
                 >
                   <Icon name="dots" size={20} />
@@ -115,24 +118,24 @@ function CommentRow({ comment, authenticated }: CommentRowProps) {
                     );
                   }}
                 >
-                  Copy Link
+                  {m.comment_copy_link()}
                 </DropdownMenu.Item>
                 <DropdownMenu.Item onClick={() => setEditing(true)}>
-                  Edit
+                  {m.comment_edit()}
                 </DropdownMenu.Item>
                 <DropdownMenu.Item
                   onClick={() => setDeleting(true)}
                   data-variant="danger"
                   className="data-[variant=danger]:text-red-500 data-[variant=danger]:hover:bg-red-50"
                 >
-                  Delete
+                  {m.comment_delete()}
                 </DropdownMenu.Item>
               </div>
             </DropdownMenu>
 
             <AlertModal
-              title="Delete comment"
-              description="Are you sure you want to delete this comment?"
+              title={m.comment_delete_title()}
+              description={m.comment_delete_description()}
               open={deleting}
               onOpenChange={setDeleting}
               action={<DeleteComment commentId={comment.id} />}

@@ -2,6 +2,8 @@ import { Form, Link } from "react-router";
 
 import type { DiscussionsDto } from "../../core/discussion";
 
+import { m } from "../../paraglide/messages";
+import { getLocale } from "../../paraglide/runtime";
 import { VoteDiscussion } from "../discussion/vote-discussion.route";
 import { Avatar } from "../shared/avatar";
 import { Icon } from "../shared/icon";
@@ -37,8 +39,8 @@ export function DiscussionRow({ discussion, authenticated }: DiscussionProps) {
           </Link>
         </DiscussionHoverCard>
         <p className="text-sm text-gray-600">
-          {discussion.author?.name} started on{" "}
-          {new Date(discussion.createdAt).toLocaleDateString("en", {
+          {discussion.author?.name} {m.discussion_started_on()}{" "}
+          {new Date(discussion.createdAt).toLocaleDateString(getLocale(), {
             dateStyle: "medium",
           })}
         </p>
@@ -56,7 +58,7 @@ export function DiscussionRow({ discussion, authenticated }: DiscussionProps) {
             "flex items-center gap-2 rounded-xl",
             "px-2 py-1 text-gray-600 hover:text-blue-600"
           )}
-          aria-label={`${discussion.commentsCount} comentários`}
+          aria-label={m.discussion_comments({ count: discussion.commentsCount })}
         >
           <Icon name="chat" size={16} />
           {discussion.commentsCount}

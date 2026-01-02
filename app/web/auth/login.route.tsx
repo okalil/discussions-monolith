@@ -12,6 +12,7 @@ import * as z from "zod";
 
 import type { Route } from "./+types/login.route";
 
+import { m } from "../../paraglide/messages";
 import { auth } from "../auth";
 import { accountService, env } from "../bindings";
 import { bodyParser } from "../body-parser";
@@ -23,7 +24,7 @@ import { Icon } from "../shared/icon";
 import { Input } from "../shared/input";
 import { validator } from "../validator";
 
-export const meta: Route.MetaFunction = () => [{ title: "Login" }];
+export const meta: Route.MetaFunction = () => [{ title: m.login_title() }];
 
 export default function Component({ actionData }: Route.ComponentProps) {
   const submit = useSubmit();
@@ -39,7 +40,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-        <h2 className="text-2xl font-bold text-center">Login</h2>
+        <h2 className="text-2xl font-bold text-center">{m.login_title()}</h2>
         <div>
           <form
             method="POST"
@@ -47,14 +48,14 @@ export default function Component({ actionData }: Route.ComponentProps) {
           >
             <Button variant="primary" className="gap-2 h-12 w-full">
               <Icon name="github" size={20} />
-              Continue with Github
+              {m.login_continue_github()}
             </Button>
           </form>
 
           <div className="relative my-6">
             <hr />
             <span className="px-4 bg-white text-gray-700 text-sm absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
-              or
+              {m.login_or()}
             </span>
           </div>
 
@@ -69,7 +70,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
 
             {redirectTo && <input name="to" value={redirectTo} type="hidden" />}
 
-            <Field label="Email" error={errors.email?.message}>
+            <Field label={m.login_field_email()} error={errors.email?.message}>
               <Input
                 {...form.register("email")}
                 defaultValue={actionData?.email}
@@ -78,7 +79,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
               />
             </Field>
 
-            <Field label="Password" error={errors.password?.message}>
+            <Field label={m.login_field_password()} error={errors.password?.message}>
               <Input
                 {...form.register("password")}
                 type="password"
@@ -98,7 +99,7 @@ export default function Component({ actionData }: Route.ComponentProps) {
                   htmlFor="remember"
                   className="text-sm text-gray-600 cursor-pointer"
                 >
-                  Remember me
+                  {m.login_remember_me()}
                 </label>
               </div>
 
@@ -106,20 +107,20 @@ export default function Component({ actionData }: Route.ComponentProps) {
                 to="/forgot-password"
                 className="text-sm text-indigo-600 hover:text-indigo-500 hover:underline"
               >
-                Forgot Password?
+                {m.login_forgot_password()}
               </Link>
             </div>
 
             <Button variant="primary" className="h-12 w-full">
-              Login
+              {m.login_button()}
             </Button>
             <p className="text-center text-sm text-gray-600">
-              Don't have an account?{" "}
+              {m.login_no_account()}{" "}
               <Link
                 to="/register"
                 className="text-indigo-600 hover:text-indigo-500 hover:underline"
               >
-                Register now
+                {m.login_register_now()}
               </Link>
             </p>
           </Form>
@@ -143,7 +144,7 @@ export async function action({ request }: Route.ActionArgs) {
   if (!user) {
     return data(
       {
-        errors: { root: { message: "Invalid email or password" } },
+        errors: { root: { message: m.validation_login_invalid() } },
         email: body.email,
       },
       400
@@ -152,14 +153,14 @@ export async function action({ request }: Route.ActionArgs) {
 
   await auth().login(user.id, input.remember);
 
-  session().flash("success", "Signed in successfully!");
+  session().flash("success", m.toast_signed_in_success());
   throw redirect(safeUrl(input.to) || "/");
 }
 
 const loginValidator = validator(
   z.object({
-    email: z.email("Inform a valid email address"),
-    password: z.string().min(1, "Password is required"),
+    email: z.email(m.validation_email_invalid()),
+    password: z.string().min(1, m.validation_password_required()),
     remember: z.stringbool().optional(),
     to: z.string().optional(),
   })
