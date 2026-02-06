@@ -1,12 +1,19 @@
+import type { MiddlewareFunction } from "react-router";
+
+import { env as cloudflareEnv } from "cloudflare:workers";
 import { AsyncLocalStorage } from "node:async_hooks";
 
-import type { AccountService } from "../core/account";
-import type { CategoryService } from "../core/category";
-import type { CommentService } from "../core/comment";
-import type { DiscussionService } from "../core/discussion";
 import type { StorageClient } from "../core/integrations/storage";
-import type { SessionService } from "../core/session";
-import type { UserService } from "../core/user";
+
+import { AccountService } from "../core/account";
+import { CategoryService } from "../core/category";
+import { CommentService } from "../core/comment";
+import { DiscussionService } from "../core/discussion";
+import { createDatabaseClient } from "../core/integrations/db";
+import { createEmailClient } from "../core/integrations/email";
+import { createStorageClient } from "../core/integrations/storage";
+import { SessionService } from "../core/session";
+import { UserService } from "../core/user";
 
 interface BindingsContext {
   env: Env;
@@ -21,9 +28,39 @@ interface BindingsContext {
 
 const als = new AsyncLocalStorage<BindingsContext>();
 
-export function provide<T>(context: BindingsContext, callback: () => T) {
-  return als.run(context, callback);
-}
+export const bindingsMiddleware: MiddlewareFunction<Response> = async (
+  _,
+  next,
+) => {
+  const env = cloudflareEnv;
+
+  // Infra
+  const db = createDatabaseClient(env.DB);
+  const storage = createStorageClient(env.R2);
+  const mailer = createEmailClient(env.RESEND_API_KEY);
+
+  // Domain
+  const accountService = new AccountService(db, mailer, env);
+  const categoryService = new CategoryService(db);
+  const commentService = new CommentService(db);
+  const discussionService = new DiscussionService(db);
+  const sessionService = new SessionService(db);
+  const userService = new UserService(db, storage);
+
+  return await als.run(
+    {
+      env,
+      storage,
+      accountService,
+      categoryService,
+      commentService,
+      discussionService,
+      sessionService,
+      userService,
+    },
+    next,
+  );
+};
 
 function bindings() {
   const store = als.getStore();
