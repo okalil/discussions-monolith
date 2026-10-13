@@ -25,8 +25,7 @@ export async function action({ params }: Route.ActionArgs) {
   });
 }
 
-export async function loader({ request, params }: Route.LoaderArgs) {
-  const url = new URL(request.url);
+export async function loader({ request, url, params }: Route.LoaderArgs) {
   const code = url.searchParams.get("code");
   if (!code) throw new Response("Invalid Code", { status: 400 });
 

@@ -6,8 +6,6 @@ export default {
     mode: "initial",
   },
   future: {
-    v8_middleware: true,
-    v8_viteEnvironmentApi: true,
     unstable_optimizeDeps: true,
   },
 } satisfies Config;

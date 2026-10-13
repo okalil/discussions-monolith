@@ -14,10 +14,10 @@ import { DiscussionRow } from "./discussion-row";
 
 export const meta: Route.MetaFunction = () => [{ title: "Top Discussions" }];
 
-export async function loader({ request, params }: Route.LoaderArgs) {
+export async function loader({ url, params }: Route.LoaderArgs) {
   const user = auth().getUser();
   const { q, page, limit } = await getDiscussionsValidator.validate(
-    Object.fromEntries(new URL(request.url).searchParams)
+    Object.fromEntries(url.searchParams)
   );
 
   const categories = await categoryService().getCategories();

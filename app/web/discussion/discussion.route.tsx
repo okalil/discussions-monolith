@@ -11,9 +11,9 @@ import { CreateComment } from "./create-comment.route";
 import { Participants } from "./participants";
 import { VoteDiscussion } from "./vote-discussion.route";
 
-export async function loader({ request, params }: Route.LoaderArgs) {
+export async function loader({ url, params }: Route.LoaderArgs) {
   const user = auth().getUser();
-  const sort = new URL(request.url).searchParams.get("sort")?.toString();
+  const sort = url.searchParams.get("sort")?.toString();
 
   const comments = commentService().getComments(+params.id, user?.id, sort);
   const participants = discussionService().getParticipants(+params.id);

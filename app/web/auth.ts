@@ -11,7 +11,7 @@ import { session } from "./session";
 const als = new AsyncLocalStorage<Auth>();
 
 export const authMiddleware: MiddlewareFunction<Response> = async (
-  { request },
+  { request, url },
   next
 ) => {
   const cookie = createCookie("__auth", {
@@ -38,9 +38,8 @@ export const authMiddleware: MiddlewareFunction<Response> = async (
       if (!user) {
         session().flash("error", "Hold on! You need to log in first");
 
-        const url = new URL(request.url);
         const searchParams = new URLSearchParams([
-          ["to", url.href.replace(url.origin, "")],
+          ["to", `${url.pathname}${url.search}`],
         ]);
         throw redirect(`/login?${searchParams}`);
       }
